@@ -1,4 +1,5 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import GlobalStyles from "./styles/GlobalStyles";
 import Header from "./components/Header";
 import RegistrationPage from "./pages/Registration";
@@ -11,6 +12,8 @@ import ControlProgressPage from "./pages/ControlProgress";
 import ClassSchedulePage from "./pages/ClassSchedule";
 import DoctorProfilePage from "./pages/DoctorProfile";
 import NotFoundPage from "./pages/NotFound";
+
+const queryClient = new QueryClient();
 
 const router = createBrowserRouter([
   {
@@ -63,9 +66,9 @@ const router = createBrowserRouter([
 
 export default function App() {
   return (
-    <>
+    <QueryClientProvider client={queryClient}>
       <GlobalStyles />
       <RouterProvider router={router} />
-    </>
+    </QueryClientProvider>
   );
 }
