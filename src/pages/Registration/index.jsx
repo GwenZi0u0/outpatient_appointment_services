@@ -1,13 +1,21 @@
 import styled from "styled-components";
 import { useQuery } from "@tanstack/react-query";
 import { fetchDepartmentsData } from "../../api";
-import { Link } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 
 export default function Registration() {
+  const { setValue } = useForm();
+  const navigate = useNavigate();
   const { data, isLoading, error } = useQuery({
     queryKey: ["departments"],
     queryFn: fetchDepartmentsData,
   });
+
+  const handleCardClick = (department) => {
+    setValue("department", department);
+    navigate("/appointment", { state: { department } });
+  };
 
   if (isLoading) return <div>載入中...</div>;
   if (error) return <div>發生錯誤: {error.message}</div>;
@@ -34,7 +42,10 @@ export default function Registration() {
         <SelectTitle>掛號、看診進度請選擇以下系別</SelectTitle>
         <SelectCards>
           {data.map((department) => (
-            <SelectCard key={department.id} to="appointment">
+            <SelectCard
+              key={department.id}
+              onClick={() => handleCardClick(department)}
+            >
               <SelectCardImage />
               <ContentContainer>
                 <SelectCardTitle>{department.department}</SelectCardTitle>
@@ -152,7 +163,7 @@ const SelectCards = styled.div`
   gap: 48px;
 `;
 
-const SelectCard = styled(Link)`
+const SelectCard = styled.button`
   display: flex;
   border-radius: 10px;
   background-color: #fff;
@@ -161,12 +172,14 @@ const SelectCard = styled(Link)`
   margin: 74.5px auto;
   border: 0.5px solid #d9d9d9;
   text-decoration: none;
+  cursor: pointer;
 `;
 
 const ContentContainer = styled.div`
   flex: 2;
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
 `;
 
 const SelectCardTitle = styled.span`
@@ -184,6 +197,7 @@ const SelectCardImage = styled.img`
 `;
 
 const SelectContent = styled.span`
+  text-align: left;
   font-size: 16px;
   color: #757575;
   line-height: 1.5;
