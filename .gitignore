@@ -27,7 +27,6 @@ vite.config.js
 .env.production.local
 
 # Build outputs
-dist
 dist-ssr
 *.local
 node_modules
