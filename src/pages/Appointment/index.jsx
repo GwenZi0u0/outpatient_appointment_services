@@ -185,7 +185,7 @@ const Container = styled.div`
   font-family: Arial, sans-serif;
   max-width: 800px;
   margin: 0 auto;
-  padding-top: 80px;
+  padding-top: 100px;
 `;
 
 const Header = styled.div`
@@ -232,4 +232,6 @@ const ProcessStep = styled.div`
 const ServiceList = styled.form`
   margin-top: 20px;
   border: 5px solid #d2cdcd;
+  height: 800px;
+  overflow-y: auto;
 `;

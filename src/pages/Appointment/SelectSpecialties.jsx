@@ -27,6 +27,7 @@ export default function SelectSpecialties({
 }
 
 const ServiceItem = styled.label`
+  position: relative;
   display: flex;
   align-items: center;
   padding: 15px;
