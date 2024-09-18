@@ -33,7 +33,7 @@ export default function Header() {
 
   return (
     <>
-      <Container isGradient={isGradient}>
+      <Container $isGradient={isGradient}>
         <LogoLink to="/">
           <LogoIcon src={Logo} alt="Logo" />
         </LogoLink>
@@ -75,7 +75,7 @@ const Container = styled.div`
       #1f7f9a 100%
     );
     transition: opacity 0.3s ease;
-    opacity: ${(props) => (props.isGradient ? 1 : 0)};
+    opacity: ${(props) => (props.$isGradient ? 1 : 0)};
     z-index: -1;
   }
 `;
