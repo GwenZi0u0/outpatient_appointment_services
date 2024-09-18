@@ -32,11 +32,11 @@ export default function Header() {
   return (
     <>
       <Container $isGradient={isGradient}>
-        <LogoLink to="/">
+        <LogoLink href="/">
           <LogoIcon src={Logo} alt="Logo" />
         </LogoLink>
         <Menu>
-          <SelectLink>網路掛號</SelectLink>
+          <SelectLink to="/">網路掛號</SelectLink>
           <SelectLink to="/cancel-registration">查詢取消掛號</SelectLink>
           {/* <SelectLink to="/">掛號需知</SelectLink> */}
           <SelectLink to="/progress">看診進度</SelectLink>
@@ -78,7 +78,7 @@ const Container = styled.div`
   }
 `;
 
-const LogoLink = styled(Link)`
+const LogoLink = styled.a`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -100,10 +100,11 @@ const Menu = styled.div`
 
 const SelectLink = styled(Link)`
   text-decoration: none;
-  font-weight: bold;
+  font-weight: 500;
+  letter-spacing: 6px;
   font-size: 20px;
   letter-spacing: 30%;
-  color: #000000;
+  color: #ffffff;
   background-color: transparent;
   border: none;
 `;
