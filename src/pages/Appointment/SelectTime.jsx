@@ -109,9 +109,8 @@ export default function SelectTime({
                     <TableData
                       key={index}
                       as={index >= 5 ? WeekendCell : undefined}
-                      onClick={() => onTimeClick(date, time)}
-                      {...register("date", "time")}
                       defaultValue={date}
+                      {...register("date")}
                     >
                       {schedule?.find(
                         (schedule) =>
@@ -124,6 +123,8 @@ export default function SelectTime({
                           type="radio"
                           name="doctor"
                           defaultValue={time}
+                          onClick={() => onTimeClick(date, time)}
+                          {...register("time")}
                         />
                       ) : null}
                     </TableData>

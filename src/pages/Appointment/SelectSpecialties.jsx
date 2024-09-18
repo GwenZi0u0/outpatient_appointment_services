@@ -13,7 +13,11 @@ export default function SelectSpecialties({
           onClick={() => onClickSpecialty(specialty)}
           {...register("specialty")}
         >
-          <CheckInput type="radio" name="specialty" defaultValue={specialty.id} />
+          <CheckInput
+            type="radio"
+            name="specialty"
+            defaultValue={specialty.id || ""}
+          />
           <CheckIcon />
           <ServiceText>{specialty.specialty}</ServiceText>
         </ServiceItem>

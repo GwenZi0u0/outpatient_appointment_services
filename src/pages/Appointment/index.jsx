@@ -8,6 +8,9 @@ import SelectSpecialties from "./SelectSpecialties";
 import SelectDoctors from "./SelectDoctors";
 import SelectTime from "./SelectTime";
 import RegistrationInformation from "./RegistrationInformation";
+import RegistrationCompleted from "./RegistrationCompleted";
+import { collection, addDoc, Timestamp } from "firebase/firestore";
+import { fireDb } from "../../firebase";
 
 export default function Appointment() {
   const navigator = useNavigate();
@@ -18,7 +21,7 @@ export default function Appointment() {
     queryFn: fetchScheduleData,
   });
 
-  const { register, handleSubmit, setValue, watch } = useForm({
+  const { register, handleSubmit, setValue, watch, getValues } = useForm({
     defaultValues: {
       department: department,
       specialty: "",
@@ -31,6 +34,9 @@ export default function Appointment() {
       phone: "",
     },
   });
+
+  console.log(getValues());
+
   const [step, setStep] = useState(1);
 
   const handleReturnClick = () => {
@@ -57,15 +63,49 @@ export default function Appointment() {
     setStep(4);
   };
 
-  const handleRegistrationClick = (idNumber, birthday) => {
-    setValue("idNumber", idNumber);
-    setValue("birthday", birthday);
-    setStep(5);
+  const birthdayStamp = () => {
+    const date = new Date(watch("birthday"));
+    const firebaseTimestamp = Timestamp.fromDate(date);
+    return firebaseTimestamp;
   };
 
-  const onSubmit = (data) => {
-    console.log("提交到 Firebase 的資料:", data);
-    setStep(5);
+  const dateStamp = () => {
+    const [monthDay] = watch("date").split(" ");
+    const [month, day] = monthDay.split("/").map(Number);
+    const date = new Date(2024, month - 1, day);
+    const firebaseTimestamp = Timestamp.fromDate(date);
+    return firebaseTimestamp;
+  };
+
+  const onSubmit = async (data) => {
+    setValue("idNumber", data.idNumber);
+    try {
+      console.log("Starting onSubmit");
+      const docRef = await addDoc(collection(fireDb, "registrations"), {
+        OPD_date: dateStamp(),
+        appointment_timeslot: data.time,
+        birth_date: birthdayStamp(),
+        division: {
+          department_id: data.department.id,
+          specialty_id: data.specialty.id,
+        },
+        doctor: data.doctor.id,
+        name: data.name,
+        patient_contact: data.phone,
+        personal_id_number: data.idNumber,
+        registration_number: "0000000000",
+        status: "confirmed",
+      });
+
+      console.log("Document written with ID: ", docRef.id);
+      setStep(5);
+    } catch (e) {
+      console.error("Error adding document: ", e);
+    }
+  };
+
+  const handleCompleted = () => {
+    navigator("/");
   };
 
   return (
@@ -116,15 +156,26 @@ export default function Appointment() {
             date={watch("date")}
             time={watch("time")}
             schedule={data}
-            onRegistrationClick={(idNumber, birthday) =>
-              handleRegistrationClick(idNumber, birthday)
-            }
             onResetClick={() => setStep(1)}
-            handleSubmit={() => onSubmit()}
+            onSubmit={(idNumber, birthday, name, phone) =>
+              onSubmit({ idNumber, birthday, name, phone })
+            }
           />
         )}
-        {step === 5 && <div>掛號資訊確認</div>}
-        {step === 6 && <div>掛號完成</div>}
+        {step === 5 && (
+          <RegistrationCompleted
+            department={watch("department")}
+            specialty={watch("specialty")}
+            doctor={watch("doctor")}
+            date={watch("date")}
+            time={watch("time")}
+            schedule={data}
+            idNumber={watch("idNumber")}
+            birthday={watch("birthday")}
+            name={watch("name")}
+            onCompletedClick={() => handleCompleted()}
+          />
+        )}
       </ServiceList>
     </Container>
   );

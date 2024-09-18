@@ -8,10 +8,11 @@ export default function RegistrationInformation({
   date,
   time,
   schedule,
-  onRegistrationClick,
+  // onRegistrationClick,
   defaultIdNumber,
   defaultBirthday,
   onResetClick,
+  onSubmit,
 }) {
   const timeSlots = {
     morning: "上午",
@@ -33,7 +34,7 @@ export default function RegistrationInformation({
   };
 
   return (
-    <FormContainer>
+    <FormContainer onSubmit={() => onSubmit(idNumber, birthday, name, phone)}>
       <h2>您欲預約的掛號資料為</h2>
       <Table>
         <thead>
@@ -50,7 +51,7 @@ export default function RegistrationInformation({
           <tr>
             <Td>{date || "undefined"}</Td>
             <Td>{timeSlots[time] || "undefined"}</Td>
-            <Td>YOI HOSPITAL</Td>
+            <Td>YOI Hospital</Td>
             <Td>{specialty.specialty || "undefined"}</Td>
             <Td>{schedule[0].room || "undefined"}</Td>
             <Td>{doctor?.physician_name || "undefined"}</Td>
@@ -114,7 +115,9 @@ export default function RegistrationInformation({
         <Button
           type="submit"
           $btnColor={true}
-          onClick={() => onRegistrationClick(idNumber, birthday, name, phone)}
+          // onClick={(e) =>
+          //   onRegistrationClick(e, idNumber, birthday, name, phone)
+          // }
         >
           確認掛號資訊
         </Button>
