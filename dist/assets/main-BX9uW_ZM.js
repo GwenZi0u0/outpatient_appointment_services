@@ -3591,7 +3591,7 @@ This typically indicates that your device does not have a healthy Internet conne
   font-size: 24px;
   font-weight: 500;
   flex-grow: 1;
-`;function a5({register:t,department:e,specialty:n,onDoctorClick:r}){const{data:i}=Jd({queryKey:["doctors"],queryFn:pU}),s=i.some(o=>o.division.division_id===e.id&&o.division.specialty_id===n.id);return V.jsx(V.Fragment,{children:s?i==null?void 0:i.map((o,a)=>o.division.division_id===e.id&&o.division.specialty_id===n.id?V.jsxs(u5,{$borderBottom:a!==i.length-1,onClick:()=>r(o),...t("doctor"),children:[V.jsx(f5,{type:"radio",name:"doctor",defaultValue:o.id}),V.jsx(p5,{src:BA}),V.jsx(m5,{src:o.image}),V.jsxs(c5,{children:[V.jsxs(h5,{children:[o.physician_name," 醫師"]}),V.jsx(d5,{to:"/",children:"醫師簡介"})]})]},o.id||a):null):V.jsx(l5,{children:"暫無安排醫師"})})}const l5=ne.div`
+`;function a5({register:t,department:e,specialty:n,onDoctorClick:r}){const{data:i}=Jd({queryKey:["doctors"],queryFn:pU}),s=i==null?void 0:i.some(o=>o.division.division_id===e.id&&o.division.specialty_id===n.id);return V.jsx(V.Fragment,{children:s?i==null?void 0:i.map((o,a)=>o.division.division_id===e.id&&o.division.specialty_id===n.id?V.jsxs(u5,{$borderBottom:a!==i.length-1,onClick:()=>r(o),...t("doctor"),children:[V.jsx(f5,{type:"radio",name:"doctor",defaultValue:o.id}),V.jsx(p5,{src:BA}),V.jsx(m5,{src:o.image}),V.jsxs(c5,{children:[V.jsxs(h5,{children:[o.physician_name," 醫師"]}),V.jsx(d5,{to:"/",children:"醫師簡介"})]})]},o.id||a):null):V.jsx(l5,{children:"暫無安排醫師"})})}const l5=ne.div`
   font-size: 28px;
   font-weight: 500;
   padding: 30px 65px;
