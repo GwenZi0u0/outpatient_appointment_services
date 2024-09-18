@@ -7,10 +7,29 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+### Firebase ###
+# Dependency directories
 node_modules
-dist
+**/.firebaserc
+.firebase/
+firebase.js
+
+# Vite cache
+.vite/
+vite.config.js
+.eslintrc.cjs
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Build outputs
 dist-ssr
 *.local
+node_modules
 
 # Editor directories and files
 .vscode/*
@@ -22,5 +41,3 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-
-firebase.js
