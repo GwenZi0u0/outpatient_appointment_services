@@ -9,10 +9,8 @@ export default function Header() {
 
   const handleScroll = () => {
     if (window.scrollY > 80) {
-      console.log("scroll");
       setIsGradient(true);
     } else {
-      console.log("no scroll");
       setIsGradient(false);
     }
   };
