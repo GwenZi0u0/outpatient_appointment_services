@@ -81,14 +81,14 @@ export default function SelectTime({
             />
           </Confirmed>
         </ConfirmedContainer>
-        <CalendarHeader>
-          {/* <Button>上一週</Button>
-          <Button>下一週</Button> */}
-        </CalendarHeader>
+        {/* <CalendarHeader>
+          <Button>上一週</Button>
+          <Button>下一週</Button>
+        </CalendarHeader> */}
         <TableWrapper>
           <StyledTable>
-            <thead>
-              <tr>
+            <Thead>
+              <Tr>
                 <TableHeader></TableHeader>
                 {formattedDates.map((day, index) => (
                   <TableHeader
@@ -98,14 +98,13 @@ export default function SelectTime({
                     {day}
                   </TableHeader>
                 ))}
-              </tr>
-            </thead>
-            <tbody>
+              </Tr>
+            </Thead>
+            <Tbody>
               {Object.entries(timeSlots).map(([time, slot]) => (
-                <tr key={time}>
+                <Tr key={time}>
                   <TimeSlot>{slot}</TimeSlot>
                   {formattedDates?.map((date, index) => (
-                    // console.log(date),
                     <TableData
                       key={index}
                       as={index >= 5 ? WeekendCell : undefined}
@@ -129,9 +128,9 @@ export default function SelectTime({
                       ) : null}
                     </TableData>
                   ))}
-                </tr>
+                </Tr>
               ))}
-            </tbody>
+            </Tbody>
           </StyledTable>
         </TableWrapper>
       </CalendarContainer>
@@ -145,18 +144,11 @@ const CalendarContainer = styled.div`
   border: 1px solid #ccc;
 `;
 
-const CalendarHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  padding: 30px;
-  background-color: #ffffff;
-`;
-
-// const Button = styled.button`
-//   padding: 5px 10px;
-//   background-color: #e0e0e0;
-//   border: none;
-//   cursor: pointer;
+// const CalendarHeader = styled.div`
+//   display: flex;
+//   justify-content: space-between;
+//   padding: 30px;
+//   background-color: #ffffff;
 // `;
 
 const ConfirmedContainer = styled.div`
@@ -191,12 +183,16 @@ const ConfirmedValue = styled.input`
 const TableWrapper = styled.div`
   width: 100%;
   border-collapse: collapse;
+  padding: 20px;
 `;
 
 const StyledTable = styled.table`
   width: 100%;
   border-collapse: collapse;
 `;
+const Thead = styled.thead``;
+const Tr = styled.tr``;
+const Tbody = styled.tbody``;
 
 const TableHeader = styled.th`
   padding: 15px;

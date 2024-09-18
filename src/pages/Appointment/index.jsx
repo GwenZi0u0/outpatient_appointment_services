@@ -93,7 +93,7 @@ export default function Appointment() {
         name: data.name,
         patient_contact: data.phone,
         personal_id_number: data.idNumber,
-        registration_number: "0000000000",
+        registration_number: "1",
         status: "confirmed",
       });
 
@@ -108,6 +108,14 @@ export default function Appointment() {
     navigator("/");
   };
 
+  const steps = [
+    { step: 1, label: "請選擇科別" },
+    { step: 2, label: "請選擇醫生" },
+    { step: 3, label: "請選擇掛號時間" },
+    { step: 4, label: "掛號資訊確認" },
+    { step: 5, label: "完成掛號" },
+  ];
+
   return (
     <Container>
       <Header>
@@ -115,12 +123,15 @@ export default function Appointment() {
         <Title>網路預約掛號流程</Title>
       </Header>
       <ProcessStep>
-        <span>請選擇科別</span>
-        <span>請選擇醫生</span>
-        <span>請選擇掛號時間</span>
-        <span>請輸入掛號資訊</span>
-        <span>掛號資訊確認</span>
-        <span>完成掛號</span>
+        {steps.map((item) => (
+          <Step
+            key={item.step}
+            $active={step === item.step}
+            $completed={step > item.step}
+          >
+            {item.label}
+          </Step>
+        ))}
       </ProcessStep>
       <ServiceList onSubmit={handleSubmit(onSubmit)}>
         {step === 1 && (
@@ -183,17 +194,20 @@ export default function Appointment() {
 
 const Container = styled.div`
   font-family: Arial, sans-serif;
-  max-width: 800px;
+  max-width: 1000px;
   margin: 0 auto;
   padding-top: 100px;
 `;
 
 const Header = styled.div`
-  background-color: #f0f0f0;
+  background-color: #b7c3da;
   height: 46px;
   display: flex;
+  justify-content: space-between;
   align-items: center;
+  padding-right: 40%;
   gap: 150px;
+  border-radius: 2px;
 `;
 
 const BackButton = styled.button`
@@ -212,26 +226,35 @@ const Title = styled.h1`
 `;
 
 const ProcessStep = styled.div`
-  background-color: #e6e6e6;
-  padding: 10px;
-  margin-top: 10px;
+  font-size: 18px;
+  letter-spacing: 1px;
+  background-color: transparent;
+  padding: 11px 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
 `;
 
-// const StepIcon = styled.div`
-//   width: 20px;
-//   height: 20px;
-//   background-color: #ffffff;
-//   border: 2px solid #cccccc;
-//   border-radius: 50%;
-//   margin-right: 10px;
-// `;
+const Step = styled.div`
+  display: flex;
+  align-items: center;
+  /* justify-content: center; */
+  width: 190px;
+  height: 45px;
+  padding-left: 30px;
+  color: #ffffff;
+  background-color: ${(props) =>
+    props.$active ? "#244a8b" : props.$completed ? "#B7C3DA" : "#d3cdcd"};
+  /* clip-path: polygon(0% 0%, 85% 0%, 100% 50%, 85% 100%, 0% 100%); //step第一個
+  clip-path: polygon(5% 0%, 90% 0%, 100% 50%, 90% 100%, 5% 100%, 12% 50%); //中間的step
+  clip-path: polygon(100% 0%, 15% 0%, 0% 50%, 15% 100%, 100% 100%); //step最後一個 */
+`;
 
 const ServiceList = styled.form`
-  margin-top: 20px;
   border: 5px solid #d2cdcd;
-  height: 800px;
+  height: auto;
+  max-height: 650px;
+  min-height: 50px;
   overflow-y: auto;
+  border-radius: 2px;
 `;
