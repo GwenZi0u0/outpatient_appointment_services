@@ -42,7 +42,7 @@ export default function Registration() {
         <Carousel>
           <TextCarousel>
             「****113/1/25~113/5/31日止，接種COVID-19疫苗免掛號費****」
-            {/* 因應疫情變化，醫師看診時間將進行滾動式調整，請留意院區掛號網頁，造成不便，敬祈見諒。 */}
+            因應疫情變化，醫師看診時間將進行滾動式調整，請留意院區掛號網頁，造成不便，敬祈見諒。
           </TextCarousel>
         </Carousel>
       </Container>
@@ -77,7 +77,6 @@ export default function Registration() {
 const MainContainer = styled.div`
   display: flex;
   flex-direction: column;
-  width: 100vw;
   height: auto;
   min-height: 100vh;
 `;
@@ -188,7 +187,6 @@ const Announcement = styled.div`
 const SelectRegion = styled.div`
   display: flex;
   flex-direction: column;
-  width: 100vw;
   height: 100vh;
   background-color: transparent;
   margin-top: 10px;
