@@ -18,6 +18,7 @@ export default function Header() {
   useEffect(() => {
     if (location.pathname === "/") {
       window.addEventListener("scroll", handleScroll);
+      setIsGradient(false);
     } else {
       setIsGradient(true);
     }
