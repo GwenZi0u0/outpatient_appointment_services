@@ -14,7 +14,8 @@ export default function SelectDoctors({
     queryKey: ["doctors"],
     queryFn: fetchDoctorsData,
   });
-  const hasDoctors = data.some(
+
+  const hasDoctors = data?.some(
     (doctor) =>
       doctor.division.division_id === department.id &&
       doctor.division.specialty_id === specialty.id
