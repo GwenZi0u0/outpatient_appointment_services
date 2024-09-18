@@ -20,10 +20,25 @@ export default function Registration() {
   if (isLoading) return <div>載入中...</div>;
   if (error) return <div>發生錯誤: {error.message}</div>;
 
+  const handleButtonClick = () => {
+    navigate("/");
+    setTimeout(() => {
+      document
+        .getElementById("select-region")
+        ?.scrollIntoView({ behavior: "smooth" });
+    }, 100);
+  };
+
   return (
     <MainContainer>
       <Container>
-        <RemindText>「預約掛號天數為28天內，內容詳見掛號須知。」</RemindText>
+        <ContainerText>
+          「預約掛號天數為28天內，內容詳見掛號須知。」
+        </ContainerText>
+        <ButtonContainer>
+          <Button onClick={() => handleButtonClick()}>網路掛號</Button>
+          <Button onClick={() => navigate("progress")}>看診進度</Button>
+        </ButtonContainer>
         <Carousel>
           <TextCarousel>
             「****113/1/25~113/5/31日止，接種COVID-19疫苗免掛號費****」
@@ -35,7 +50,7 @@ export default function Registration() {
         <AnnouncementImage />
         <Announcement>公告</Announcement>
       </AnnouncementContainer>
-      <RemindText>
+      <RemindText id="select-region">
         就醫時請攜帶健保IC卡，未貼照片者請攜帶身分證、駕照、戶口名簿、外籍居留證、敬老卡或身心障礙手冊等證明文件以核對。
       </RemindText>
       <SelectRegion>
@@ -68,6 +83,9 @@ const MainContainer = styled.div`
 `;
 
 const Container = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
   display: flex;
   flex-direction: column;
   padding-top: 80px;
@@ -78,17 +96,47 @@ const Container = styled.div`
   position: relative;
 `;
 
+const ContainerText = styled.div`
+  font-size: 28px;
+  letter-spacing: 5px;
+  line-height: 56px;
+  font-weight: 500;
+  width: 100%;
+  height: auto;
+  background-color: #ffffffb5;
+  color: #000000;
+  padding: 0 10px;
+`;
+
 const RemindText = styled.div`
   font-size: 28px;
   letter-spacing: 5px;
   line-height: 56px;
-  font-weight: bold;
+  font-weight: 500;
   width: 100%;
-  height: 56px;
+  height: auto;
   background-color: #ffffffb5;
   color: #000000;
-  padding: 0 20px;
-  overflow: hidden;
+  padding: 100px 185px;
+`;
+
+const ButtonContainer = styled.div`
+  position: absolute;
+  bottom: 195px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  width: 100%;
+  gap: 40px;
+`;
+
+const Button = styled.button`
+  text-align: center;
+  font-size: 24px;
+  border: 2px solid #ffffff;
+  border-radius: 100px;
+  width: 185px;
+  height: 65px;
 `;
 
 const Carousel = styled.div`
@@ -100,7 +148,7 @@ const Carousel = styled.div`
   text-overflow: ellipsis;
   white-space: nowrap;
   background-color: #ffffffb5;
-  padding: 0 20px;
+  padding-bottom: 20px;
 `;
 
 const TextCarousel = styled.div`
@@ -144,7 +192,7 @@ const SelectRegion = styled.div`
   height: 100vh;
   background-color: transparent;
   margin-top: 10px;
-  padding: 20px;
+  padding: 20px 165px 20px;
   gap: 20px;
 `;
 
@@ -169,7 +217,7 @@ const SelectCard = styled.button`
   background-color: #fff;
   padding: 20px;
   box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
-  margin: 74.5px auto;
+  margin: 35.5px auto;
   border: 0.5px solid #d9d9d9;
   text-decoration: none;
   cursor: pointer;
