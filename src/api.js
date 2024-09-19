@@ -13,7 +13,7 @@ export const fetchDepartmentsData = async () => {
 export const fetchDoctorsData = async () => {
   const querySnapshot = await getDocs(collection(fireDb, "doctors"));
   const doctors = querySnapshot.docs.map((doc) => ({
-    id: doc.id,
+    id: doc.uid,
     ...doc.data(),
   }));
   return doctors;
