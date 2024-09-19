@@ -30,6 +30,10 @@ export default function RegistrationCompleted({
   const foundItem = Array.isArray(data)
     ? data.find((item) => item.personal_id_number === idNumber)
     : null;
+    
+  const currentSchedule = schedule.find(
+    (schedule) => schedule.doctor_id === doctor.uid
+  );
 
   const timeSlots = {
     morning: "上午",
@@ -60,7 +64,7 @@ export default function RegistrationCompleted({
                 <Td>{timeSlots[time] || "undefined"}</Td>
                 <Td>YOI Hospital</Td>
                 <Td>{specialty?.specialty || "undefined"}</Td>
-                <Td>{schedule[0]?.room || "undefined"}</Td>
+                <Td>{currentSchedule?.room || "undefined"}</Td>
                 <Td>{foundItem?.registration_number || "undefined"}</Td>
                 <Td>{doctor?.physician_name || "undefined"}</Td>
               </tr>

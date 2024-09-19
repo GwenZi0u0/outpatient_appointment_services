@@ -11,6 +11,8 @@ export default function RegistrationInformation({
   defaultIdNumber,
   defaultBirthday,
   onResetClick,
+  registrationData,
+  getNextRegistrationNumber,
   onSubmit,
 }) {
   const timeSlots = {
@@ -23,6 +25,10 @@ export default function RegistrationInformation({
   const [birthday, setBirthday] = useState(defaultBirthday || "");
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const nextRegistrationNumber = getNextRegistrationNumber(
+    registrationData,
+    time
+  );
 
   const handleInputChange = (e) => {
     const value = e.target.value;
@@ -37,7 +43,11 @@ export default function RegistrationInformation({
   );
 
   return (
-    <FormContainer onSubmit={() => onSubmit(idNumber, birthday, name, phone)}>
+    <FormContainer
+      onSubmit={() =>
+        onSubmit(idNumber, birthday, name, phone, nextRegistrationNumber)
+      }
+    >
       <h2>您欲預約的掛號資料為</h2>
       <Table>
         <thead>
@@ -68,7 +78,7 @@ export default function RegistrationInformation({
       <Input
         type="text"
         maxLength={10}
-        value="A112234456"
+        placeholder="A112234456"
         onChange={handleInputChange}
         {...register("idNumber", {
           required: "請輸入身分證號碼",

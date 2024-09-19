@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { fetchScheduleData } from "../../api";
+import { fetchScheduleData, fetchRegistrationData } from "../../api";
 import SelectSpecialties from "./SelectSpecialties";
 import SelectDoctors from "./SelectDoctors";
 import SelectTime from "./SelectTime";
@@ -16,9 +16,14 @@ export default function Appointment() {
   const navigator = useNavigate();
   const { state } = useLocation();
   const { department } = state;
-  const { data } = useQuery({
+  const { data: scheduleData } = useQuery({
     queryKey: ["schedules"],
     queryFn: fetchScheduleData,
+  });
+
+  const { data: registrationData } = useQuery({
+    queryKey: ["registrations"],
+    queryFn: fetchRegistrationData,
   });
 
   const { register, handleSubmit, setValue, watch, getValues } = useForm({
@@ -32,6 +37,7 @@ export default function Appointment() {
       birthday: "",
       name: "",
       phone: "",
+      nextRegistrationNumber: "",
     },
   });
 
@@ -77,10 +83,38 @@ export default function Appointment() {
     return firebaseTimestamp;
   };
 
+  function formatFirestoreTimestamp(timestamp) {
+    const date = new Date(timestamp.seconds * 1000);
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+
+    return `${month}/${day}`;
+  }
+
+  const getNextRegistrationNumber = (data, time) => {
+    const extractedDate = watch("date").match(/\d+\/\d+/)[0];
+    const foundDate = data.filter(
+      (item) => formatFirestoreTimestamp(item.OPD_date) === extractedDate
+    );
+    const foundTime = foundDate.filter(
+      (item) => item.appointment_timeslot === time
+    );
+    const maxRegistrationNumber = Math.max(
+      ...foundTime.map((item) => item.registration_number),
+      0
+    );
+    return maxRegistrationNumber + 1;
+  };
+
   const onSubmit = async (data) => {
+    const nextRegistrationNumber = getNextRegistrationNumber(
+      registrationData,
+      data.time
+    );
+    setValue("nextRegistrationNumber", nextRegistrationNumber);
+
     setValue("idNumber", data.idNumber);
     try {
-      console.log("Starting onSubmit");
       const docRef = await addDoc(collection(fireDb, "registrations"), {
         OPD_date: dateStamp(),
         appointment_timeslot: data.time,
@@ -93,7 +127,7 @@ export default function Appointment() {
         name: data.name,
         patient_contact: data.phone,
         personal_id_number: data.idNumber,
-        registration_number: "1",
+        registration_number: nextRegistrationNumber,
         status: "confirmed",
       });
 
@@ -155,7 +189,7 @@ export default function Appointment() {
             department={watch("department")}
             specialty={watch("specialty")}
             doctor={watch("doctor")}
-            schedule={data}
+            schedule={scheduleData}
             onTimeClick={(date, time) => handleTimeClick(date, time)}
           />
         )}
@@ -166,7 +200,9 @@ export default function Appointment() {
             doctor={watch("doctor")}
             date={watch("date")}
             time={watch("time")}
-            schedule={data}
+            schedule={scheduleData}
+            getNextRegistrationNumber={getNextRegistrationNumber}
+            registrationData={registrationData}
             onResetClick={() => setStep(1)}
             onSubmit={(idNumber, birthday, name, phone) =>
               onSubmit({ idNumber, birthday, name, phone })
@@ -180,7 +216,7 @@ export default function Appointment() {
             doctor={watch("doctor")}
             date={watch("date")}
             time={watch("time")}
-            schedule={data}
+            schedule={scheduleData}
             idNumber={watch("idNumber")}
             birthday={watch("birthday")}
             name={watch("name")}
