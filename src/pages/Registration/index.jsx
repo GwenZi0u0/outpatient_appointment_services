@@ -82,7 +82,6 @@ const MainContainer = styled.div`
 `;
 
 const Container = styled.div`
-  position: absolute;
   top: 0;
   left: 0;
   display: flex;
