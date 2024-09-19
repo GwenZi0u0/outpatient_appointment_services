@@ -38,7 +38,7 @@ export default function SelectDoctors({
               <DoctorImage src={doctor.image} />
               <DoctorInfo>
                 <DoctorName>{doctor.physician_name} 醫師</DoctorName>
-                <DoctorTitle to="/">醫師簡介</DoctorTitle>
+                <DoctorTitle to="/doctor-profile">醫師簡介</DoctorTitle>
               </DoctorInfo>
             </DoctorItem>
           ) : null

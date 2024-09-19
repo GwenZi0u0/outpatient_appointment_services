@@ -8,7 +8,6 @@ export default function RegistrationInformation({
   date,
   time,
   schedule,
-  // onRegistrationClick,
   defaultIdNumber,
   defaultBirthday,
   onResetClick,
@@ -115,9 +114,6 @@ export default function RegistrationInformation({
         <Button
           type="submit"
           $btnColor={true}
-          // onClick={(e) =>
-          //   onRegistrationClick(e, idNumber, birthday, name, phone)
-          // }
         >
           確認掛號資訊
         </Button>
@@ -187,4 +183,3 @@ const Button = styled.button`
     background-color: ${(props) => (props.$btnColor ? "#1a356d" : "#bfbfbf")};
   }
 `;
-// "#D2CDCD" || "#244a8b"
