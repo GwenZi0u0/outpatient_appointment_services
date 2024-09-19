@@ -6,6 +6,7 @@ import { Outlet, Link, useLocation } from "react-router-dom";
 export default function Header() {
   const [isGradient, setIsGradient] = useState(false);
   const location = useLocation();
+  const isRootPath = location.pathname === "/";
 
   const handleScroll = () => {
     if (window.scrollY > 80) {
@@ -16,7 +17,7 @@ export default function Header() {
   };
 
   useEffect(() => {
-    if (location.pathname === "/") {
+    if (isRootPath) {
       window.addEventListener("scroll", handleScroll);
       setIsGradient(false);
     } else {
@@ -24,7 +25,7 @@ export default function Header() {
     }
 
     return () => {
-      if (location.pathname === "/") {
+      if (isRootPath) {
         window.removeEventListener("scroll", handleScroll);
       }
     };
