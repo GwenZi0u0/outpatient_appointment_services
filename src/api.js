@@ -45,3 +45,12 @@ export const fetchPatientData = async () => {
   }));
   return patients;
 };
+
+export const fetchUserData = async () => {
+  const querySnapshot = await getDocs(collection(fireDb, "users"));
+  const users = querySnapshot.docs.map((doc) => ({
+    id: doc.id,
+    ...doc.data(),
+  }));
+  return users;
+};
