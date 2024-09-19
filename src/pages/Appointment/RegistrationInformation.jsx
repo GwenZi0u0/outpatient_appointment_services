@@ -32,6 +32,10 @@ export default function RegistrationInformation({
     }
   };
 
+  const currentSchedule = schedule.find(
+    (schedule) => schedule.doctor_id === doctor.uid
+  );
+
   return (
     <FormContainer onSubmit={() => onSubmit(idNumber, birthday, name, phone)}>
       <h2>您欲預約的掛號資料為</h2>
@@ -52,7 +56,7 @@ export default function RegistrationInformation({
             <Td>{timeSlots[time] || "undefined"}</Td>
             <Td>YOI Hospital</Td>
             <Td>{specialty.specialty || "undefined"}</Td>
-            <Td>{schedule[0].room || "undefined"}</Td>
+            <Td>{currentSchedule?.room || "undefined"}</Td>
             <Td>{doctor?.physician_name || "undefined"}</Td>
           </tr>
         </tbody>
@@ -111,10 +115,7 @@ export default function RegistrationInformation({
         <Button type="button" $btnColor={false} onClick={() => onResetClick()}>
           重新選擇
         </Button>
-        <Button
-          type="submit"
-          $btnColor={true}
-        >
+        <Button type="submit" $btnColor={true}>
           確認掛號資訊
         </Button>
       </ButtonContainer>

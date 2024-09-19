@@ -3,15 +3,12 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchRegistrationData } from "../../api";
 
 export default function RegistrationCompleted({
-  // department,
   specialty,
   doctor,
   date,
   time,
   schedule,
   idNumber,
-  // birthday,
-  // name,
   onCompletedClick,
 }) {
   const { data } = useQuery({

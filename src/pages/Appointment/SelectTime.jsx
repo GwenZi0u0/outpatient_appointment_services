@@ -114,7 +114,7 @@ export default function SelectTime({
                       {schedule?.find(
                         (schedule) =>
                           schedule.department_id === department.id &&
-                          schedule.doctor_id === doctor.id &&
+                          schedule.doctor_id === doctor.uid &&
                           getDayKey(index) in schedule.shift_rules &&
                           time === schedule.shift_rules[getDayKey(index)]
                       ) ? (

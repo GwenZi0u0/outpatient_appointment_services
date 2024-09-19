@@ -89,7 +89,7 @@ export default function Appointment() {
           department_id: data.department.id,
           specialty_id: data.specialty.id,
         },
-        doctor: data.doctor.id,
+        doctor_id: data.doctor.uid,
         name: data.name,
         patient_contact: data.phone,
         personal_id_number: data.idNumber,
