@@ -129,7 +129,7 @@ const Profile = styled.div`
 const Dropdown = styled.div`
   display: ${(props) => (props.$isOpen ? "flex" : "none")};
   position: absolute;
-  top: 75px;
+  top: 60px;
   right: -40px;
   align-items: center;
   justify-content: center;
