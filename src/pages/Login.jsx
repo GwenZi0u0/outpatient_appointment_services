@@ -48,7 +48,6 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Login ID"
-                autocomplete="email"
                 required
               />
             </Content>
@@ -62,7 +61,6 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Password"
-                  autocomplete="current-password"
                   required
                 />
               </PassWord>
@@ -132,13 +130,13 @@ const LoginIcon = styled.div`
   background-color: #000000;
 `;
 const LoginInput = styled.input`
-  width: 450px;
+  width: auto;
   height: 50px;
   border: none;
 `;
 
 const PasswordInput = styled.input`
-  width: 432px;
+  width: auto;
   height: 50px;
   border: none;
 `;
