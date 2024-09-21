@@ -64,6 +64,11 @@ const useDataQueries = () => {
 
   return queryResults;
 };
+export const refresh = () => {
+  queries.forEach(({ queryKey }) => {
+    queryClient.invalidateQueries(queryKey);
+  });
+};
 
 const DataContext = createContext(null);
 

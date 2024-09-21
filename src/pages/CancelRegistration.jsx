@@ -1,10 +1,8 @@
 import styled from "styled-components";
 import { useEffect, useState } from "react";
-import { useData } from "../contexts/DataContext";
+import { useData, refresh } from "../contexts/DataContext";
 import { doc, updateDoc } from "firebase/firestore";
 import { fireDb } from "../firebase";
-
-
 // K789456444
 
 export default function CancelRegistrationPage() {
@@ -30,8 +28,11 @@ export default function CancelRegistrationPage() {
         (data) =>
           data.personal_id_number === idNumber && data.status === "confirmed"
       ) || [];
-    setMockDatabase(filteredData);
-  }, [registrationData, idNumber]);
+
+    if (JSON.stringify(filteredData) !== JSON.stringify(mockDatabase)) {
+      setMockDatabase(filteredData);
+    }
+  }, [registrationData, idNumber, mockDatabase]);
 
   const matchedIdNumber = mockDatabase.map((data) => data.personal_id_number);
 
@@ -59,7 +60,6 @@ export default function CancelRegistrationPage() {
 
   const handleCancel = async (confirmData) => {
     if (window.confirm("確定要取消掛號嗎？")) {
-      
       try {
         const docRef = doc(
           fireDb,
@@ -71,6 +71,7 @@ export default function CancelRegistrationPage() {
         });
 
         alert("掛號已取消");
+        refresh();
       } catch (error) {
         console.error("Error updating document: ", error);
         alert("取消掛號時出現錯誤，請稍後再試。");
