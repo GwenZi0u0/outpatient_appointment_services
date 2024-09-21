@@ -62,12 +62,12 @@ export default function RegistrationInformation({
         </thead>
         <tbody>
           <tr>
-            <Td>{date || "undefined"}</Td>
-            <Td>{timeSlots[time] || "undefined"}</Td>
+            <Td>{date || ""}</Td>
+            <Td>{timeSlots[time] || ""}</Td>
             <Td>YOI Hospital</Td>
-            <Td>{specialty.specialty || "undefined"}</Td>
-            <Td>{currentSchedule?.room || "undefined"}</Td>
-            <Td>{doctor?.physician_name || "undefined"}</Td>
+            <Td>{specialty.specialty || ""}</Td>
+            <Td>{currentSchedule?.room || ""}</Td>
+            <Td>{doctor?.physician_name || ""}</Td>
           </tr>
         </tbody>
       </Table>

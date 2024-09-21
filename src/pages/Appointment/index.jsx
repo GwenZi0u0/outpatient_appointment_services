@@ -97,7 +97,8 @@ export default function Appointment() {
       (item) => formatFirestoreTimestamp(item.OPD_date) === extractedDate
     );
     const foundTime = foundDate.filter(
-      (item) => item.appointment_timeslot === time
+      (item) =>
+        item.appointment_timeslot === time && item.status === "confirmed"
     );
     const maxRegistrationNumber = Math.max(
       ...foundTime.map((item) => item.registration_number),

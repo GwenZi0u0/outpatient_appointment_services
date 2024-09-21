@@ -24,7 +24,7 @@ export default function RegistrationCompleted({
       const day = String(date.getDate()).padStart(2, "0");
       return `${year}/${month}/${day}`;
     }
-    return "undefined";
+    return "";
   };
 
   const foundItem = Array.isArray(data)
@@ -60,20 +60,20 @@ export default function RegistrationCompleted({
           {foundItem ? (
             <>
               <tr>
-                <Td>{date || "undefined"}</Td>
-                <Td>{timeSlots[time] || "undefined"}</Td>
+                <Td>{date || ""}</Td>
+                <Td>{timeSlots[time] || ""}</Td>
                 <Td>YOI Hospital</Td>
-                <Td>{specialty?.specialty || "undefined"}</Td>
-                <Td>{currentSchedule?.room || "undefined"}</Td>
-                <Td>{foundItem?.registration_number || "undefined"}</Td>
-                <Td>{doctor?.physician_name || "undefined"}</Td>
+                <Td>{specialty?.specialty || ""}</Td>
+                <Td>{currentSchedule?.room || ""}</Td>
+                <Td>{foundItem?.registration_number || ""}</Td>
+                <Td>{doctor?.physician_name || ""}</Td>
               </tr>
               <tr>
-                您的身分證字號為：{foundItem.personal_id_number || "undefined"}
+                您的身分證字號為：{foundItem.personal_id_number || ""}
               </tr>
-              <tr>您的姓名為：{foundItem.name || "undefined"}</tr>
+              <tr>您的姓名為：{foundItem.name || ""}</tr>
               <tr>
-                您的生日為：{formatDate(foundItem.birth_date) || "undefined"}
+                您的生日為：{formatDate(foundItem.birth_date) || ""}
               </tr>
             </>
           ) : null}
