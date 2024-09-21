@@ -97,8 +97,7 @@ export default function Appointment() {
       (item) => formatFirestoreTimestamp(item.OPD_date) === extractedDate
     );
     const foundTime = foundDate.filter(
-      (item) =>
-        item.appointment_timeslot === time && item.status === "confirmed"
+      (item) => item.appointment_timeslot === time
     );
     const maxRegistrationNumber = Math.max(
       ...foundTime.map((item) => item.registration_number),
@@ -107,7 +106,24 @@ export default function Appointment() {
     return maxRegistrationNumber + 1;
   };
 
+  function isValidTaiwanID(id) {
+    if (!/^[A-Z]\d{9}$/.test(id)) return false;
+
+    const weights = [1, 9, 8, 7, 6, 5, 4, 3, 2, 1];
+    const letterToNumber = (letter) => letter.charCodeAt(0) - 55;
+
+    let sum = letterToNumber(id[0]) % 10;
+    for (let i = 1; i < id.length; i++) {
+      sum += Number(id[i]) * weights[i];
+    }
+    return sum % 10 === 0;
+  }
+
   const onSubmit = async (data) => {
+    if (!isValidTaiwanID(data.idNumber)) {
+      alert("身分證號碼輸入錯誤");
+      return; 
+    }
     const nextRegistrationNumber = getNextRegistrationNumber(
       registrationData,
       data.time
