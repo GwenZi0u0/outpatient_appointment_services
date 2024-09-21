@@ -39,22 +39,39 @@ export default function SelectTime({
     return new Date(date.setDate(date.getDate() + diff));
   };
 
-  const formatWeeklyDates = (startDate) => {
+  function formatWeeklyDates(startDate) {
     let formattedDates = [];
-    for (let i = 0; i < 7; i++) {
+    for (let i = 0; i < 28; i++) {
       let currentDate = new Date(startDate);
       currentDate.setDate(startDate.getDate() + i);
 
-      let day = currentDate.getDate();
+      let day = currentDate.getDate() + 1;
       let month = currentDate.getMonth() + 1;
 
       let dayKey = getDayKey(currentDate.getDay());
 
       formattedDates.push(`${month}/${day} ${daysOfWeek[dayKey]}`);
     }
-    return formattedDates;
-  };
+    let weeks = [];
+    for (let i = 0; i < formattedDates.length; i += 7) {
+      weeks.push(formattedDates.slice(i, i + 7));
+    }
 
+    return weeks;
+  }
+  const isDisabled = (dateStr) => {
+    const [monthDay] = dateStr.split(" (");
+    const [month, day] = monthDay.split("/").map(Number);
+
+    const today = new Date();
+    const currentMonth = today.getMonth() + 1;
+    const currentDay = today.getDate();
+
+    if (month < currentMonth || (month === currentMonth && day <= currentDay)) {
+      return true;
+    }
+    return false;
+  };
   const timeSlots = {
     morning: "上午",
     afternoon: "下午",
@@ -62,7 +79,7 @@ export default function SelectTime({
   };
 
   const monday = getMonday(today);
-  const formattedDates = formatWeeklyDates(monday);
+  const weeks = formatWeeklyDates(monday);
 
   return (
     <>
@@ -81,57 +98,61 @@ export default function SelectTime({
             />
           </Confirmed>
         </ConfirmedContainer>
-        {/* <CalendarHeader>
-          <Button>上一週</Button>
-          <Button>下一週</Button>
-        </CalendarHeader> */}
         <TableWrapper>
-          <StyledTable>
-            <Thead>
-              <Tr>
-                <TableHeader></TableHeader>
-                {formattedDates.map((day, index) => (
-                  <TableHeader
-                    key={day}
-                    as={index >= 5 ? WeekendCell : undefined}
-                  >
-                    {day}
-                  </TableHeader>
-                ))}
-              </Tr>
-            </Thead>
-            <Tbody>
-              {Object.entries(timeSlots).map(([time, slot]) => (
-                <Tr key={time}>
-                  <TimeSlot>{slot}</TimeSlot>
-                  {formattedDates?.map((date, index) => (
-                    <TableData
-                      key={index}
-                      as={index >= 5 ? WeekendCell : undefined}
-                      defaultValue={date}
-                      {...register("date")}
+          {weeks.map((week, weekIndex) => (
+            <StyledTable key={weekIndex}>
+              <Thead>
+                <Tr>
+                  <TableHeader></TableHeader>
+                  {week.map((day, dayIndex) => (
+                    <TableHeader
+                      key={`${weekIndex}-${dayIndex}`}
+                      as={dayIndex >= 5 ? WeekendCell : undefined}
                     >
-                      {schedule?.find(
-                        (schedule) =>
-                          schedule.department_id === department.id &&
-                          schedule.doctor_id === doctor.uid &&
-                          getDayKey(index) in schedule.shift_rules &&
-                          time === schedule.shift_rules[getDayKey(index)]
-                      ) ? (
-                        <CheckInput
-                          type="radio"
-                          name="doctor"
-                          defaultValue={time}
-                          onClick={() => onTimeClick(date, time)}
-                          {...register("time")}
-                        />
-                      ) : null}
-                    </TableData>
+                      {day}
+                    </TableHeader>
                   ))}
                 </Tr>
-              ))}
-            </Tbody>
-          </StyledTable>
+              </Thead>
+              <Tbody>
+                {Object.entries(timeSlots).map(([time, slot]) => (
+                  <Tr key={time}>
+                    <TimeSlot>{slot}</TimeSlot>
+                    {week.map((date, dayIndex) => (
+                      <TableData
+                        key={`${weekIndex}-${dayIndex}`}
+                        as={dayIndex >= 5 ? WeekendCell : undefined}
+                        defaultValue={date}
+                        {...register("date")}
+                      >
+                        {schedule?.find(
+                          (schedule) =>
+                            schedule.department_id === department.id &&
+                            schedule.doctor_id === doctor.uid &&
+                            getDayKey(dayIndex) in schedule.shift_rules &&
+                            Array.isArray(
+                              schedule.shift_rules[getDayKey(dayIndex)]
+                            ) &&
+                            schedule.shift_rules[getDayKey(dayIndex)].includes(
+                              time
+                            )
+                        ) ? (
+                          <CheckInput
+                            type="radio"
+                            name="doctor"
+                            defaultValue={time}
+                            onClick={() => onTimeClick(date, time)}
+                            {...register("time")}
+                            disabled={isDisabled(date)}
+                          />
+                        ) : null}
+                      </TableData>
+                    ))}
+                  </Tr>
+                ))}
+              </Tbody>
+            </StyledTable>
+          ))}
         </TableWrapper>
       </CalendarContainer>
     </>
@@ -143,13 +164,6 @@ const CalendarContainer = styled.div`
   flex-direction: column;
   border: 1px solid #ccc;
 `;
-
-// const CalendarHeader = styled.div`
-//   display: flex;
-//   justify-content: space-between;
-//   padding: 30px;
-//   background-color: #ffffff;
-// `;
 
 const ConfirmedContainer = styled.div`
   display: flex;
@@ -189,23 +203,27 @@ const TableWrapper = styled.div`
 const StyledTable = styled.table`
   width: 100%;
   border-collapse: collapse;
+  margin-bottom: 20px;
 `;
 const Thead = styled.thead``;
 const Tr = styled.tr``;
 const Tbody = styled.tbody``;
 
 const TableHeader = styled.th`
+  text-align: center;
   padding: 15px;
   background-color: #8282828a;
   color: #000;
   text-align: left;
   border: 1px solid #000;
+  width: 80px;
 `;
 
 const TableData = styled.td`
   border: 1px solid #000;
   padding: 10px;
   text-align: center;
+  position: relative;
 `;
 
 const WeekendCell = styled(TableData)`
@@ -218,5 +236,9 @@ const TimeSlot = styled(TableData)`
 `;
 
 const CheckInput = styled.input`
+  width: 50%;
+  height: 70%;
   position: absolute;
+  top: 15%;
+  left: 25%;
 `;
