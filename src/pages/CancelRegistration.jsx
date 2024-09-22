@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useData, refresh } from "../contexts/DataContext";
 import { doc, updateDoc } from "firebase/firestore";
 import { fireDb } from "../firebase";
-// K789456444
+import { Timestamp } from "firebase/firestore";
 
 export default function CancelRegistrationPage() {
   const [idNumber, setIdNumber] = useState("K789456444");
@@ -33,6 +33,36 @@ export default function CancelRegistrationPage() {
       setMockDatabase(filteredData);
     }
   }, [registrationData, idNumber, mockDatabase]);
+
+  const getCurrentDateInfo = (data) => {
+    const timestamp =
+      data instanceof Timestamp ? data : Timestamp.fromDate(data);
+    const seconds = timestamp.seconds;
+    const dateFromSeconds = new Date(seconds * 1000);
+
+    const year = dateFromSeconds.getFullYear();
+    const month = String(dateFromSeconds.getMonth() + 1).padStart(2, "0");
+    const day = String(dateFromSeconds.getDate()).padStart(2, "0");
+    return [year, month, day];
+  };
+
+  const filterRegistrationDataByCurrentDate = (mockDatabase) => {
+    const currentDateFormatted = getCurrentDateInfo(new Date());
+
+    const filteredData = mockDatabase.filter((data) => {
+      const currentOPDDate = getCurrentDateInfo(data.OPD_date);
+      const isDateMatching = currentOPDDate.every(
+        (component, index) => component >= currentDateFormatted[index]
+      );
+      const isStatus = data.status === "confirmed";
+
+      return isDateMatching && isStatus;
+    });
+
+    return filteredData;
+  };
+
+  const result = filterRegistrationDataByCurrentDate(mockDatabase);
 
   const matchedIdNumber = mockDatabase.map((data) => data.personal_id_number);
 
@@ -118,8 +148,8 @@ export default function CancelRegistrationPage() {
                 </TableRow>
               </TableHeader>
               <tbody>
-                {mockDatabase.length > 0 ? (
-                  mockDatabase?.map((data, index) => {
+                {result.length > 0 ? (
+                  result?.map((data, index) => {
                     const doctor = doctorData.find(
                       (doctor) => doctor.uid === data.doctor_id
                     );
@@ -191,6 +221,7 @@ const Title = styled.h1`
   font-weight: bold;
   color: #000000;
   margin-bottom: 20px;
+  letter-spacing: 10.4px;
 `;
 
 const Input = styled.input`
