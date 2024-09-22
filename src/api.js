@@ -54,3 +54,12 @@ export const fetchUserData = async () => {
   }));
   return users;
 };
+
+export const fetchProgressData = async () => {
+  const querySnapshot = await getDocs(collection(fireDb, "progress"));
+  const progress = querySnapshot.docs.map((doc) => ({
+    id: doc.id,
+    ...doc.data(),
+  }));
+  return progress;
+}

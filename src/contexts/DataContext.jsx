@@ -12,6 +12,7 @@ import {
   fetchRegistrationData,
   fetchPatientData,
   fetchUserData,
+  fetchProgressData,
 } from "../api";
 
 const queryClient = new QueryClient();
@@ -23,6 +24,7 @@ const useStore = create((set) => ({
   registrationData: [],
   patientData: [],
   userData: [],
+  progressData: [],
   setData: (key, data) => set({ [key]: data }),
 }));
 
@@ -49,6 +51,11 @@ const queries = [
     stateKey: "patientData",
   },
   { queryKey: ["users"], queryFn: fetchUserData, stateKey: "userData" },
+  {
+    queryKey: ["progress"],
+    queryFn: fetchProgressData,
+    stateKey: "progressData",
+  },
 ];
 
 const useDataQueries = () => {
@@ -143,5 +150,13 @@ export const useUserData = () => {
   return {
     data: store((state) => state.userData),
     ...queries.userData,
+  };
+};
+
+export const useProgressData = () => {
+  const { store, queries } = useData();
+  return {
+    data: store((state) => state.progressData),
+    ...queries.progressData,
   };
 };
