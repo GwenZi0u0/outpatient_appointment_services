@@ -3,6 +3,7 @@ import { Outlet, Navigate, Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import Logo from "../assets/Logo.svg";
 import { useState } from "react";
+import AuthImage from "../assets/auth.svg";
 
 export default function ProtectedLayout() {
   const { user, loading, signOut } = useAuth((state) => ({
@@ -114,7 +115,10 @@ const SelectLink = styled(Link)`
 const AuthImg = styled.div`
   width: 50px;
   height: 50px;
-  background-color: #ffffff;
+  border-radius: 50%;
+  background-image: url(${AuthImage});
+  background-size: cover;
+  background-repeat: no-repeat;
 `;
 
 const Profile = styled.div`
