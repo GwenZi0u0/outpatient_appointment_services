@@ -14,6 +14,7 @@ export default function ProgressPage() {
   const doctorData = queries[1]?.data || [];
   const scheduleData = queries[2]?.data || [];
   const registrationData = queries[3]?.data || [];
+  const progressData = queries[6]?.data || [];
 
   const [mockDatabase, setMockDatabase] = useState([]);
 
@@ -87,7 +88,7 @@ export default function ProgressPage() {
   return (
     <MainContainer>
       <Container>
-        <Title>你的門診看診進度</Title>
+        <Title>今日門診進度</Title>
         <Label>身分證號碼查詢 </Label>
         <Input
           type="text"
@@ -112,27 +113,35 @@ export default function ProgressPage() {
             <tbody>
               {result.length > 0 ? (
                 result?.map((data, index) => {
-                  const doctor = doctorData.find(
-                    (doctor) => doctor.uid === data.doctor_id
-                  );
-                  const department = departmentData.find(
-                    (department) =>
-                      department.id === data.division.department_id
-                  );
-                  const specialtyData = department.specialties.find(
-                    (specialty) => specialty.id === data.division.specialty_id
-                  );
-                  const schedule = scheduleData.find(
-                    (schedule) => schedule.doctor_id === data.doctor_id
-                  );
-
+                  const doctor =
+                    doctorData?.find(
+                      (doctor) => doctor.uid === data.doctor_id
+                    ) || {};
+                  const department =
+                    departmentData?.find(
+                      (department) =>
+                        department.id === data.division.department_id
+                    ) || {};
+                  const specialtyData =
+                    department.specialties?.find(
+                      (specialty) => specialty.id === data.division.specialty_id
+                    ) || {};
+                  const schedule =
+                    scheduleData?.find(
+                      (schedule) => schedule.doctor_id === data.doctor_id
+                    ) || {};
+                  const progress =
+                    progressData?.find(
+                      (progress) => progress.doctor_id === data.doctor_id
+                    ) || {};
+                  console.log(progress.number);
                   return (
                     <TableRow key={index}>
                       <TableCell>{specialtyData.specialty || ""}</TableCell>
                       <TableCell>{schedule.room || ""}</TableCell>
                       <TableCell>{doctor.physician_name || ""}</TableCell>
                       <TableCell>{data.registration_number || ""}</TableCell>
-                      <TableCell>{"尚未開診"}</TableCell>
+                      <TableCell>{progress.number || "尚未開診"}</TableCell>
                     </TableRow>
                   );
                 })
@@ -174,6 +183,7 @@ const Title = styled.h1`
   font-weight: bold;
   color: #000000;
   margin-bottom: 20px;
+  letter-spacing: 9.6px;
 `;
 
 const Input = styled.input`
@@ -214,10 +224,12 @@ const TableRow = styled.tr`
 `;
 
 const TableCell = styled.td`
+  text-align: center;
   padding: 8px;
   border: 1px solid #ddd;
 `;
 
 const TableHeaderCell = styled(TableCell).attrs({ as: "th" })`
+  text-align: center;
   font-weight: bold;
 `;
