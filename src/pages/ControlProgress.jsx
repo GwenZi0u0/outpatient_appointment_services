@@ -1,18 +1,31 @@
 import styled from "styled-components";
 import { useAuth } from "../contexts/AuthContext";
-import { useData } from "../contexts/DataContext";
+import { useData, refresh } from "../contexts/DataContext";
 import { Timestamp } from "firebase/firestore";
 import { useEffect, useState } from "react";
+import { fireDb } from "../firebase";
+import {
+  collection,
+  addDoc,
+  getDocs,
+  query,
+  where,
+  deleteDoc,
+  doc,
+  updateDoc,
+} from "firebase/firestore";
 
 export default function CancelRegistrationPage() {
   const [isOpen, setIsOpen] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [currentNumber, setCurrentNumber] = useState(null);
-  const [nextNumber, setNextNumber] = useState(null);
-  const [validNumbers, setValidNumbers] = useState([]);
   const { user } = useAuth();
   const { queries } = useData();
   const registrationData = queries[3]?.data || [];
+  const progressData = queries[6]?.data || [];
+  const [currentPeriod, setCurrentPeriod] = useState(null);
+  const [period, setPeriod] = useState("");
+
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTime(new Date());
@@ -29,8 +42,11 @@ export default function CancelRegistrationPage() {
     const year = dateFromSeconds.getFullYear();
     const month = String(dateFromSeconds.getMonth() + 1).padStart(2, "0");
     const day = String(dateFromSeconds.getDate()).padStart(2, "0");
-
     return `${year}/${month}/${day}`;
+  };
+
+  const handleButtonClick = (selectedPeriod) => {
+    setPeriod(selectedPeriod);
   };
 
   const filterRegistrationDataByCurrentDate = (registrationData) => {
@@ -41,12 +57,70 @@ export default function CancelRegistrationPage() {
         getCurrentDateInfo(data.OPD_date) === currentDateFormatted;
       const isDoctorMatching = user.uid === data.doctor_id;
       const isStatus = data.status === "confirmed";
-      return isDateMatching && isDoctorMatching && isStatus;
+      const isPeriodMatching = period === data.appointment_timeslot;
+      return isDateMatching && isDoctorMatching && isStatus && isPeriodMatching;
+    });
+    const sortedData = filteredData.sort(
+      (a, b) => a.registration_number - b.registration_number
+    );
+    return sortedData;
+  };
+
+  const result = filterRegistrationDataByCurrentDate(registrationData);
+
+  const filterProgressData = (result) => {
+    const filteredData = result.filter((data) => {
+      const isMatching =
+        user.uid === data.doctor_id && data.registration_number > currentNumber;
+      return isMatching;
     });
     return filteredData;
   };
 
-  const result = filterRegistrationDataByCurrentDate(registrationData);
+  const toggleClinic = async () => {
+    if (isOpen) {
+      try {
+        const querySnapshot = await getDocs(
+          query(
+            collection(fireDb, "progress"),
+            where("doctor_id", "==", user.uid)
+          )
+        );
+        querySnapshot.forEach(async (doc) => {
+          await deleteDoc(doc.ref);
+          console.log("Document deleted with ID: ", doc.id);
+        });
+      } catch (e) {
+        console.error("Error deleting document: ", e);
+      }
+
+      setCurrentNumber(null);
+      setCurrentPeriod(null);
+      refresh();
+    } else {
+      try {
+        const registrationNumber = null;
+        const docRef = await addDoc(collection(fireDb, "progress"), {
+          date: new Date(),
+          time: period,
+          doctor_id: user.uid || null,
+          number: registrationNumber,
+        });
+        console.log("Document written with ID: ", docRef.id);
+
+        if (["morning", "afternoon", "evening"].includes(period)) {
+          setCurrentPeriod(period);
+        }
+      } catch (e) {
+        console.error("Error adding document: ", e);
+      }
+      refresh();
+    }
+
+    setIsOpen((prev) => !prev);
+  };
+
+  const filteredData = filterProgressData(result);
 
   const formatTime = (date) => {
     const hours = String(date.getHours()).padStart(2, "0");
@@ -55,50 +129,25 @@ export default function CancelRegistrationPage() {
     return `${hours}:${minutes}:${seconds}`;
   };
 
-  useEffect(() => {
-    const currentDateFormatted = getCurrentDateInfo(new Date());
+  const handleNext = async () => {
+    const progressDataId = progressData.filter(
+      (data) => data.doctor_id === user.uid
+    )[0]?.id;
+    console.log(progressDataId);
+    const firstValidNumber = filteredData[0]?.registration_number || null;
 
-    const filteredData = registrationData.filter((data) => {
-      const isDateMatching =
-        getCurrentDateInfo(data.OPD_date) === currentDateFormatted;
-      const isDoctorMatching = user.uid === data.doctor_id;
-      const isStatus = data.status === "confirmed";
-      return isDateMatching && isDoctorMatching && isStatus;
-    });
-
-    const numbers = filteredData
-      .filter((data) => data.registration_number)
-      .map((data) => data.registration_number);
-    setValidNumbers(numbers.sort((a, b) => a - b));
-    if (numbers.length > 0) {
-      setNextNumber(numbers[0]);
-    }
-  }, [registrationData, user.uid]);
-
-  const handleNext = () => {
-    if (validNumbers.length > 0) {
-      if (currentNumber === null) {
-        setCurrentNumber(validNumbers[0]);
-        setNextNumber(validNumbers[1] || null);
-      } else {
-        const currentIndex = validNumbers.indexOf(currentNumber);
-        if (currentIndex < validNumbers.length - 1) {
-          setCurrentNumber(validNumbers[currentIndex + 1]);
-          setNextNumber(validNumbers[currentIndex + 2] || null);
-        } else {
-          setCurrentNumber(validNumbers[currentIndex]);
-          setNextNumber("");
-        }
+    if (firstValidNumber) {
+      setCurrentNumber(firstValidNumber);
+      try {
+        const docRef = doc(fireDb, "progress", progressDataId);
+        await updateDoc(docRef, {
+          number: firstValidNumber,
+        });
+        console.log("Document updated successfully");
+      } catch (error) {
+        console.error("Error updating document: ", error);
       }
     }
-  };
-
-  const toggleClinic = () => {
-    if (isOpen) {
-      setCurrentNumber(null);
-      setNextNumber(validNumbers[0] || null);
-    }
-    setIsOpen((prev) => !prev);
   };
 
   return (
@@ -116,16 +165,36 @@ export default function CancelRegistrationPage() {
           <OpenClinicButton onClick={handleNext} disabled={!isOpen}>
             <Text>下一位</Text>
           </OpenClinicButton>
-          <ProgressNumberDisplayArea isOpen={isOpen}>
+          <ProgressNumberDisplayArea $isOpen={isOpen}>
             <CurrentNumber>
               <Text>目前看診號碼</Text>
-              <Number>{currentNumber !== null ? currentNumber : " "}</Number>
+              <Number>{currentNumber}</Number>
             </CurrentNumber>
             <NextNumber>
               <Text>下一位看診號碼</Text>
-              <Number>{nextNumber !== null ? nextNumber : " "}</Number>
+              <Number>{filteredData[0]?.registration_number || null}</Number>
             </NextNumber>
           </ProgressNumberDisplayArea>
+          <ButtonArea>
+            <OpenClinicButton
+              onClick={() => handleButtonClick("morning")}
+              disabled={currentPeriod && currentPeriod !== "morning"}
+            >
+              <Text>上午</Text>
+            </OpenClinicButton>
+            <OpenClinicButton
+              onClick={() => handleButtonClick("afternoon")}
+              disabled={currentPeriod && currentPeriod !== "afternoon"}
+            >
+              <Text>下午</Text>
+            </OpenClinicButton>
+            <OpenClinicButton
+              onClick={() => handleButtonClick("evening")}
+              disabled={currentPeriod && currentPeriod !== "evening"}
+            >
+              <Text>夜間</Text>
+            </OpenClinicButton>
+          </ButtonArea>
           <OpenClinicButton onClick={toggleClinic}>
             <Text>{isOpen ? "結束就診" : "開始就診"}</Text>
           </OpenClinicButton>
@@ -134,6 +203,10 @@ export default function CancelRegistrationPage() {
     </>
   );
 }
+const ButtonArea = styled.div`
+  display: flex;
+  flex-direction: row;
+`;
 
 const MainContainer = styled.div`
   display: flex;
@@ -192,7 +265,7 @@ const PeopleNumber = styled.span`
 `;
 
 const ProgressNumberDisplayArea = styled.div`
-  display: ${({ isOpen }) => (isOpen ? "flex" : "none")};
+  display: ${(props) => (props.$isOpen ? "flex" : "none")};
   align-items: center;
   justify-content: center;
   background-color: #ffffff;
