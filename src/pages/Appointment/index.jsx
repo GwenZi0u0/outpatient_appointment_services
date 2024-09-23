@@ -48,6 +48,11 @@ export default function Appointment() {
   const handleReturnClick = () => {
     if (step === 1) {
       navigator("/");
+      setTimeout(() => {
+        document
+          .getElementById("select-department")
+          ?.scrollIntoView({ behavior: "smooth" });
+      }, 0);
     } else {
       setStep(step - 1);
     }
@@ -122,7 +127,7 @@ export default function Appointment() {
   const onSubmit = async (data) => {
     if (!isValidTaiwanID(data.idNumber)) {
       alert("身分證號碼輸入錯誤");
-      return; 
+      return;
     }
     const nextRegistrationNumber = getNextRegistrationNumber(
       registrationData,
@@ -309,5 +314,14 @@ const ServiceList = styled.form`
   max-height: 650px;
   min-height: 50px;
   overflow-y: auto;
+  overflow-x: hidden;
   border-radius: 2px;
+  scroll-behavior: smooth;
+  /* 隐藏滚动条 */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+
+  &::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
 `;

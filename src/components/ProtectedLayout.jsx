@@ -106,7 +106,7 @@ const SelectLink = styled(Link)`
   text-decoration: none;
   font-weight: 500;
   letter-spacing: 6px;
-  font-size: 20px;
+  font-size: 22px;
   letter-spacing: 30%;
   color: #ffffff;
   background-color: transparent;

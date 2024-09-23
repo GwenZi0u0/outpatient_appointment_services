@@ -43,6 +43,7 @@ export default function Header() {
           {/* <SelectLink to="/">掛號需知</SelectLink> */}
           <SelectLink to="/progress">看診進度</SelectLink>
         </Menu>
+        <div></div>
       </Container>
       <Outlet />
     </>
@@ -95,7 +96,7 @@ const Menu = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-right: 28%;
+  padding-right: 10%;
   height: 100%;
   gap: 60px;
 `;
@@ -104,7 +105,7 @@ const SelectLink = styled(Link)`
   text-decoration: none;
   font-weight: 500;
   letter-spacing: 6px;
-  font-size: 20px;
+  font-size: 22px;
   letter-spacing: 30%;
   color: #ffffff;
   background-color: transparent;

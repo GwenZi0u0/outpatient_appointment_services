@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { useParams } from "react-router-dom";
 import { useData } from "../../contexts/DataContext";
-import DoctorImage from "../../assets/physicianImag.png";
+import AuthImage from "../../assets/auth.svg";
 
 export default function EditProfile({ calculateAge }) {
   const { doctorId } = useParams();
@@ -19,7 +19,7 @@ export default function EditProfile({ calculateAge }) {
           <ProfileContent>
             <ImageContainer>
               <ProfileImage
-                src={DoctorImage}
+                src={AuthImage}
                 alt={selectedDoctor.physician_name}
               />
             </ImageContainer>
@@ -75,7 +75,7 @@ const MainContainer = styled.div`
 `;
 
 const ProfileContainer = styled.div`
-  max-width: 600px;
+  width: 800px;
   margin: 20px auto;
   padding: 20px;
   border: 1px solid #e0e0e0;
@@ -83,7 +83,7 @@ const ProfileContainer = styled.div`
 `;
 
 const Title = styled.h2`
-  font-size: 18px;
+  font-size: 30px;
   margin-bottom: 20px;
 `;
 
@@ -113,7 +113,8 @@ const InfoContainer = styled.div`
 `;
 
 const Name = styled.h3`
-  font-size: 20px;
+  letter-spacing: 4px;
+  font-size: 25px;
   color: #4a90e2;
   margin-bottom: 10px;
 `;
@@ -121,6 +122,7 @@ const Name = styled.h3`
 const Position = styled.p`
   font-weight: bold;
   margin-bottom: 10px;
+  font-size: 22px;
 `;
 
 const SpecialtiesContainer = styled.div`
@@ -134,7 +136,7 @@ const SpecialtyTag = styled.span`
   background-color: #f0f0f0;
   padding: 5px 10px;
   border-radius: 20px;
-  font-size: 14px;
+  font-size: 22px;
 `;
 
 const DetailsList = styled.ul`
@@ -144,9 +146,11 @@ const DetailsList = styled.ul`
 
 const DetailItem = styled.li`
   margin-bottom: 5px;
+  font-size: 22px;
 `;
 
 const AdditionalInfo = styled.div`
+  font-size: 20px;
   background-color: #fff0f5;
   border-radius: 8px;
   padding: 15px;

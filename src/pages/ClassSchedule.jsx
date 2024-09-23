@@ -251,7 +251,9 @@ export default function ClassSchedulePage() {
                             onChange={() => handleCheckboxClick(date, time)}
                             disabled={isDisabled(date)}
                           />
-                        ) : "休"}
+                        ) : (
+                          "休"
+                        )}
                       </TableData>
                     ))}
                   </Tr>
@@ -269,6 +271,7 @@ export default function ClassSchedulePage() {
 const CalendarContainer = styled.div`
   display: flex;
   flex-direction: column;
+  align-items: center;
   border: 1px solid #ccc;
   padding-top: 100px;
 `;
@@ -278,6 +281,7 @@ const ConfirmedContainer = styled.div`
   flex-direction: row;
   justify-content: space-between;
   padding: 20px 30px;
+  width: 85%;
 `;
 
 const Confirmed = styled.div`
@@ -296,12 +300,13 @@ const ConfirmedTitle = styled.div`
 
 const Button = styled.button`
   width: 500px;
+  height: 50px;
 `;
 
 const TableWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  width: 100%;
+  width: 85%;
   border-collapse: collapse;
   align-items: center;
   padding: 20px;

@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 import { useQuery } from "@tanstack/react-query";
 import { fetchDepartmentsData } from "../../api";
 import { useForm } from "react-hook-form";
@@ -41,8 +41,10 @@ export default function Registration() {
         </ButtonContainer>
         <Carousel>
           <TextCarousel>
-            「****113/1/25~113/5/31日止，接種COVID-19疫苗免掛號費****」
-            因應疫情變化，醫師看診時間將進行滾動式調整，請留意院區掛號網頁，造成不便，敬祈見諒。
+            1.
+            進入醫療機構請正確配戴口罩、遵循呼吸道衛生與咳嗽禮節、落實手部衛生。
+            2. 若COVID19快篩陽性，請主動告知醫護人員; 3.
+            21天內有出國旅遊史及職業史、接觸史、群聚史，請主動告知。
           </TextCarousel>
         </Carousel>
       </Container>
@@ -53,7 +55,7 @@ export default function Registration() {
       <RemindText id="select-region">
         就醫時請攜帶健保IC卡，未貼照片者請攜帶身分證、駕照、戶口名簿、外籍居留證、敬老卡或身心障礙手冊等證明文件以核對。
       </RemindText>
-      <SelectRegion>
+      <SelectRegion id="select-department">
         <SelectTitle>掛號、看診進度請選擇以下系別</SelectTitle>
         <SelectCards>
           {data.map((department) => (
@@ -95,10 +97,10 @@ const Container = styled.div`
 `;
 
 const ContainerText = styled.div`
-  font-size: 28px;
+  font-size: 30px;
   letter-spacing: 5px;
   line-height: 56px;
-  font-weight: 500;
+  font-weight: 600;
   width: 100%;
   height: auto;
   background-color: #ffffffb5;
@@ -110,7 +112,7 @@ const RemindText = styled.div`
   font-size: 28px;
   letter-spacing: 5px;
   line-height: 56px;
-  font-weight: 500;
+  font-weight: 600;
   width: 100%;
   height: auto;
   background-color: #ffffffb5;
@@ -137,23 +139,33 @@ const Button = styled.button`
   height: 65px;
 `;
 
+const scrollAnimation = keyframes`
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+`;
+
 const Carousel = styled.div`
   position: absolute;
   bottom: 20px;
   width: 100%;
   height: 100px;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  background-color: #ffffffb5;
+  background-color: rgba(255, 194, 136, 0.7);
   padding-bottom: 20px;
 `;
 
 const TextCarousel = styled.div`
+  display: inline-block;
   font-size: 32px;
   line-height: 100px;
   font-weight: bold;
-  width: auto;
+  white-space: nowrap;
+  color: #b3261e;
+  animation: ${scrollAnimation} 18s linear infinite;
 `;
 
 const AnnouncementContainer = styled.div`
@@ -195,7 +207,7 @@ const SelectRegion = styled.div`
 
 const SelectTitle = styled.div`
   font-size: 38px;
-  font-weight: bold;
+  font-weight: 600;
   color: #000000;
   width: 100%;
   background-color: transparent;
