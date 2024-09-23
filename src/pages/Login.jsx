@@ -66,7 +66,7 @@ export default function LoginPage() {
               </PassWord>
             </Content>
             <Button type="submit">Sign In</Button>
-            {error && <p style={{ color: "red" }}>{error}</p>}
+            {error && <p style={{ color: "red" }}>{"帳號/密碼輸入錯誤"}</p>}
           </LoginContent>
         </LoginContainer>
       </Container>
