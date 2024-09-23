@@ -166,13 +166,13 @@ export default function CancelRegistrationPage() {
 
                     return (
                       <TableRow key={index}>
-                        <TableCell>{specialtyData.specialty || ""}</TableCell>
+                        <TableCell>{specialtyData?.specialty || ""}</TableCell>
                         <TableCell>{formatDate(data.OPD_date) || ""}</TableCell>
                         <TableCell>
                           {timeSlots[data.appointment_timeslot] || ""}
                         </TableCell>
                         <TableCell>{schedule?.room || ""}</TableCell>
-                        <TableCell>{doctor.physician_name || ""}</TableCell>
+                        <TableCell>{doctor?.physician_name || ""}</TableCell>
                         <TableCell>{data.registration_number || ""}</TableCell>
                         <TableCell>
                           <Button onClick={() => handleCancel(index)}>
