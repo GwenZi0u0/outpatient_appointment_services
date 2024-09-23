@@ -44,6 +44,10 @@ const router = createBrowserRouter([
     element: <LoginPage />,
   },
   {
+    path: "doctor-profile/:doctorId",
+    element: <DoctorProfilePage />,
+  },
+  {
     element: <ProtectedLayout />,
     children: [
       {
@@ -53,10 +57,6 @@ const router = createBrowserRouter([
       {
         path: "class-schedule",
         element: <ClassSchedulePage />,
-      },
-      {
-        path: "doctor-profile",
-        element: <DoctorProfilePage />,
       },
     ],
   },
