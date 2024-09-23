@@ -13,6 +13,7 @@ import {
   fetchPatientData,
   fetchUserData,
   fetchProgressData,
+  fetchRequestLeaveData,
 } from "../api";
 
 const queryClient = new QueryClient();
@@ -25,6 +26,7 @@ const useStore = create((set) => ({
   patientData: [],
   userData: [],
   progressData: [],
+  requestLeaveData: [],
   setData: (key, data) => set({ [key]: data }),
 }));
 
@@ -55,6 +57,11 @@ const queries = [
     queryKey: ["progress"],
     queryFn: fetchProgressData,
     stateKey: "progressData",
+  },
+  {
+    queryKey: ["requestLeave"],
+    queryFn: fetchRequestLeaveData,
+    stateKey: "requestLeaveData",
   },
 ];
 
@@ -158,5 +165,13 @@ export const useProgressData = () => {
   return {
     data: store((state) => state.progressData),
     ...queries.progressData,
+  };
+};
+
+export const useRequestLeaveData = () => {
+  const { store, queries } = useData();
+  return {
+    data: store((state) => state.requestLeaveData),
+    ...queries.requestLeaveData,
   };
 };
