@@ -171,7 +171,7 @@ export default function CancelRegistrationPage() {
                         <TableCell>
                           {timeSlots[data.appointment_timeslot] || ""}
                         </TableCell>
-                        <TableCell>{schedule.room || ""}</TableCell>
+                        <TableCell>{schedule?.room || ""}</TableCell>
                         <TableCell>{doctor.physician_name || ""}</TableCell>
                         <TableCell>{data.registration_number || ""}</TableCell>
                         <TableCell>
