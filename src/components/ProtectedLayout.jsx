@@ -10,6 +10,7 @@ export default function ProtectedLayout() {
     user: state.user,
     loading: state.loading,
   }));
+  
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   if (loading) {
@@ -33,7 +34,7 @@ export default function ProtectedLayout() {
           <Menu>
             <SelectLink to="/control-progress">看診進度</SelectLink>
             <SelectLink to="/class-schedule">門診班表</SelectLink>
-            <SelectLink to="/doctor-profile">醫師簡介</SelectLink>
+            <SelectLink to={`/doctor-profile/${user.uid}`}>醫師簡介</SelectLink>
           </Menu>
           <Profile onMouseEnter={handleMouseEnter}>
             <AuthImg />

@@ -95,7 +95,7 @@ const Menu = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-right: 40%;
+  padding-right: 28%;
   height: 100%;
   gap: 60px;
 `;
