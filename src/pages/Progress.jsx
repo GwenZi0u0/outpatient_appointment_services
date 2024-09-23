@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { useEffect, useState } from "react";
-import { useData } from "../contexts/DataContext";
+import { refresh, useData } from "../contexts/DataContext";
 import { Timestamp } from "firebase/firestore";
 // K789456444
 // A123456789
@@ -52,7 +52,7 @@ export default function ProgressPage() {
       );
 
       const isStatus = data.status === "confirmed";
-
+      refresh();
       return isDateMatching && isStatus;
     });
 
@@ -134,14 +134,14 @@ export default function ProgressPage() {
                     progressData?.find(
                       (progress) => progress.doctor_id === data.doctor_id
                     ) || {};
-                  console.log(progress.number);
+
                   return (
                     <TableRow key={index}>
-                      <TableCell>{specialtyData.specialty || ""}</TableCell>
-                      <TableCell>{schedule.room || ""}</TableCell>
-                      <TableCell>{doctor.physician_name || ""}</TableCell>
+                      <TableCell>{specialtyData?.specialty || ""}</TableCell>
+                      <TableCell>{schedule?.room || ""}</TableCell>
+                      <TableCell>{doctor?.physician_name || ""}</TableCell>
                       <TableCell>{data.registration_number || ""}</TableCell>
-                      <TableCell>{progress.number || "尚未開診"}</TableCell>
+                      <TableCell>{progress?.number || "尚未開診"}</TableCell>
                     </TableRow>
                   );
                 })
