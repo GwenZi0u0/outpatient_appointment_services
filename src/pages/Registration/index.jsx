@@ -42,8 +42,12 @@ export default function Registration() {
         <Carousel>
           <TextCarousel>
             1.
-            進入醫療機構請正確配戴口罩、遵循呼吸道衛生與咳嗽禮節、落實手部衛生。
-            2. 若COVID19快篩陽性，請主動告知醫護人員; 3.
+            進入醫療機構請正確配戴口罩、遵循呼吸道衛生與咳嗽禮節、落實手部衛生。&nbsp;
+            2. 若COVID19快篩陽性，請主動告知醫護人員。&nbsp; 3.
+            21天內有出國旅遊史及職業史、接觸史、群聚史，請主動告知。&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            1.
+            進入醫療機構請正確配戴口罩、遵循呼吸道衛生與咳嗽禮節、落實手部衛生。&nbsp;
+            2. 若COVID19快篩陽性，請主動告知醫護人員。&nbsp; 3.
             21天內有出國旅遊史及職業史、接觸史、群聚史，請主動告知。
           </TextCarousel>
         </Carousel>
@@ -165,7 +169,7 @@ const TextCarousel = styled.div`
   font-weight: bold;
   white-space: nowrap;
   color: #b3261e;
-  animation: ${scrollAnimation} 18s linear infinite;
+  animation: ${scrollAnimation} 35s linear infinite;
 `;
 
 const AnnouncementContainer = styled.div`
