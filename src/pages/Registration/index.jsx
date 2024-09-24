@@ -36,7 +36,7 @@ export default function Registration() {
           「預約掛號天數為28天內，內容詳見掛號須知。」
         </ContainerText>
         <ButtonContainer>
-          <Button onClick={() => handleButtonClick()}>網路掛號</Button>
+          <Button onClick={handleButtonClick}>網路掛號</Button>
           <Button onClick={() => navigate("progress")}>看診進度</Button>
         </ButtonContainer>
         <Carousel>
