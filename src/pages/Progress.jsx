@@ -1,14 +1,43 @@
+import { create } from "zustand";
 import styled from "styled-components";
-import { useEffect, useState } from "react";
-import { refresh, useData } from "../contexts/DataContext";
+import { useData } from "../contexts/DataContext";
 import { Timestamp } from "firebase/firestore";
 // K789456444
 // A123456789
 
+const useProgressStore = create((set) => ({
+  idNumber: "A112234456",
+  setIdNumber: (idNumber) => set({ idNumber }),
+  error: "",
+  setError: (error) => set({ error }),
+  isOpened: false,
+  setIsOpened: (isOpened) => set({ isOpened }),
+}));
+
+const getCurrentDateInfo = (data) => {
+  const timestamp = data instanceof Timestamp ? data : Timestamp.fromDate(data);
+  const dateFromSeconds = new Date(timestamp.seconds * 1000);
+  return [
+    dateFromSeconds.getFullYear(),
+    String(dateFromSeconds.getMonth() + 1).padStart(2, "0"),
+    String(dateFromSeconds.getDate()).padStart(2, "0"),
+  ];
+};
+
+const filterRegistrationDataByCurrentDate = (mockDatabase) => {
+  const currentDateFormatted = getCurrentDateInfo(new Date());
+  return mockDatabase.filter((data) => {
+    const currentOPDDate = getCurrentDateInfo(data.OPD_date);
+    const isDateMatching = currentOPDDate.every(
+      (component, index) => component === currentDateFormatted[index]
+    );
+    return isDateMatching && data.status === "confirmed";
+  });
+};
+
 export default function ProgressPage() {
-  const [idNumber, setIdNumber] = useState("A112234456");
-  const [error, setError] = useState("");
-  const [isOpened, setIsOpened] = useState(false);
+  const { idNumber, setIdNumber, error, setError, isOpened, setIsOpened } =
+    useProgressStore();
   const { queries } = useData();
   const departmentData = queries[0]?.data || [];
   const doctorData = queries[1]?.data || [];
@@ -16,65 +45,24 @@ export default function ProgressPage() {
   const registrationData = queries[3]?.data || [];
   const progressData = queries[6]?.data || [];
 
-  const [mockDatabase, setMockDatabase] = useState([]);
-
-  useEffect(() => {
-    const filteredData =
-      registrationData.filter(
-        (data) =>
-          data.personal_id_number === idNumber && data.status === "confirmed"
-      ) || [];
-
-    if (JSON.stringify(filteredData) !== JSON.stringify(mockDatabase)) {
-      setMockDatabase(filteredData);
-    }
-  }, [registrationData, idNumber, mockDatabase]);
-
-  const getCurrentDateInfo = (data) => {
-    const timestamp =
-      data instanceof Timestamp ? data : Timestamp.fromDate(data);
-    const seconds = timestamp.seconds;
-    const dateFromSeconds = new Date(seconds * 1000);
-
-    const year = dateFromSeconds.getFullYear();
-    const month = String(dateFromSeconds.getMonth() + 1).padStart(2, "0");
-    const day = String(dateFromSeconds.getDate()).padStart(2, "0");
-    return [year, month, day];
-  };
-
-  const filterRegistrationDataByCurrentDate = (mockDatabase) => {
-    const currentDateFormatted = getCurrentDateInfo(new Date());
-
-    const filteredData = mockDatabase.filter((data) => {
-      const currentOPDDate = getCurrentDateInfo(data.OPD_date);
-      const isDateMatching = currentOPDDate.every(
-        (component, index) => component === currentDateFormatted[index]
-      );
-
-      const isStatus = data.status === "confirmed";
-      refresh();
-      return isDateMatching && isStatus;
-    });
-
-    return filteredData;
-  };
+  const mockDatabase = registrationData.filter(
+    (data) =>
+      data.personal_id_number === idNumber && data.status === "confirmed"
+  );
 
   const result = filterRegistrationDataByCurrentDate(mockDatabase);
 
-  const matchedIdNumber = mockDatabase.map((data) => data.personal_id_number);
-
   const handleInputChange = (e) => {
-    const value = e.target.value.toUpperCase();
-    setIdNumber(value);
+    setIdNumber(e.target.value.toUpperCase());
   };
 
   const handleSearch = () => {
     const regex = /^[A-Z]{1}[0-9]{9}$/;
-    if (!idNumber.match(regex) || !matchedIdNumber.includes(idNumber)) {
-      setError("查無此身分證號碼");
+    if (!idNumber.match(regex) || !mockDatabase.some(data => data.personal_id_number === idNumber)) {
+      setError('查無此身分證號碼');
       setIsOpened(false);
     } else {
-      setError("");
+      setError('');
       setIsOpened(true);
     }
   };
@@ -147,7 +135,7 @@ export default function ProgressPage() {
                 })
               ) : (
                 <TableRow>
-                  <TableCell colSpan={7}>尚未開診</TableCell>
+                  <TableCell colSpan={5}>尚未開診</TableCell>
                 </TableRow>
               )}
             </tbody>

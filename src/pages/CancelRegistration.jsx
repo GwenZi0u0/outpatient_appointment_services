@@ -99,9 +99,8 @@ export default function CancelRegistrationPage() {
         await updateDoc(docRef, {
           status: "cancelled",
         });
-
+        refresh(["registrations"]);
         alert("掛號已取消");
-        refresh();
       } catch (error) {
         console.error("Error updating document: ", error);
         alert("取消掛號時出現錯誤，請稍後再試。");

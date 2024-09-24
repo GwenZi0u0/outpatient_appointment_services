@@ -78,7 +78,7 @@ export default function RegistrationInformation({
       <Input
         type="text"
         maxLength={10}
-        placeholder="A112234456"
+        placeholder="A234567890"
         onChange={handleInputChange}
         {...register("idNumber", {
           required: "請輸入身分證號碼",

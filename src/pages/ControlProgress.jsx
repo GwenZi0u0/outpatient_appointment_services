@@ -96,7 +96,7 @@ export default function CancelRegistrationPage() {
 
       setCurrentNumber(null);
       setCurrentPeriod(null);
-      refresh();
+      refresh(["progress"]);
     } else {
       try {
         const registrationNumber = null;
@@ -114,7 +114,7 @@ export default function CancelRegistrationPage() {
       } catch (e) {
         console.error("Error adding document: ", e);
       }
-      refresh();
+      refresh(["progress"]);
     }
 
     setIsOpen((prev) => !prev);

@@ -169,7 +169,7 @@ const TextCarousel = styled.div`
   font-weight: bold;
   white-space: nowrap;
   color: #b3261e;
-  animation: ${scrollAnimation} 35s linear infinite;
+  animation: ${scrollAnimation} 40s linear infinite;
 `;
 
 const AnnouncementContainer = styled.div`

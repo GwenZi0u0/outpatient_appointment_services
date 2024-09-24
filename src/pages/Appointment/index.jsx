@@ -317,11 +317,10 @@ const ServiceList = styled.form`
   overflow-x: hidden;
   border-radius: 2px;
   scroll-behavior: smooth;
-  /* 隐藏滚动条 */
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* Internet Explorer 10+ */
+  scrollbar-width: none;
+  -ms-overflow-style: none; 
 
   &::-webkit-scrollbar {
-    display: none; /* Chrome, Safari, Opera */
+    display: none;
   }
 `;
