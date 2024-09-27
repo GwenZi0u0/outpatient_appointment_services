@@ -135,7 +135,7 @@ export default function RegistrationInformation({
 
 const FormContainer = styled.div`
   width: 100%;
-  max-width: 600px;
+  max-width: 800px;
   margin: 0 auto;
   padding: 20px;
   border-radius: 5px;
@@ -144,7 +144,8 @@ const FormContainer = styled.div`
 const Table = styled.table`
   width: 100%;
   border-collapse: collapse;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
+  font-size: 22px;
 `;
 
 const Th = styled.th`
@@ -160,30 +161,34 @@ const Td = styled.td`
 `;
 
 const Label = styled.label`
+  font-size: 24px;
   display: block;
-  margin-bottom: 5px;
+  margin-bottom: 15px;
 `;
 
 const Select = styled.select`
   width: 100%;
-  padding: 5px;
+  padding: 15px;
   margin-bottom: 10px;
+  font-size: 20px;
 `;
 
 const Input = styled.input`
   width: 100%;
-  padding: 5px;
-  margin-bottom: 10px;
+  padding: 15px;
+  margin-bottom: 15px;
+  font-size: 20px;
 `;
 
 const ButtonContainer = styled.div`
   display: flex;
   justify-content: center;
-  gap: 10px;
+  gap: 20px;
 `;
 
 const Button = styled.button`
-  padding: 10px 20px;
+  padding: 14px 32px;
+  font-size: 24px;
   background-color: ${(props) => (props.$btnColor ? "#244a8b" : "#D2CDCD")};
   color: ${(props) => (props.$btnColor ? "#fff" : "#000")};
   border: none;
