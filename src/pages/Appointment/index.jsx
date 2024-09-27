@@ -179,11 +179,14 @@ export default function Appointment() {
         <Title>網路預約掛號流程</Title>
       </Header>
       <ProcessStep>
-        {steps.map((item) => (
+        {steps.map((item, index) => (
           <Step
             key={item.step}
             $active={step === item.step}
             $completed={step > item.step}
+            $isFirst={index === 0}
+            $isMiddle={index > 0 && index < steps.length - 1}
+            $isLast={index === steps.length - 1}
           >
             {item.label}
           </Step>
@@ -271,16 +274,20 @@ const Header = styled.div`
 const BackButton = styled.button`
   width: 148px;
   height: 100%;
-  margin-left: 20px;
   border: none;
   color: #244a8b;
-  background-color: #d9d9d9;
+  background-color: #ffc288;
+  font-size: 24px;
+  font-weight: 700;
+  opacity: 0.8;
+  border-radius: 2px;
   cursor: pointer;
 `;
 
 const Title = styled.h1`
   margin-left: 20px;
   font-size: 18px;
+  color: #244a8b;
 `;
 
 const ProcessStep = styled.div`
@@ -296,29 +303,32 @@ const ProcessStep = styled.div`
 const Step = styled.div`
   display: flex;
   align-items: center;
-  /* justify-content: center; */
-  width: 190px;
+  width: 200px;
   height: 45px;
-  padding-left: 30px;
+  padding-left: 40px;
   color: #ffffff;
+  border-radius: 2px;
   background-color: ${(props) =>
     props.$active ? "#244a8b" : props.$completed ? "#B7C3DA" : "#d3cdcd"};
-  /* clip-path: polygon(0% 0%, 85% 0%, 100% 50%, 85% 100%, 0% 100%); //step第一個
-  clip-path: polygon(5% 0%, 90% 0%, 100% 50%, 90% 100%, 5% 100%, 12% 50%); //中間的step
-  clip-path: polygon(100% 0%, 15% 0%, 0% 50%, 15% 100%, 100% 100%); //step最後一個 */
+  clip-path: ${(props) =>
+    props.$isFirst
+      ? "polygon(0% 0%, 88% 0%, 100% 50%, 88% 100%, 0% 100%)"
+      : props.$isLast
+      ? "polygon(100% 0%, 0% 0%, 12% 50%, 0% 100%, 100% 100%)"
+      : "polygon(0% 0%, 88% 0%, 100% 50%, 88% 100%, 0% 100%, 12% 50%)"};
 `;
 
 const ServiceList = styled.form`
   border: 5px solid #d2cdcd;
   height: auto;
-  max-height: 650px;
+  max-height: 840px;
   min-height: 50px;
   overflow-y: auto;
   overflow-x: hidden;
   border-radius: 2px;
   scroll-behavior: smooth;
   scrollbar-width: none;
-  -ms-overflow-style: none; 
+  -ms-overflow-style: none;
 
   &::-webkit-scrollbar {
     display: none;
