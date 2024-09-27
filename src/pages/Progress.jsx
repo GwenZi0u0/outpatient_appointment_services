@@ -58,11 +58,14 @@ export default function ProgressPage() {
 
   const handleSearch = () => {
     const regex = /^[A-Z]{1}[0-9]{9}$/;
-    if (!idNumber.match(regex) || !mockDatabase.some(data => data.personal_id_number === idNumber)) {
-      setError('查無此身分證號碼');
+    if (
+      !idNumber.match(regex) ||
+      !mockDatabase.some((data) => data.personal_id_number === idNumber)
+    ) {
+      setError("查無此身分證號碼");
       setIsOpened(false);
     } else {
-      setError('');
+      setError("");
       setIsOpened(true);
     }
   };
@@ -77,16 +80,18 @@ export default function ProgressPage() {
     <MainContainer>
       <Container>
         <Title>今日門診進度</Title>
-        <Label>身分證號碼查詢 </Label>
-        <Input
-          type="text"
-          placeholder="請輸入身分證號碼"
-          maxLength={10}
-          value={idNumber}
-          onChange={handleInputChange}
-          onKeyDown={handleKeyDown}
-        />
-        {error && <ErrorMessage>{error}</ErrorMessage>}
+        <SearchContainer>
+          <Label>身分證號碼查詢 </Label>
+          <Input
+            type="text"
+            placeholder="請輸入身分證號碼"
+            maxLength={10}
+            value={idNumber}
+            onChange={handleInputChange}
+            onKeyDown={handleKeyDown}
+          />
+          {error && <ErrorMessage>{error}</ErrorMessage>}
+        </SearchContainer>
         {isOpened && (
           <Table $isOpened={isOpened}>
             <TableHeader>
@@ -160,9 +165,9 @@ const MainContainer = styled.div`
 
 const Container = styled.div`
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   flex-direction: column;
-  padding-top: 80px;
+  padding-top: 160px;
   background-color: transparent;
 `;
 
@@ -174,15 +179,22 @@ const Title = styled.h1`
   letter-spacing: 9.6px;
 `;
 
+const SearchContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+`;
+
 const Input = styled.input`
-  width: 300px;
+  width: auto;
   height: 50px;
   padding: 10px;
   font-size: 16px;
   border: 1px solid #000000;
   border-radius: 5px;
-  margin-bottom: 20px;
 `;
+
 const Label = styled.label`
   display: flex;
   justify-content: center;
@@ -192,7 +204,9 @@ const Label = styled.label`
   letter-spacing: 10.4px;
   width: 100%;
   height: 93px;
+  padding-left: 35px;
 `;
+
 const Table = styled.table`
   display: ${(props) => (props.$isOpened ? "table" : "none")};
   width: 100%;
@@ -201,8 +215,12 @@ const Table = styled.table`
 `;
 
 const TableHeader = styled.thead`
-  background-color: gray;
+  background-color: #00B0C1;
   color: white;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 10.4px;
+  height: 93px;
 `;
 
 const TableRow = styled.tr`
