@@ -10,6 +10,7 @@ const GlobalStyles = createGlobalStyle`
         font-family: 'Noto Sans', sans-serif;
         padding: 0;
         margin: 0;
+        background-color: #FFFDF9;
     }
 `;
 export default GlobalStyles;
