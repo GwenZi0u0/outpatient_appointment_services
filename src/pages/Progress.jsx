@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import styled from "styled-components";
 import { useData } from "../contexts/DataContext";
-import { Timestamp } from "firebase/firestore";
+import { filterRegistrationDataByCurrentDate } from "../utils/dateUtils";
 // K789456444
 // A123456789
 
@@ -13,27 +13,6 @@ const useProgressStore = create((set) => ({
   isOpened: false,
   setIsOpened: (isOpened) => set({ isOpened }),
 }));
-
-const getCurrentDateInfo = (data) => {
-  const timestamp = data instanceof Timestamp ? data : Timestamp.fromDate(data);
-  const dateFromSeconds = new Date(timestamp.seconds * 1000);
-  return [
-    dateFromSeconds.getFullYear(),
-    String(dateFromSeconds.getMonth() + 1).padStart(2, "0"),
-    String(dateFromSeconds.getDate()).padStart(2, "0"),
-  ];
-};
-
-const filterRegistrationDataByCurrentDate = (mockDatabase) => {
-  const currentDateFormatted = getCurrentDateInfo(new Date());
-  return mockDatabase.filter((data) => {
-    const currentOPDDate = getCurrentDateInfo(data.OPD_date);
-    const isDateMatching = currentOPDDate.every(
-      (component, index) => component === currentDateFormatted[index]
-    );
-    return isDateMatching && data.status === "confirmed";
-  });
-};
 
 export default function ProgressPage() {
   const { idNumber, setIdNumber, error, setError, isOpened, setIsOpened } =
@@ -70,9 +49,9 @@ export default function ProgressPage() {
     }
   };
 
-  const handleKeyDown = (e) => {
+  const handleKeyDown = (e, registrationData) => {
     if (e.key === "Enter") {
-      handleSearch();
+      handleSearch(registrationData); 
     }
   };
 
@@ -88,7 +67,7 @@ export default function ProgressPage() {
             maxLength={10}
             value={idNumber}
             onChange={handleInputChange}
-            onKeyDown={handleKeyDown}
+            onKeyDown={(e) => handleKeyDown(e, registrationData)}
           />
           {error && <ErrorMessage>{error}</ErrorMessage>}
         </SearchContainer>
@@ -140,7 +119,7 @@ export default function ProgressPage() {
                 })
               ) : (
                 <TableRow>
-                  <TableCell colSpan={5}>尚未開診</TableCell>
+                  <TableCell colSpan={5}>查無資料</TableCell>
                 </TableRow>
               )}
             </tbody>
@@ -215,7 +194,7 @@ const Table = styled.table`
 `;
 
 const TableHeader = styled.thead`
-  background-color: #00B0C1;
+  background-color: #00b0c1;
   color: white;
   font-size: 24px;
   font-weight: 700;
