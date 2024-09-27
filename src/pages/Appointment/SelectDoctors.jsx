@@ -35,7 +35,7 @@ export default function SelectDoctors({
             >
               <CheckInput type="radio" name="doctor" defaultValue={doctor.id} />
               <CheckIcon src={SelectedIcon} />
-              <DoctorImage src={doctor.image} />
+              <DoctorImage src={doctor.physician_imag} />
               <DoctorInfo>
                 <DoctorName>{doctor.physician_name} 醫師</DoctorName>
                 <DoctorTitle to={`/doctor-profile/${doctor.uid}`}>
@@ -103,5 +103,6 @@ const DoctorImage = styled.img`
   width: 100px;
   height: 100px;
   background-color: gray;
-  border-radius: 10px;
+  border-radius: 50%;
+  object-fit: cover;
 `;
