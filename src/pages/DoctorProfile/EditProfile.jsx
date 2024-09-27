@@ -1,65 +1,262 @@
+import { create } from "zustand";
 import styled from "styled-components";
 import { useParams } from "react-router-dom";
 import { useData } from "../../contexts/DataContext";
+import { useState } from "react";
+import { fireDb, fireStorage } from "../../firebase";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { doc, updateDoc } from "firebase/firestore";
 import AuthImage from "../../assets/auth.svg";
+import ProfileDoctor from "../../assets/profileDoctor.svg";
+
+const useEditProfileStore = create((set) => ({
+  isEditing: false,
+  setIsEditing: (isEditing) => set({ isEditing }),
+  newExpertise: "",
+  setNewExpertise: (newExpertise) => set({ newExpertise }),
+}));
 
 export default function EditProfile({ calculateAge }) {
   const { doctorId } = useParams();
   const { queries } = useData();
   const departmentData = queries[0]?.data;
   const doctorData = queries[1]?.data;
+  const userData = doctorData?.find((doctor) => doctor.uid === doctorId);
+  const [doctor, setDoctor] = useState(userData);
 
-  const selectedDoctor = doctorData?.find((doctor) => doctor.uid === doctorId);
+  const { isEditing, setIsEditing, newExpertise, setNewExpertise } =
+    useEditProfileStore((state) => ({
+      isEditing: state.isEditing,
+      setIsEditing: state.setIsEditing,
+      newExpertise: state.newExpertise,
+      setNewExpertise: state.setNewExpertise,
+    }));
+
+  const selectFile = () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.onchange = () => {
+      const file = input.files[0];
+      return file;
+    };
+    input.click();
+  };
+
+  const handleEditImage = async () => {
+    setIsEditing(true);
+    const file = selectFile();
+    if (file) {
+      const storageRef = ref(fireStorage, `userAvatar/${doctorId}`);
+      await uploadBytes(storageRef, file);
+      const downloadURL = await getDownloadURL(storageRef);
+      await updateDoc(doc(fireDb, "doctors", doctorId), {
+        physician_imag: downloadURL,
+      });
+      setDoctor((prev) => ({ ...prev, physician_imag: downloadURL }));
+    }
+  };
+
+  const handleDegreeChange = (value) => {
+    setDoctor((prev) => ({ ...prev, degree: value }));
+  };
+
+  const handleDutyChange = (value) => {
+    setDoctor((prev) => ({ ...prev, duty: value }));
+    console.log(doctor.duty);
+  };
+
+  const handleContentChange = (value) => {
+    setDoctor((prev) => ({ ...prev, content: value }));
+  };
+
+  const handleRemoveExpertise = (index) => {
+    const updatedExpertises = [...userData.expertises];
+    updatedExpertises.splice(index, 1);
+    setDoctor((prev) => ({ ...prev, expertises: updatedExpertises }));
+    console.log(updatedExpertises);
+  };
+
+  const handleDragDrop = (fromIndex, toIndex) => {
+    const updatedExpertises = [...userData.expertises];
+    const [removed] = updatedExpertises.splice(fromIndex, 1);
+    updatedExpertises.splice(toIndex, 0, removed);
+    setDoctor((prev) => ({ ...prev, expertises: updatedExpertises }));
+    console.log(updatedExpertises);
+  };  
+
+  const handleAddExpertise = (newExpertise) => {
+    setDoctor((prev) => ({ ...prev, expertises: [...prev.expertises, newExpertise] }));
+    console.log(doctor?.expertises);
+  }
+
+  const handleEditProfile = () => {
+    setIsEditing(true);
+  };
+
+  const handleSaveProfile = () => {
+    setIsEditing(false);
+  };
 
   return (
     <MainContainer>
-      {selectedDoctor ? (
-        <ProfileContainer key={selectedDoctor.uid}>
-          <Title>醫師簡介</Title>
+      {userData ? (
+        <ProfileContainer key={userData.uid}>
+          <TitleContainer>
+            <Title>
+              <TitleImg src={ProfileDoctor} alt="profile" />
+              醫師簡介
+            </Title>
+            <EditButtonContainer>
+              {isEditing ? (
+                <EditButton onClick={handleSaveProfile}>儲存</EditButton>
+              ) : (
+                <EditButton onClick={handleEditProfile}>修改</EditButton>
+              )}
+            </EditButtonContainer>
+          </TitleContainer>
           <ProfileContent>
-            <ImageContainer>
-              <ProfileImage
-                src={AuthImage}
-                alt={selectedDoctor.physician_name}
+            <ProfileInfoContainer>
+              <ImageContainer>
+                <ProfileImage
+                  src={userData.physician_imag || AuthImage}
+                  alt={userData.physician_name}
+                />
+                {isEditing && (
+                  <EditImageButton
+                    type="button"
+                    onClick={() => handleEditImage()}
+                  >
+                    編輯
+                  </EditImageButton>
+                )}
+                <Name>{userData.physician_name}</Name>
+              </ImageContainer>
+              <InfoContainer>
+                <DetailsList>
+                  <DetailItem>
+                    年齡：
+                    {calculateAge(userData.physician_birth_date)}
+                  </DetailItem>
+                  {departmentData && (
+                    <>
+                      <DetailItem>
+                        系别：
+                        {
+                          departmentData.find(
+                            (department) =>
+                              department.id === userData.division.division_id
+                          )?.department
+                        }
+                      </DetailItem>
+                      <DetailItem>
+                        主治：
+                        {
+                          departmentData
+                            .find(
+                              (department) =>
+                                department.id === userData.division.division_id
+                            )
+                            ?.specialties.find(
+                              (specialty) =>
+                                specialty.id === userData.division.specialty_id
+                            )?.specialty
+                        }
+                      </DetailItem>
+                    </>
+                  )}
+                  <DetailItem>
+                    學歷：
+                    {isEditing ? (
+                      <EditableInput
+                        type="text"
+                        value={doctor?.degree}
+                        onChange={(e) => handleDegreeChange(e.target.value)}
+                      />
+                    ) : (
+                      userData?.degree || ""
+                    )}
+                  </DetailItem>
+                  <DetailItem>
+                    現任職務：
+                    {isEditing ? (
+                      <EditableInput
+                        type="text"
+                        value={doctor?.duty}
+                        onChange={(e) => handleDutyChange(e.target.value)}
+                      />
+                    ) : (
+                      userData?.duty || ""
+                    )}
+                  </DetailItem>
+                </DetailsList>
+              </InfoContainer>
+            </ProfileInfoContainer>
+            {isEditing ? (
+              <EditableTextArea
+                value={userData?.content}
+                onChange={(e) => handleContentChange(e.target.value)}
               />
-            </ImageContainer>
-            <InfoContainer>
-              <Name>{selectedDoctor.physician_name}</Name>
+            ) : (
+              <AdditionalInfo>{userData.content}</AdditionalInfo>
+            )}
+            <PositionContainer>
               <Position>專長</Position>
               <SpecialtiesContainer>
-                {selectedDoctor.expertises.map((expertise) => (
-                  <SpecialtyTag key={expertise}>{expertise}</SpecialtyTag>
+                {userData?.expertises.map((expertise, index) => (
+                  <SpecialtyTag
+                    key={index}
+                    draggable={true}
+                    onDragStart={(e) =>
+                      e.dataTransfer.setData("text/plain", index)
+                    }
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      const fromIndex = parseInt(
+                        e.dataTransfer.getData("text/plain"),
+                        10
+                      );
+                      handleDragDrop(fromIndex, index);
+                    }}
+                  >
+                    {isEditing ? (
+                      <>
+                        {expertise}
+                        <RemoveExpertiseButton
+                          onClick={() => handleRemoveExpertise(index)}
+                        >
+                          X
+                        </RemoveExpertiseButton>
+                      </>
+                    ) : (
+                      expertise
+                    )}
+                  </SpecialtyTag>
                 ))}
               </SpecialtiesContainer>
-              <DetailsList>
-                <DetailItem>
-                  年齡：{calculateAge(selectedDoctor.physician_birth_date)}
-                </DetailItem>
-                {departmentData &&
-                  (() => {
-                    const department = departmentData
-                      .find(
-                        (department) =>
-                          department.id === selectedDoctor.division.division_id
-                      )
-                      ?.specialties.find(
-                        (specialty) =>
-                          specialty.id === selectedDoctor.division.specialty_id
-                      )?.specialty;
-
-                    return (
-                      <>
-                        <DetailItem>科別：{department}</DetailItem>
-                        <DetailItem>主治：{department}</DetailItem>
-                      </>
-                    );
-                  })()}
-                <DetailItem>學歷：{selectedDoctor.degree}</DetailItem>
-                <DetailItem>現任職務：{selectedDoctor.duty}</DetailItem>
-              </DetailsList>
-            </InfoContainer>
+              {isEditing && (
+                <TagContainer>
+                  <EditableInput
+                    type="text"
+                    value={newExpertise}
+                    onChange={(e) => setNewExpertise(e.target.value)}
+                    placeholder="輸入新專長"
+                  />
+                  <AddExpertiseButton
+                    onClick={() => {
+                      if (newExpertise.trim()) {
+                        handleAddExpertise(newExpertise);
+                        setNewExpertise("");
+                      }
+                    }}
+                  >
+                    新增
+                  </AddExpertiseButton>
+                </TagContainer>
+              )}
+            </PositionContainer>
           </ProfileContent>
-          <AdditionalInfo>{selectedDoctor.content}</AdditionalInfo>
         </ProfileContainer>
       ) : null}
     </MainContainer>
@@ -75,37 +272,89 @@ const MainContainer = styled.div`
 `;
 
 const ProfileContainer = styled.div`
-  width: 800px;
+  width: 850px;
   margin: 20px auto;
   padding: 20px;
-  border: 1px solid #e0e0e0;
   border-radius: 8px;
 `;
 
+const TitleContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const TitleImg = styled.img`
+  width: 40px;
+  height: 40px;
+  margin-right: 15px;
+`;
+
 const Title = styled.h2`
-  font-size: 30px;
+  display: flex;
+  align-items: center;
+  font-size: 32px;
   margin-bottom: 20px;
+`;
+
+const EditButtonContainer = styled.div`
+  display: flex;
+  gap: 10px;
+`;
+
+const EditButton = styled.button`
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
 `;
 
 const ProfileContent = styled.div`
   display: flex;
+  flex-direction: column;
   border: 1px solid #4a90e2;
   border-radius: 8px;
   padding: 20px;
+  gap: 20px;
+`;
+
+const ProfileInfoContainer = styled.div`
+  display: flex;
+  align-items: flex-start;
+  gap: 25px;
 `;
 
 const ImageContainer = styled.div`
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: auto;
+  height: auto;
   overflow: hidden;
-  margin-right: 20px;
+  padding: 20px;
+  gap: 20px;
 `;
 
 const ProfileImage = styled.img`
-  width: 100%;
-  height: 100%;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
   object-fit: cover;
+`;
+
+const EditImageButton = styled.button`
+  position: absolute;
+  top: 140px;
+  left: 60px;
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
 `;
 
 const InfoContainer = styled.div`
@@ -121,8 +370,9 @@ const Name = styled.h3`
 
 const Position = styled.p`
   font-weight: bold;
-  margin-bottom: 10px;
-  font-size: 22px;
+  font-size: 24px;
+  letter-spacing: 2px;
+  line-height: 2.2;
 `;
 
 const SpecialtiesContainer = styled.div`
@@ -132,7 +382,19 @@ const SpecialtiesContainer = styled.div`
   margin-bottom: 20px;
 `;
 
+const PositionContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  font-size: 22px;
+  font-weight: 400;
+  gap: 10px;
+  padding: 10px;
+`;
+
 const SpecialtyTag = styled.span`
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background-color: #f0f0f0;
   padding: 5px 10px;
   border-radius: 20px;
@@ -142,11 +404,14 @@ const SpecialtyTag = styled.span`
 const DetailsList = styled.ul`
   list-style-type: none;
   padding: 0;
+  letter-spacing: 2px;
+  line-height: 2.2;
 `;
 
 const DetailItem = styled.li`
-  margin-bottom: 5px;
+  text-align: left;
   font-size: 22px;
+  font-weight: 450;
 `;
 
 const AdditionalInfo = styled.div`
@@ -154,5 +419,44 @@ const AdditionalInfo = styled.div`
   background-color: #fff0f5;
   border-radius: 8px;
   padding: 15px;
-  margin-top: 20px;
+  letter-spacing: 2px;
+  line-height: 2.2;
+`;
+
+const AddExpertiseButton = styled.button`
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+`;
+
+const EditableInput = styled.input`
+  width: 100%;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+`;
+
+const TagContainer = styled.div`
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+`;
+
+const EditableTextArea = styled.textarea`
+  width: 100%;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+`;
+
+const RemoveExpertiseButton = styled.button`
+  background-color: transparent;
+  color: #d2d2d2;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
 `;
