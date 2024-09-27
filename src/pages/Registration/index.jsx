@@ -3,6 +3,8 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchDepartmentsData } from "../../api";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
+import BackGround from "../../assets/background.svg";
+import AnnouncementImg from "../../assets/announcementImage.svg";
 
 export default function Registration() {
   const { setValue } = useForm();
@@ -36,8 +38,12 @@ export default function Registration() {
           「預約掛號天數為28天內，內容詳見掛號須知。」
         </ContainerText>
         <ButtonContainer>
-          <Button onClick={handleButtonClick}>網路掛號</Button>
-          <Button onClick={() => navigate("progress")}>看診進度</Button>
+          <Button $bgcolor="#0267b5de" onClick={handleButtonClick}>
+            網路掛號
+          </Button>
+          <Button $bgcolor="#00b1c1de" onClick={() => navigate("progress")}>
+            看診進度
+          </Button>
         </ButtonContainer>
         <Carousel>
           <TextCarousel>
@@ -62,18 +68,23 @@ export default function Registration() {
       <SelectRegion id="select-department">
         <SelectTitle>掛號、看診進度請選擇以下系別</SelectTitle>
         <SelectCards>
-          {data.map((department) => (
-            <SelectCard
-              key={department.id}
-              onClick={() => handleCardClick(department)}
-            >
-              <SelectCardImage />
-              <ContentContainer>
-                <SelectCardTitle>{department.department}</SelectCardTitle>
-                <SelectContent>{department.description}</SelectContent>
-              </ContentContainer>
-            </SelectCard>
-          ))}
+          {data
+            .sort((a, b) => a.department_id - b.department_id)
+            .map((department) => (
+              <SelectCard
+                key={department.id}
+                onClick={() => handleCardClick(department)}
+              >
+                <SelectCardImage
+                  src={department.image}
+                  alt={department.department}
+                />
+                <ContentContainer>
+                  <SelectCardTitle>{department.department}</SelectCardTitle>
+                  <SelectContent>{department.description}</SelectContent>
+                </ContentContainer>
+              </SelectCard>
+            ))}
         </SelectCards>
       </SelectRegion>
     </MainContainer>
@@ -93,6 +104,9 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   padding-top: 80px;
+  background-image: url(${BackGround});
+  background-size: cover;
+  background-repeat: no-repeat;
   background-color: lightgray;
   width: 100%;
   height: 100vh;
@@ -126,7 +140,7 @@ const RemindText = styled.div`
 
 const ButtonContainer = styled.div`
   position: absolute;
-  bottom: 195px;
+  bottom: 200px;
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -141,6 +155,8 @@ const Button = styled.button`
   border-radius: 100px;
   width: 185px;
   height: 65px;
+  color: #ffffff;
+  background-color: ${(props) => props.$bgcolor};
 `;
 
 const scrollAnimation = keyframes`
@@ -178,22 +194,22 @@ const AnnouncementContainer = styled.div`
   align-items: center;
   justify-content: center;
   padding: 90px 0 100px 0;
-  background-color: #f5f5f5;
+  background-color: transparent;
   width: 100%;
   height: 100vh;
-  margin-top: 10px;
   gap: 200px;
 `;
 const AnnouncementImage = styled.div`
   width: 348px;
   height: 550px;
   background-color: #ffffff;
+  background-image: url(${AnnouncementImg});
 `;
 
 const Announcement = styled.div`
   width: 837px;
   height: 736px;
-  background-color: #ffffff;
+  background-color: #f2f2f2;
   color: #000000;
   display: flex;
   flex-direction: column;
@@ -202,11 +218,11 @@ const Announcement = styled.div`
 const SelectRegion = styled.div`
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: auto;
   background-color: transparent;
   margin-top: 10px;
-  padding: 20px 165px 20px;
-  gap: 20px;
+  padding: 20px 165px 100px;
+  gap: 40px;
 `;
 
 const SelectTitle = styled.div`
@@ -221,7 +237,7 @@ const SelectCards = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   background-color: #ffffff;
-  gap: 48px;
+  gap: 40px;
 `;
 
 const SelectCard = styled.button`
@@ -230,10 +246,14 @@ const SelectCard = styled.button`
   background-color: #fff;
   padding: 20px;
   box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
-  margin: 35.5px auto;
+  margin: 8px auto;
   border: 0.5px solid #d9d9d9;
   text-decoration: none;
   cursor: pointer;
+  &:hover {
+    transform: scale(1.1);
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+  }
 `;
 
 const ContentContainer = styled.div`
@@ -254,7 +274,7 @@ const SelectCardImage = styled.img`
   margin-right: 20px;
   width: 160px;
   height: 160px;
-  background-color: gray;
+  background-color: lightgray;
 `;
 
 const SelectContent = styled.span`
