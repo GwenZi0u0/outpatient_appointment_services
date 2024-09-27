@@ -192,6 +192,7 @@ const ConfirmedValue = styled.input`
   border-radius: 4px;
   background-color: #8282828a;
   cursor: not-allowed;
+  padding-left: 10px;
 `;
 
 const TableWrapper = styled.div`
