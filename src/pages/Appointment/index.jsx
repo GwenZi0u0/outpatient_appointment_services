@@ -1,9 +1,10 @@
+import { create } from "zustand";
 import styled from "styled-components";
-import { useState } from "react";
+import { useMemo, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { fetchScheduleData } from "../../api";
+import { fetchSchedulesData, fetchRegistrationData } from "../../api";
 import SelectSpecialties from "./SelectSpecialties";
 import SelectDoctors from "./SelectDoctors";
 import SelectTime from "./SelectTime";
@@ -11,14 +12,29 @@ import RegistrationInformation from "./RegistrationInformation";
 import RegistrationCompleted from "./RegistrationCompleted";
 import { collection, addDoc, Timestamp } from "firebase/firestore";
 import { fireDb } from "../../firebase";
+import {
+  isValidTaiwanID,
+  formatFirestoreTimestamp,
+  convertToTimestamp,
+} from "../../utils/dateUtils";
+
+const useAppointmentStore = create((set) => ({
+  step: 1,
+  setStep: (newStep) => set({ step: newStep }),
+}));
 
 export default function Appointment() {
   const navigator = useNavigate();
   const { state } = useLocation();
   const { department } = state;
-  const { data } = useQuery({
+  const { step, setStep } = useAppointmentStore();
+  const { data: scheduleData } = useQuery({
     queryKey: ["schedules"],
-    queryFn: fetchScheduleData,
+    queryFn: fetchSchedulesData,
+  });
+  const { data: registrationData } = useQuery({
+    queryKey: ["registrations"],
+    queryFn: fetchRegistrationData,
   });
 
   const { register, handleSubmit, setValue, watch, getValues } = useForm({
@@ -32,20 +48,35 @@ export default function Appointment() {
       birthday: "",
       name: "",
       phone: "",
+      nextRegistrationNumber: "",
     },
   });
 
   console.log(getValues());
 
-  const [step, setStep] = useState(1);
+  const steps = useMemo(
+    () => [
+      { step: 1, label: "請選擇科別" },
+      { step: 2, label: "請選擇醫生" },
+      { step: 3, label: "請選擇掛號時間" },
+      { step: 4, label: "掛號資訊確認" },
+      { step: 5, label: "完成掛號" },
+    ],
+    []
+  );
 
-  const handleReturnClick = () => {
+  const handleReturnClick = useCallback(() => {
     if (step === 1) {
       navigator("/");
+      setTimeout(() => {
+        document
+          .getElementById("select-department")
+          ?.scrollIntoView({ behavior: "smooth" });
+      }, 0);
     } else {
       setStep(step - 1);
     }
-  };
+  }, [step, navigator]);
 
   const handleSpecialtyClick = (specialty) => {
     setValue("specialty", specialty);
@@ -63,37 +94,54 @@ export default function Appointment() {
     setStep(4);
   };
 
-  const birthdayStamp = () => {
-    const date = new Date(watch("birthday"));
+  const handleCompleted = () => {
+    navigator("/");
+  };
+
+  const birthdayStamp = (data) => {
+    const date = new Date(data);
     const firebaseTimestamp = Timestamp.fromDate(date);
     return firebaseTimestamp;
   };
 
-  const dateStamp = () => {
-    const [monthDay] = watch("date").split(" ");
-    const [month, day] = monthDay.split("/").map(Number);
-    const date = new Date(2024, month - 1, day);
-    const firebaseTimestamp = Timestamp.fromDate(date);
-    return firebaseTimestamp;
+  const getNextRegistrationNumber = (data, time) => {
+    const extractedDate = watch("date").split(" ")[0];
+    const foundDate = data.filter(
+      (item) => formatFirestoreTimestamp(item.OPD_date) === extractedDate
+    );
+    const foundTime = foundDate.filter(
+      (item) => item.appointment_timeslot === time
+    );
+    const maxRegistrationNumber = Math.max(
+      ...foundTime.map((item) => item.registration_number),
+      0
+    );
+    return maxRegistrationNumber + 1;
   };
 
   const onSubmit = async (data) => {
+    if (!isValidTaiwanID(data.idNumber)) {
+      alert("身分證號碼輸入錯誤");
+      return;
+    }
+    const nextNumber = getNextRegistrationNumber(registrationData, data.time);
+    setValue("nextRegistrationNumber", nextNumber);
+
     setValue("idNumber", data.idNumber);
     try {
-      console.log("Starting onSubmit");
       const docRef = await addDoc(collection(fireDb, "registrations"), {
-        OPD_date: dateStamp(),
+        OPD_date: convertToTimestamp(data.date),
         appointment_timeslot: data.time,
-        birth_date: birthdayStamp(),
+        birth_date: birthdayStamp(data.birthday),
         division: {
           department_id: data.department.id,
           specialty_id: data.specialty.id,
         },
-        doctor: data.doctor.id,
+        doctor_id: data.doctor.uid,
         name: data.name,
         patient_contact: data.phone,
         personal_id_number: data.idNumber,
-        registration_number: "1",
+        registration_number: nextNumber,
         status: "confirmed",
       });
 
@@ -104,18 +152,6 @@ export default function Appointment() {
     }
   };
 
-  const handleCompleted = () => {
-    navigator("/");
-  };
-
-  const steps = [
-    { step: 1, label: "請選擇科別" },
-    { step: 2, label: "請選擇醫生" },
-    { step: 3, label: "請選擇掛號時間" },
-    { step: 4, label: "掛號資訊確認" },
-    { step: 5, label: "完成掛號" },
-  ];
-
   return (
     <Container>
       <Header>
@@ -123,11 +159,14 @@ export default function Appointment() {
         <Title>網路預約掛號流程</Title>
       </Header>
       <ProcessStep>
-        {steps.map((item) => (
+        {steps.map((item, index) => (
           <Step
             key={item.step}
             $active={step === item.step}
             $completed={step > item.step}
+            $isFirst={index === 0}
+            $isMiddle={index > 0 && index < steps.length - 1}
+            $isLast={index === steps.length - 1}
           >
             {item.label}
           </Step>
@@ -155,7 +194,7 @@ export default function Appointment() {
             department={watch("department")}
             specialty={watch("specialty")}
             doctor={watch("doctor")}
-            schedule={data}
+            schedule={scheduleData}
             onTimeClick={(date, time) => handleTimeClick(date, time)}
           />
         )}
@@ -166,7 +205,9 @@ export default function Appointment() {
             doctor={watch("doctor")}
             date={watch("date")}
             time={watch("time")}
-            schedule={data}
+            schedule={scheduleData}
+            getNextRegistrationNumber={getNextRegistrationNumber}
+            registrationData={registrationData}
             onResetClick={() => setStep(1)}
             onSubmit={(idNumber, birthday, name, phone) =>
               onSubmit({ idNumber, birthday, name, phone })
@@ -180,7 +221,7 @@ export default function Appointment() {
             doctor={watch("doctor")}
             date={watch("date")}
             time={watch("time")}
-            schedule={data}
+            schedule={scheduleData}
             idNumber={watch("idNumber")}
             birthday={watch("birthday")}
             name={watch("name")}
@@ -213,16 +254,20 @@ const Header = styled.div`
 const BackButton = styled.button`
   width: 148px;
   height: 100%;
-  margin-left: 20px;
   border: none;
   color: #244a8b;
-  background-color: #d9d9d9;
+  background-color: #ffc288;
+  font-size: 24px;
+  font-weight: 700;
+  opacity: 0.8;
+  border-radius: 2px;
   cursor: pointer;
 `;
 
 const Title = styled.h1`
   margin-left: 20px;
   font-size: 18px;
+  color: #244a8b;
 `;
 
 const ProcessStep = styled.div`
@@ -238,23 +283,34 @@ const ProcessStep = styled.div`
 const Step = styled.div`
   display: flex;
   align-items: center;
-  /* justify-content: center; */
-  width: 190px;
+  width: 200px;
   height: 45px;
-  padding-left: 30px;
+  padding-left: 40px;
   color: #ffffff;
+  border-radius: 2px;
   background-color: ${(props) =>
     props.$active ? "#244a8b" : props.$completed ? "#B7C3DA" : "#d3cdcd"};
-  /* clip-path: polygon(0% 0%, 85% 0%, 100% 50%, 85% 100%, 0% 100%); //step第一個
-  clip-path: polygon(5% 0%, 90% 0%, 100% 50%, 90% 100%, 5% 100%, 12% 50%); //中間的step
-  clip-path: polygon(100% 0%, 15% 0%, 0% 50%, 15% 100%, 100% 100%); //step最後一個 */
+  clip-path: ${(props) =>
+    props.$isFirst
+      ? "polygon(0% 0%, 88% 0%, 100% 50%, 88% 100%, 0% 100%)"
+      : props.$isLast
+      ? "polygon(100% 0%, 0% 0%, 12% 50%, 0% 100%, 100% 100%)"
+      : "polygon(0% 0%, 88% 0%, 100% 50%, 88% 100%, 0% 100%, 12% 50%)"};
 `;
 
 const ServiceList = styled.form`
   border: 5px solid #d2cdcd;
   height: auto;
-  max-height: 650px;
+  max-height: 840px;
   min-height: 50px;
   overflow-y: auto;
+  overflow-x: hidden;
   border-radius: 2px;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 `;

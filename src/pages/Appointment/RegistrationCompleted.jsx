@@ -3,15 +3,12 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchRegistrationData } from "../../api";
 
 export default function RegistrationCompleted({
-  // department,
   specialty,
   doctor,
   date,
   time,
   schedule,
   idNumber,
-  // birthday,
-  // name,
   onCompletedClick,
 }) {
   const { data } = useQuery({
@@ -27,12 +24,16 @@ export default function RegistrationCompleted({
       const day = String(date.getDate()).padStart(2, "0");
       return `${year}/${month}/${day}`;
     }
-    return "undefined";
+    return "";
   };
 
   const foundItem = Array.isArray(data)
     ? data.find((item) => item.personal_id_number === idNumber)
     : null;
+    
+  const currentSchedule = schedule.find(
+    (schedule) => schedule.doctor_id === doctor.uid
+  );
 
   const timeSlots = {
     morning: "上午",
@@ -59,20 +60,20 @@ export default function RegistrationCompleted({
           {foundItem ? (
             <>
               <tr>
-                <Td>{date || "undefined"}</Td>
-                <Td>{timeSlots[time] || "undefined"}</Td>
+                <Td>{date || ""}</Td>
+                <Td>{timeSlots[time] || ""}</Td>
                 <Td>YOI Hospital</Td>
-                <Td>{specialty?.specialty || "undefined"}</Td>
-                <Td>{schedule[0]?.room || "undefined"}</Td>
-                <Td>{foundItem?.registration_number || "undefined"}</Td>
-                <Td>{doctor?.physician_name || "undefined"}</Td>
+                <Td>{specialty?.specialty || ""}</Td>
+                <Td>{currentSchedule?.room || ""}</Td>
+                <Td>{foundItem?.registration_number || ""}</Td>
+                <Td>{doctor?.physician_name || ""}</Td>
               </tr>
               <tr>
-                您的身分證字號為：{foundItem.personal_id_number || "undefined"}
+                您的身分證字號為：{foundItem.personal_id_number || ""}
               </tr>
-              <tr>您的姓名為：{foundItem.name || "undefined"}</tr>
+              <tr>您的姓名為：{foundItem.name || ""}</tr>
               <tr>
-                您的生日為：{formatDate(foundItem.birth_date) || "undefined"}
+                您的生日為：{formatDate(foundItem.birth_date) || ""}
               </tr>
             </>
           ) : null}

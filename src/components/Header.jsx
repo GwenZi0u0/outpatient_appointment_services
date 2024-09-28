@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
 import styled from "styled-components";
 import Logo from "../assets/Logo.svg";
-import { Outlet, Link, useLocation } from "react-router-dom";
+import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 
 export default function Header() {
+  const navigate = useNavigate();
   const [isGradient, setIsGradient] = useState(false);
   const location = useLocation();
+  const isRootPath = location.pathname === "/";
 
   const handleScroll = () => {
     if (window.scrollY > 80) {
@@ -16,7 +18,7 @@ export default function Header() {
   };
 
   useEffect(() => {
-    if (location.pathname === "/") {
+    if (isRootPath) {
       window.addEventListener("scroll", handleScroll);
       setIsGradient(false);
     } else {
@@ -24,11 +26,20 @@ export default function Header() {
     }
 
     return () => {
-      if (location.pathname === "/") {
+      if (isRootPath) {
         window.removeEventListener("scroll", handleScroll);
       }
     };
   }, [location.pathname]);
+
+  const handleButtonClick = () => {
+    navigate("/");
+    setTimeout(() => {
+      document
+        .getElementById("select-region")
+        ?.scrollIntoView({ behavior: "smooth" });
+    }, 100);
+  };
 
   return (
     <>
@@ -37,11 +48,14 @@ export default function Header() {
           <LogoIcon src={Logo} alt="Logo" />
         </LogoLink>
         <Menu>
-          <SelectLink to="/">網路掛號</SelectLink>
+          <SelectLink to="/" onClick={handleButtonClick}>
+            網路掛號
+          </SelectLink>
           <SelectLink to="/cancel-registration">查詢取消掛號</SelectLink>
           {/* <SelectLink to="/">掛號需知</SelectLink> */}
           <SelectLink to="/progress">看診進度</SelectLink>
         </Menu>
+        <div></div>
       </Container>
       <Outlet />
     </>
@@ -94,7 +108,7 @@ const Menu = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-right: 40%;
+  padding-right: 10%;
   height: 100%;
   gap: 60px;
 `;
@@ -103,7 +117,7 @@ const SelectLink = styled(Link)`
   text-decoration: none;
   font-weight: 500;
   letter-spacing: 6px;
-  font-size: 20px;
+  font-size: 22px;
   letter-spacing: 30%;
   color: #ffffff;
   background-color: transparent;

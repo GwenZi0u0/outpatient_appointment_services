@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { timeSlots, weeks, isDisabled, dayKeys } from "../../utils/dateUtils";
 
 export default function SelectTime({
   register,
@@ -8,94 +9,30 @@ export default function SelectTime({
   schedule,
   onTimeClick,
 }) {
-  const daysOfWeek = {
-    monday: "(一)",
-    tuesday: "(二)",
-    wednesday: "(三)",
-    thursday: "(四)",
-    friday: "(五)",
-    saturday: "(六)",
-    sunday: "(日)",
-  };
-
-  const today = new Date();
-
-  const getDayKey = (dayIndex) => {
-    const dayMap = [
-      "monday",
-      "tuesday",
-      "wednesday",
-      "thursday",
-      "friday",
-      "saturday",
-      "sunday",
-    ];
-    return dayMap[dayIndex];
-  };
-
-  const getMonday = (date) => {
-    const day = date.getDay();
-    const diff = day === 0 ? -7 : 0 - day;
-    return new Date(date.setDate(date.getDate() + diff));
-  };
-
-  const formatWeeklyDates = (startDate) => {
-    let formattedDates = [];
-    for (let i = 0; i < 7; i++) {
-      let currentDate = new Date(startDate);
-      currentDate.setDate(startDate.getDate() + i);
-
-      let day = currentDate.getDate();
-      let month = currentDate.getMonth() + 1;
-
-      let dayKey = getDayKey(currentDate.getDay());
-
-      formattedDates.push(`${month}/${day} ${daysOfWeek[dayKey]}`);
-    }
-    return formattedDates;
-  };
-
-  const timeSlots = {
-    morning: "上午",
-    afternoon: "下午",
-    evening: "夜間",
-  };
-
-  const monday = getMonday(today);
-  const formattedDates = formatWeeklyDates(monday);
-
   return (
-    <>
-      <CalendarContainer>
-        <ConfirmedContainer>
-          <Confirmed>
-            <ConfirmedTitle>科別 : </ConfirmedTitle>
-            <ConfirmedValue type="text" value={specialty.specialty} readOnly />
-          </Confirmed>
-          <Confirmed>
-            <ConfirmedTitle>醫師 : </ConfirmedTitle>
-            <ConfirmedValue
-              type="text"
-              value={doctor.physician_name}
-              readOnly
-            />
-          </Confirmed>
-        </ConfirmedContainer>
-        {/* <CalendarHeader>
-          <Button>上一週</Button>
-          <Button>下一週</Button>
-        </CalendarHeader> */}
-        <TableWrapper>
-          <StyledTable>
+    <CalendarContainer>
+      <ConfirmedContainer>
+        <Confirmed>
+          <ConfirmedTitle>科別 : </ConfirmedTitle>
+          <ConfirmedValue type="text" value={specialty.specialty} readOnly />
+        </Confirmed>
+        <Confirmed>
+          <ConfirmedTitle>醫師 : </ConfirmedTitle>
+          <ConfirmedValue type="text" value={doctor.physician_name} readOnly />
+        </Confirmed>
+      </ConfirmedContainer>
+      <TableWrapper>
+        {weeks.map((week, weekIndex) => (
+          <StyledTable key={weekIndex}>
             <Thead>
               <Tr>
                 <TableHeader></TableHeader>
-                {formattedDates.map((day, index) => (
+                {week.map((day, dayIndex) => (
                   <TableHeader
-                    key={day}
-                    as={index >= 5 ? WeekendCell : undefined}
+                    key={`${weekIndex}-${dayIndex}`}
+                    as={dayIndex >= 5 ? WeekendCell : undefined}
                   >
-                    {day}
+                    {day.slice(5)}
                   </TableHeader>
                 ))}
               </Tr>
@@ -104,19 +41,24 @@ export default function SelectTime({
               {Object.entries(timeSlots).map(([time, slot]) => (
                 <Tr key={time}>
                   <TimeSlot>{slot}</TimeSlot>
-                  {formattedDates?.map((date, index) => (
+                  {week.map((date, dayIndex) => (
                     <TableData
-                      key={index}
-                      as={index >= 5 ? WeekendCell : undefined}
+                      key={`${weekIndex}-${dayIndex}`}
+                      as={dayIndex >= 5 ? WeekendCell : undefined}
                       defaultValue={date}
                       {...register("date")}
                     >
                       {schedule?.find(
-                        (schedule) =>
-                          schedule.department_id === department.id &&
-                          schedule.doctor_id === doctor.id &&
-                          getDayKey(index) in schedule.shift_rules &&
-                          time === schedule.shift_rules[getDayKey(index)]
+                        (scheduleItem) =>
+                          scheduleItem.department_id === department.id &&
+                          scheduleItem.doctor_id === doctor.uid &&
+                          dayKeys[dayIndex] in scheduleItem.shift_rules &&
+                          Array.isArray(
+                            scheduleItem.shift_rules[dayKeys[dayIndex]]
+                          ) &&
+                          scheduleItem.shift_rules[dayKeys[dayIndex]].includes(
+                            time
+                          )
                       ) ? (
                         <CheckInput
                           type="radio"
@@ -124,6 +66,7 @@ export default function SelectTime({
                           defaultValue={time}
                           onClick={() => onTimeClick(date, time)}
                           {...register("time")}
+                          disabled={isDisabled(date)}
                         />
                       ) : null}
                     </TableData>
@@ -132,9 +75,9 @@ export default function SelectTime({
               ))}
             </Tbody>
           </StyledTable>
-        </TableWrapper>
-      </CalendarContainer>
-    </>
+        ))}
+      </TableWrapper>
+    </CalendarContainer>
   );
 }
 
@@ -143,13 +86,6 @@ const CalendarContainer = styled.div`
   flex-direction: column;
   border: 1px solid #ccc;
 `;
-
-// const CalendarHeader = styled.div`
-//   display: flex;
-//   justify-content: space-between;
-//   padding: 30px;
-//   background-color: #ffffff;
-// `;
 
 const ConfirmedContainer = styled.div`
   display: flex;
@@ -178,6 +114,7 @@ const ConfirmedValue = styled.input`
   border-radius: 4px;
   background-color: #8282828a;
   cursor: not-allowed;
+  padding-left: 10px;
 `;
 
 const TableWrapper = styled.div`
@@ -189,23 +126,27 @@ const TableWrapper = styled.div`
 const StyledTable = styled.table`
   width: 100%;
   border-collapse: collapse;
+  margin-bottom: 20px;
 `;
 const Thead = styled.thead``;
 const Tr = styled.tr``;
 const Tbody = styled.tbody``;
 
 const TableHeader = styled.th`
+  text-align: center;
   padding: 15px;
   background-color: #8282828a;
   color: #000;
   text-align: left;
   border: 1px solid #000;
+  width: 80px;
 `;
 
 const TableData = styled.td`
   border: 1px solid #000;
   padding: 10px;
   text-align: center;
+  position: relative;
 `;
 
 const WeekendCell = styled(TableData)`
@@ -218,5 +159,9 @@ const TimeSlot = styled(TableData)`
 `;
 
 const CheckInput = styled.input`
+  width: 50%;
+  height: 70%;
   position: absolute;
+  top: 15%;
+  left: 25%;
 `;
