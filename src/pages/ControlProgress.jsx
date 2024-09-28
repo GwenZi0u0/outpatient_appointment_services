@@ -1,8 +1,10 @@
+import { create } from "zustand";
 import styled from "styled-components";
 import { useAuth } from "../contexts/AuthContext";
-import { useData, refresh } from "../contexts/DataContext";
+import { useQuery } from "@tanstack/react-query";
+import { fetchProgressData, fetchRegistrationData } from "../api";
 import { Timestamp } from "firebase/firestore";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { fireDb } from "../firebase";
 import {
   collection,
@@ -15,16 +17,48 @@ import {
   updateDoc,
 } from "firebase/firestore";
 
+const useControlProgressStore = create((set) => ({
+  isOpen: false,
+  currentTime: new Date(),
+  currentNumber: null,
+  currentPeriod: null,
+  period: "",
+
+  setIsOpen: (isOpen) => set({ isOpen }),
+  setCurrentTime: (currentTime) => set({ currentTime }),
+  setCurrentNumber: (currentNumber) => set({ currentNumber }),
+  setCurrentPeriod: (currentPeriod) => set({ currentPeriod }),
+  setPeriod: (period) => set({ period }),
+  toggleIsOpen: () => set((state) => ({ isOpen: !state.isOpen })),
+}));
+
 export default function CancelRegistrationPage() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [currentTime, setCurrentTime] = useState(new Date());
-  const [currentNumber, setCurrentNumber] = useState(null);
+  const {
+    isOpen,
+    currentTime,
+    currentNumber,
+    currentPeriod,
+    period,
+    setCurrentTime,
+    setCurrentNumber,
+    setCurrentPeriod,
+    setPeriod,
+    toggleIsOpen,
+  } = useControlProgressStore();
+
   const { user } = useAuth();
-  const { queries } = useData();
-  const registrationData = queries[3]?.data || [];
-  const progressData = queries[6]?.data || [];
-  const [currentPeriod, setCurrentPeriod] = useState(null);
-  const [period, setPeriod] = useState("");
+  const { data: registrationData } = useQuery({
+    queryKey: ["registration"],
+    queryFn: fetchRegistrationData,
+  });
+  const { data: progressData } = useQuery({
+    queryKey: ["progress"],
+    queryFn: fetchProgressData,
+  });
+
+  useEffect(() => {
+    console.log("progressData:", progressData);
+  }, [progressData]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -35,14 +69,14 @@ export default function CancelRegistrationPage() {
   }, []);
 
   const getCurrentDateInfo = (data) => {
-    const timestamp =
-      data instanceof Timestamp ? data : Timestamp.fromDate(data);
-    const seconds = timestamp.seconds;
-    const dateFromSeconds = new Date(seconds * 1000);
-    const year = dateFromSeconds.getFullYear();
-    const month = String(dateFromSeconds.getMonth() + 1).padStart(2, "0");
-    const day = String(dateFromSeconds.getDate()).padStart(2, "0");
-    return `${year}/${month}/${day}`;
+    const date = data instanceof Timestamp ? data.toDate() : new Date(data);
+    return date
+      .toLocaleDateString("zh-TW", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      })
+      .replace(/\//g, "/");
   };
 
   const handleButtonClick = (selectedPeriod) => {
@@ -51,8 +85,7 @@ export default function CancelRegistrationPage() {
 
   const filterRegistrationDataByCurrentDate = (registrationData) => {
     const currentDateFormatted = getCurrentDateInfo(new Date());
-
-    const filteredData = registrationData.filter((data) => {
+    const filteredData = registrationData?.filter((data) => {
       const isDateMatching =
         getCurrentDateInfo(data.OPD_date) === currentDateFormatted;
       const isDoctorMatching = user.uid === data.doctor_id;
@@ -60,21 +93,10 @@ export default function CancelRegistrationPage() {
       const isPeriodMatching = period === data.appointment_timeslot;
       return isDateMatching && isDoctorMatching && isStatus && isPeriodMatching;
     });
-    const sortedData = filteredData.sort(
+    const sortedData = filteredData?.sort(
       (a, b) => a.registration_number - b.registration_number
     );
     return sortedData;
-  };
-
-  const result = filterRegistrationDataByCurrentDate(registrationData);
-
-  const filterProgressData = (result) => {
-    const filteredData = result.filter((data) => {
-      const isMatching =
-        user.uid === data.doctor_id && data.registration_number > currentNumber;
-      return isMatching;
-    });
-    return filteredData;
   };
 
   const toggleClinic = async () => {
@@ -86,42 +108,37 @@ export default function CancelRegistrationPage() {
             where("doctor_id", "==", user.uid)
           )
         );
-        querySnapshot.forEach(async (doc) => {
-          await deleteDoc(doc.ref);
-          console.log("Document deleted with ID: ", doc.id);
-        });
+        await Promise.all(querySnapshot.docs.map((doc) => deleteDoc(doc.ref)));
+        console.log("Document deleted");
       } catch (e) {
-        console.error("Error deleting document: ", e);
+        console.error("Error deleting document", e);
       }
 
       setCurrentNumber(null);
       setCurrentPeriod(null);
-      refresh(["progress"]);
     } else {
       try {
-        const registrationNumber = null;
-        const docRef = await addDoc(collection(fireDb, "progress"), {
+        await addDoc(collection(fireDb, "progress"), {
           date: new Date(),
           time: period,
           doctor_id: user.uid || null,
-          number: registrationNumber,
+          number: null,
         });
-        console.log("Document written with ID: ", docRef.id);
-
         if (["morning", "afternoon", "evening"].includes(period)) {
           setCurrentPeriod(period);
         }
       } catch (e) {
         console.error("Error adding document: ", e);
       }
-      refresh(["progress"]);
     }
-
-    setIsOpen((prev) => !prev);
+    toggleIsOpen();
   };
 
-  const filteredData = filterProgressData(result);
-
+  const filterProgressData = (result) =>
+    result?.filter(
+      (data) =>
+        user.uid === data.doctor_id && data.registration_number > currentNumber
+    );
   const formatTime = (date) => {
     const hours = String(date.getHours()).padStart(2, "0");
     const minutes = String(date.getMinutes()).padStart(2, "0");
@@ -129,13 +146,20 @@ export default function CancelRegistrationPage() {
     return `${hours}:${minutes}:${seconds}`;
   };
 
+  const result = useMemo(
+    () => filterRegistrationDataByCurrentDate(registrationData),
+    [registrationData, period, user.uid]
+  );
+  const filteredData = useMemo(
+    () => filterProgressData(result),
+    [result, currentNumber, user.uid]
+  );
+
   const handleNext = async () => {
-    const progressDataId = progressData.filter(
+    const progressDataId = progressData?.filter(
       (data) => data.doctor_id === user.uid
     )[0]?.id;
-    console.log(progressDataId);
     const firstValidNumber = filteredData[0]?.registration_number || null;
-
     if (firstValidNumber) {
       setCurrentNumber(firstValidNumber);
       try {
@@ -160,7 +184,7 @@ export default function CancelRegistrationPage() {
           </DateContext>
           <NumberRegisteredPeopleText>
             當日掛號人數
-            <PeopleNumber>{result.length}</PeopleNumber>
+            <PeopleNumber>{result?.length}</PeopleNumber>
           </NumberRegisteredPeopleText>
           <OpenClinicButton onClick={handleNext} disabled={!isOpen}>
             <Text>下一位</Text>
@@ -172,7 +196,7 @@ export default function CancelRegistrationPage() {
             </CurrentNumber>
             <NextNumber>
               <Text>下一位看診號碼</Text>
-              <Number>{filteredData[0]?.registration_number || null}</Number>
+              <Number>{filteredData?.[0]?.registration_number || null}</Number>
             </NextNumber>
           </ProgressNumberDisplayArea>
           <ButtonArea>

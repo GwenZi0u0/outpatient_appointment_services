@@ -1,13 +1,20 @@
+import { create } from "zustand";
 import styled from "styled-components";
 import Lock from "../assets/Lock.svg";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 
+const useLoginStore = create((set) => ({
+  email: "",
+  password: "",
+  setEmail: (email) => set({ email }),
+  setPassword: (password) => set({ password }),
+}));
+
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const { signInWithEmail, error } = useAuth();
+  const { email, password, setEmail, setPassword } = useLoginStore();
+  const { signInWithEmail, error, loading } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -25,7 +32,6 @@ export default function LoginPage() {
     try {
       await signInWithEmail(email, password);
       localStorage.setItem("email", email);
-      localStorage.setItem("password", password);
 
       navigate("/control-progress");
     } catch (err) {
@@ -33,18 +39,21 @@ export default function LoginPage() {
     }
   };
 
+  if (loading) {
+    return <div>加載中...</div>;
+  }
+
   return (
     <>
       <Container onSubmit={handleLogin}>
-        <NoticeContainer></NoticeContainer>
+        <NoticeContainer />
         <LoginContainer>
           <LockIcon src={Lock} />
           <LoginContent>
             <Content htmlFor="email">
-              <LoginIcon></LoginIcon>
+              <LoginIcon />
               <LoginInput
                 type="email"
-                name="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Login ID"
@@ -57,7 +66,6 @@ export default function LoginPage() {
                 password 密 碼
                 <PasswordInput
                   type="password"
-                  name="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Password"
@@ -66,7 +74,7 @@ export default function LoginPage() {
               </PassWord>
             </Content>
             <Button type="submit">Sign In</Button>
-            {error && <p style={{ color: "red" }}>{"帳號/密碼輸入錯誤"}</p>}
+            {error && <ErrorMessage>帳號/密碼輸入錯誤</ErrorMessage>}
           </LoginContent>
         </LoginContainer>
       </Container>
@@ -116,6 +124,7 @@ const LoginContent = styled.form`
   border: 1px solid #e0e0e0;
   gap: 20px;
 `;
+
 const Content = styled.label`
   display: flex;
   align-items: center;
@@ -124,30 +133,53 @@ const Content = styled.label`
   gap: 20px;
   border-bottom: 1px solid #e0e0e0;
 `;
+
 const LoginIcon = styled.div`
   width: 20px;
   height: 20px;
   background-color: #000000;
 `;
+
 const LoginInput = styled.input`
-  width: auto;
+  width: 100%;
   height: 50px;
   border: none;
+  &:focus {
+    outline: none;
+  }
 `;
 
 const PasswordInput = styled.input`
   width: auto;
   height: 50px;
   border: none;
+  &:focus {
+    outline: none;
+  }
 `;
 
 const PassWord = styled.div`
   display: flex;
   flex-direction: column;
+  width: 100%;
   gap: 10px;
 `;
 
 const Button = styled.button`
-  width: 420px;
+  width: 100%;
   height: 97px;
+  font-size: 28px;
+  letter-spacing: 5px;
+  background-color: #00b0c1;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  &:hover {
+    background-color: #b7c3da;
+  }
+`;
+
+const ErrorMessage = styled.p`
+  color: red;
 `;

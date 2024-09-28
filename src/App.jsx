@@ -13,7 +13,6 @@ import ClassSchedulePage from "./pages/ClassSchedule";
 import DoctorProfilePage from "./pages/DoctorProfile";
 import NotFoundPage from "./pages/NotFound";
 import { AuthProvider } from "./contexts/AuthContext";
-import { AppDataProvider } from "./contexts/DataContext";
 
 const queryClient = new QueryClient();
 
@@ -69,12 +68,10 @@ const router = createBrowserRouter([
 export default function App() {
   return (
     <AuthProvider>
-      <AppDataProvider>
-        <QueryClientProvider client={queryClient}>
-          <GlobalStyles />
-          <RouterProvider router={router} />
-        </QueryClientProvider>
-      </AppDataProvider>
+      <QueryClientProvider client={queryClient}>
+        <GlobalStyles />
+        <RouterProvider router={router} />
+      </QueryClientProvider>
     </AuthProvider>
   );
 }

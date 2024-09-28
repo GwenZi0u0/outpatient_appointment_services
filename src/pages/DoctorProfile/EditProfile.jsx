@@ -1,8 +1,9 @@
 import { create } from "zustand";
 import styled from "styled-components";
 import { useParams } from "react-router-dom";
-import { useData } from "../../contexts/DataContext";
-import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { fetchDepartmentsData, fetchDoctorsData } from "../../api";
+import { useEffect } from "react";
 import { fireDb, fireStorage } from "../../firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { doc, updateDoc } from "firebase/firestore";
@@ -11,18 +12,30 @@ import ProfileDoctor from "../../assets/profileDoctor.svg";
 
 const useEditProfileStore = create((set) => ({
   isEditing: false,
-  setIsEditing: (isEditing) => set({ isEditing }),
   newExpertise: "",
+  doctor: null,
+  setIsEditing: (isEditing) => set({ isEditing }),
   setNewExpertise: (newExpertise) => set({ newExpertise }),
+  setDoctor: (doctor) => set({ doctor }),
 }));
 
 export default function EditProfile({ calculateAge }) {
   const { doctorId } = useParams();
-  const { queries } = useData();
-  const departmentData = queries[0]?.data;
-  const doctorData = queries[1]?.data;
+  const { data: departmentData } = useQuery({
+    queryKey: ["departments"],
+    queryFn: fetchDepartmentsData,
+  });
+  const { data: doctorData } = useQuery({
+    queryKey: ["doctors"],
+    queryFn: fetchDoctorsData,
+  });
+  const { doctor, setDoctor } = useEditProfileStore();
   const userData = doctorData?.find((doctor) => doctor.uid === doctorId);
-  const [doctor, setDoctor] = useState(userData);
+  useEffect(() => {
+    if (userData) {
+      setDoctor(userData);
+    }
+  }, [userData, setDoctor]);
 
   const { isEditing, setIsEditing, newExpertise, setNewExpertise } =
     useEditProfileStore((state) => ({
@@ -33,19 +46,21 @@ export default function EditProfile({ calculateAge }) {
     }));
 
   const selectFile = () => {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = "image/*";
-    input.onchange = () => {
-      const file = input.files[0];
-      return file;
-    };
-    input.click();
+    return new Promise((resolve) => {
+      const input = document.createElement("input");
+      input.type = "file";
+      input.accept = "image/*";
+      input.onchange = (e) => {
+        const file = e.target.files[0];
+        resolve(file);
+      };
+      input.click();
+    });
   };
 
   const handleEditImage = async () => {
     setIsEditing(true);
-    const file = selectFile();
+    const file = await selectFile();
     if (file) {
       const storageRef = ref(fireStorage, `userAvatar/${doctorId}`);
       await uploadBytes(storageRef, file);
@@ -83,12 +98,15 @@ export default function EditProfile({ calculateAge }) {
     updatedExpertises.splice(toIndex, 0, removed);
     setDoctor((prev) => ({ ...prev, expertises: updatedExpertises }));
     console.log(updatedExpertises);
-  };  
+  };
 
   const handleAddExpertise = (newExpertise) => {
-    setDoctor((prev) => ({ ...prev, expertises: [...prev.expertises, newExpertise] }));
+    setDoctor((prev) => ({
+      ...prev,
+      expertises: [...prev.expertises, newExpertise],
+    }));
     console.log(doctor?.expertises);
-  }
+  };
 
   const handleEditProfile = () => {
     setIsEditing(true);
@@ -172,6 +190,8 @@ export default function EditProfile({ calculateAge }) {
                         type="text"
                         value={doctor?.degree}
                         onChange={(e) => handleDegreeChange(e.target.value)}
+                        id="degree"
+                        name="degree"
                       />
                     ) : (
                       userData?.degree || ""
@@ -184,6 +204,8 @@ export default function EditProfile({ calculateAge }) {
                         type="text"
                         value={doctor?.duty}
                         onChange={(e) => handleDutyChange(e.target.value)}
+                        id="duty"
+                        name="duty"
                       />
                     ) : (
                       userData?.duty || ""
@@ -196,6 +218,8 @@ export default function EditProfile({ calculateAge }) {
               <EditableTextArea
                 value={userData?.content}
                 onChange={(e) => handleContentChange(e.target.value)}
+                id="content"
+                name="content"
               />
             ) : (
               <AdditionalInfo>{userData.content}</AdditionalInfo>
@@ -242,6 +266,8 @@ export default function EditProfile({ calculateAge }) {
                     value={newExpertise}
                     onChange={(e) => setNewExpertise(e.target.value)}
                     placeholder="輸入新專長"
+                    id="newExpertise"
+                    name="newExpertise"
                   />
                   <AddExpertiseButton
                     onClick={() => {
@@ -432,7 +458,10 @@ const AddExpertiseButton = styled.button`
   cursor: pointer;
 `;
 
-const EditableInput = styled.input`
+const EditableInput = styled.input.attrs((props) => ({
+  id: props.id,
+  name: props.name,
+}))`
   width: 100%;
   padding: 5px;
   border: 1px solid #ccc;
@@ -445,8 +474,12 @@ const TagContainer = styled.div`
   margin-bottom: 20px;
 `;
 
-const EditableTextArea = styled.textarea`
+const EditableTextArea = styled.textarea.attrs((props) => ({
+  id: props.id,
+  name: props.name,
+}))`
   width: 100%;
+  font-size: 22px;
   padding: 5px;
   border: 1px solid #ccc;
   border-radius: 5px;

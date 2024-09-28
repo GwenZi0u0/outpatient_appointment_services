@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import styled from "styled-components";
 import Logo from "../assets/Logo.svg";
-import { Outlet, Link, useLocation } from "react-router-dom";
+import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 
 export default function Header() {
+  const navigate = useNavigate();
   const [isGradient, setIsGradient] = useState(false);
   const location = useLocation();
   const isRootPath = location.pathname === "/";
@@ -31,6 +32,15 @@ export default function Header() {
     };
   }, [location.pathname]);
 
+  const handleButtonClick = () => {
+    navigate("/");
+    setTimeout(() => {
+      document
+        .getElementById("select-region")
+        ?.scrollIntoView({ behavior: "smooth" });
+    }, 100);
+  };
+
   return (
     <>
       <Container $isGradient={isGradient}>
@@ -38,7 +48,9 @@ export default function Header() {
           <LogoIcon src={Logo} alt="Logo" />
         </LogoLink>
         <Menu>
-          <SelectLink to="/">網路掛號</SelectLink>
+          <SelectLink to="/" onClick={handleButtonClick}>
+            網路掛號
+          </SelectLink>
           <SelectLink to="/cancel-registration">查詢取消掛號</SelectLink>
           {/* <SelectLink to="/">掛號需知</SelectLink> */}
           <SelectLink to="/progress">看診進度</SelectLink>

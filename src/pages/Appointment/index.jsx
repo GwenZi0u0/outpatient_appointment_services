@@ -1,9 +1,10 @@
+import { create } from "zustand";
 import styled from "styled-components";
-import { useState } from "react";
+import { useMemo, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { fetchScheduleData, fetchRegistrationData } from "../../api";
+import { fetchSchedulesData, fetchRegistrationData } from "../../api";
 import SelectSpecialties from "./SelectSpecialties";
 import SelectDoctors from "./SelectDoctors";
 import SelectTime from "./SelectTime";
@@ -11,16 +12,26 @@ import RegistrationInformation from "./RegistrationInformation";
 import RegistrationCompleted from "./RegistrationCompleted";
 import { collection, addDoc, Timestamp } from "firebase/firestore";
 import { fireDb } from "../../firebase";
+import {
+  isValidTaiwanID,
+  formatFirestoreTimestamp,
+  convertToTimestamp,
+} from "../../utils/dateUtils";
+
+const useAppointmentStore = create((set) => ({
+  step: 1,
+  setStep: (newStep) => set({ step: newStep }),
+}));
 
 export default function Appointment() {
   const navigator = useNavigate();
   const { state } = useLocation();
   const { department } = state;
+  const { step, setStep } = useAppointmentStore();
   const { data: scheduleData } = useQuery({
     queryKey: ["schedules"],
-    queryFn: fetchScheduleData,
+    queryFn: fetchSchedulesData,
   });
-
   const { data: registrationData } = useQuery({
     queryKey: ["registrations"],
     queryFn: fetchRegistrationData,
@@ -43,9 +54,18 @@ export default function Appointment() {
 
   console.log(getValues());
 
-  const [step, setStep] = useState(1);
+  const steps = useMemo(
+    () => [
+      { step: 1, label: "請選擇科別" },
+      { step: 2, label: "請選擇醫生" },
+      { step: 3, label: "請選擇掛號時間" },
+      { step: 4, label: "掛號資訊確認" },
+      { step: 5, label: "完成掛號" },
+    ],
+    []
+  );
 
-  const handleReturnClick = () => {
+  const handleReturnClick = useCallback(() => {
     if (step === 1) {
       navigator("/");
       setTimeout(() => {
@@ -56,7 +76,7 @@ export default function Appointment() {
     } else {
       setStep(step - 1);
     }
-  };
+  }, [step, navigator]);
 
   const handleSpecialtyClick = (specialty) => {
     setValue("specialty", specialty);
@@ -74,30 +94,18 @@ export default function Appointment() {
     setStep(4);
   };
 
-  const birthdayStamp = () => {
-    const date = new Date(watch("birthday"));
+  const handleCompleted = () => {
+    navigator("/");
+  };
+
+  const birthdayStamp = (data) => {
+    const date = new Date(data);
     const firebaseTimestamp = Timestamp.fromDate(date);
     return firebaseTimestamp;
   };
-
-  const dateStamp = () => {
-    const [monthDay] = watch("date").split(" ");
-    const [month, day] = monthDay.split("/").map(Number);
-    const date = new Date(2024, month - 1, day);
-    const firebaseTimestamp = Timestamp.fromDate(date);
-    return firebaseTimestamp;
-  };
-
-  function formatFirestoreTimestamp(timestamp) {
-    const date = new Date(timestamp.seconds * 1000);
-    const month = date.getMonth() + 1;
-    const day = date.getDate();
-
-    return `${month}/${day}`;
-  }
 
   const getNextRegistrationNumber = (data, time) => {
-    const extractedDate = watch("date").match(/\d+\/\d+/)[0];
+    const extractedDate = watch("date").split(" ")[0];
     const foundDate = data.filter(
       (item) => formatFirestoreTimestamp(item.OPD_date) === extractedDate
     );
@@ -111,36 +119,20 @@ export default function Appointment() {
     return maxRegistrationNumber + 1;
   };
 
-  function isValidTaiwanID(id) {
-    if (!/^[A-Z]\d{9}$/.test(id)) return false;
-
-    const weights = [1, 9, 8, 7, 6, 5, 4, 3, 2, 1];
-    const letterToNumber = (letter) => letter.charCodeAt(0) - 55;
-
-    let sum = letterToNumber(id[0]) % 10;
-    for (let i = 1; i < id.length; i++) {
-      sum += Number(id[i]) * weights[i];
-    }
-    return sum % 10 === 0;
-  }
-
   const onSubmit = async (data) => {
     if (!isValidTaiwanID(data.idNumber)) {
       alert("身分證號碼輸入錯誤");
       return;
     }
-    const nextRegistrationNumber = getNextRegistrationNumber(
-      registrationData,
-      data.time
-    );
-    setValue("nextRegistrationNumber", nextRegistrationNumber);
+    const nextNumber = getNextRegistrationNumber(registrationData, data.time);
+    setValue("nextRegistrationNumber", nextNumber);
 
     setValue("idNumber", data.idNumber);
     try {
       const docRef = await addDoc(collection(fireDb, "registrations"), {
-        OPD_date: dateStamp(),
+        OPD_date: convertToTimestamp(data.date),
         appointment_timeslot: data.time,
-        birth_date: birthdayStamp(),
+        birth_date: birthdayStamp(data.birthday),
         division: {
           department_id: data.department.id,
           specialty_id: data.specialty.id,
@@ -149,7 +141,7 @@ export default function Appointment() {
         name: data.name,
         patient_contact: data.phone,
         personal_id_number: data.idNumber,
-        registration_number: nextRegistrationNumber,
+        registration_number: nextNumber,
         status: "confirmed",
       });
 
@@ -159,18 +151,6 @@ export default function Appointment() {
       console.error("Error adding document: ", e);
     }
   };
-
-  const handleCompleted = () => {
-    navigator("/");
-  };
-
-  const steps = [
-    { step: 1, label: "請選擇科別" },
-    { step: 2, label: "請選擇醫生" },
-    { step: 3, label: "請選擇掛號時間" },
-    { step: 4, label: "掛號資訊確認" },
-    { step: 5, label: "完成掛號" },
-  ];
 
   return (
     <Container>

@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { timeSlots, weeks, isDisabled, dayKeys } from "../../utils/dateUtils";
 
 export default function SelectTime({
   register,
@@ -8,154 +9,75 @@ export default function SelectTime({
   schedule,
   onTimeClick,
 }) {
-  const daysOfWeek = {
-    monday: "(一)",
-    tuesday: "(二)",
-    wednesday: "(三)",
-    thursday: "(四)",
-    friday: "(五)",
-    saturday: "(六)",
-    sunday: "(日)",
-  };
-
-  const today = new Date();
-
-  const getDayKey = (dayIndex) => {
-    const dayMap = [
-      "monday",
-      "tuesday",
-      "wednesday",
-      "thursday",
-      "friday",
-      "saturday",
-      "sunday",
-    ];
-    return dayMap[dayIndex];
-  };
-
-  const getMonday = (date) => {
-    const day = date.getDay();
-    const diff = day === 0 ? -7 : 0 - day;
-    return new Date(date.setDate(date.getDate() + diff));
-  };
-
-  function formatWeeklyDates(startDate) {
-    let formattedDates = [];
-    for (let i = 0; i < 28; i++) {
-      let currentDate = new Date(startDate);
-      currentDate.setDate(startDate.getDate() + i);
-
-      let day = currentDate.getDate() + 1;
-      let month = currentDate.getMonth() + 1;
-
-      let dayKey = getDayKey(currentDate.getDay());
-
-      formattedDates.push(`${month}/${day} ${daysOfWeek[dayKey]}`);
-    }
-    let weeks = [];
-    for (let i = 0; i < formattedDates.length; i += 7) {
-      weeks.push(formattedDates.slice(i, i + 7));
-    }
-
-    return weeks;
-  }
-  const isDisabled = (dateStr) => {
-    const [monthDay] = dateStr.split(" (");
-    const [month, day] = monthDay.split("/").map(Number);
-
-    const today = new Date();
-    const currentMonth = today.getMonth() + 1;
-    const currentDay = today.getDate();
-
-    if (month < currentMonth || (month === currentMonth && day <= currentDay)) {
-      return true;
-    }
-    return false;
-  };
-  const timeSlots = {
-    morning: "上午",
-    afternoon: "下午",
-    evening: "夜間",
-  };
-
-  const monday = getMonday(today);
-  const weeks = formatWeeklyDates(monday);
-
   return (
-    <>
-      <CalendarContainer>
-        <ConfirmedContainer>
-          <Confirmed>
-            <ConfirmedTitle>科別 : </ConfirmedTitle>
-            <ConfirmedValue type="text" value={specialty.specialty} readOnly />
-          </Confirmed>
-          <Confirmed>
-            <ConfirmedTitle>醫師 : </ConfirmedTitle>
-            <ConfirmedValue
-              type="text"
-              value={doctor.physician_name}
-              readOnly
-            />
-          </Confirmed>
-        </ConfirmedContainer>
-        <TableWrapper>
-          {weeks.map((week, weekIndex) => (
-            <StyledTable key={weekIndex}>
-              <Thead>
-                <Tr>
-                  <TableHeader></TableHeader>
-                  {week.map((day, dayIndex) => (
-                    <TableHeader
+    <CalendarContainer>
+      <ConfirmedContainer>
+        <Confirmed>
+          <ConfirmedTitle>科別 : </ConfirmedTitle>
+          <ConfirmedValue type="text" value={specialty.specialty} readOnly />
+        </Confirmed>
+        <Confirmed>
+          <ConfirmedTitle>醫師 : </ConfirmedTitle>
+          <ConfirmedValue type="text" value={doctor.physician_name} readOnly />
+        </Confirmed>
+      </ConfirmedContainer>
+      <TableWrapper>
+        {weeks.map((week, weekIndex) => (
+          <StyledTable key={weekIndex}>
+            <Thead>
+              <Tr>
+                <TableHeader></TableHeader>
+                {week.map((day, dayIndex) => (
+                  <TableHeader
+                    key={`${weekIndex}-${dayIndex}`}
+                    as={dayIndex >= 5 ? WeekendCell : undefined}
+                  >
+                    {day.slice(5)}
+                  </TableHeader>
+                ))}
+              </Tr>
+            </Thead>
+            <Tbody>
+              {Object.entries(timeSlots).map(([time, slot]) => (
+                <Tr key={time}>
+                  <TimeSlot>{slot}</TimeSlot>
+                  {week.map((date, dayIndex) => (
+                    <TableData
                       key={`${weekIndex}-${dayIndex}`}
                       as={dayIndex >= 5 ? WeekendCell : undefined}
+                      defaultValue={date}
+                      {...register("date")}
                     >
-                      {day}
-                    </TableHeader>
+                      {schedule?.find(
+                        (scheduleItem) =>
+                          scheduleItem.department_id === department.id &&
+                          scheduleItem.doctor_id === doctor.uid &&
+                          dayKeys[dayIndex] in scheduleItem.shift_rules &&
+                          Array.isArray(
+                            scheduleItem.shift_rules[dayKeys[dayIndex]]
+                          ) &&
+                          scheduleItem.shift_rules[dayKeys[dayIndex]].includes(
+                            time
+                          )
+                      ) ? (
+                        <CheckInput
+                          type="radio"
+                          name="doctor"
+                          defaultValue={time}
+                          onClick={() => onTimeClick(date, time)}
+                          {...register("time")}
+                          disabled={isDisabled(date)}
+                        />
+                      ) : null}
+                    </TableData>
                   ))}
                 </Tr>
-              </Thead>
-              <Tbody>
-                {Object.entries(timeSlots).map(([time, slot]) => (
-                  <Tr key={time}>
-                    <TimeSlot>{slot}</TimeSlot>
-                    {week.map((date, dayIndex) => (
-                      <TableData
-                        key={`${weekIndex}-${dayIndex}`}
-                        as={dayIndex >= 5 ? WeekendCell : undefined}
-                        defaultValue={date}
-                        {...register("date")}
-                      >
-                        {schedule?.find(
-                          (schedule) =>
-                            schedule.department_id === department.id &&
-                            schedule.doctor_id === doctor.uid &&
-                            getDayKey(dayIndex) in schedule.shift_rules &&
-                            Array.isArray(
-                              schedule.shift_rules[getDayKey(dayIndex)]
-                            ) &&
-                            schedule.shift_rules[getDayKey(dayIndex)].includes(
-                              time
-                            )
-                        ) ? (
-                          <CheckInput
-                            type="radio"
-                            name="doctor"
-                            defaultValue={time}
-                            onClick={() => onTimeClick(date, time)}
-                            {...register("time")}
-                            disabled={isDisabled(date)}
-                          />
-                        ) : null}
-                      </TableData>
-                    ))}
-                  </Tr>
-                ))}
-              </Tbody>
-            </StyledTable>
-          ))}
-        </TableWrapper>
-      </CalendarContainer>
-    </>
+              ))}
+            </Tbody>
+          </StyledTable>
+        ))}
+      </TableWrapper>
+    </CalendarContainer>
   );
 }
 

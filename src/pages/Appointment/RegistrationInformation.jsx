@@ -1,5 +1,17 @@
-import { useState } from "react";
+import { create } from "zustand";
 import styled from "styled-components";
+import { timeSlots } from "../../utils/dateUtils";
+
+const useRegistrationInformationStore = create((set) => ({
+  idNumber: "",
+  birthday: "",
+  name: "",
+  phone: "0912345666",
+  setIdNumber: (value) => set({ idNumber: value }),
+  setBirthday: (value) => set({ birthday: value }),
+  setName: (value) => set({ name: value }),
+  setPhone: (value) => set({ phone: value }),
+}));
 
 export default function RegistrationInformation({
   register,
@@ -8,46 +20,43 @@ export default function RegistrationInformation({
   date,
   time,
   schedule,
-  defaultIdNumber,
-  defaultBirthday,
   onResetClick,
   registrationData,
   getNextRegistrationNumber,
   onSubmit,
 }) {
-  const timeSlots = {
-    morning: "上午",
-    afternoon: "下午",
-    evening: "夜間",
-  };
+  const {
+    idNumber,
+    birthday,
+    name,
+    phone,
+    setIdNumber,
+    setBirthday,
+    setName,
+    setPhone,
+  } = useRegistrationInformationStore();
 
-  const [idNumber, setIdNumber] = useState(defaultIdNumber || "");
-  const [birthday, setBirthday] = useState(defaultBirthday || "");
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
   const nextRegistrationNumber = getNextRegistrationNumber(
     registrationData,
     time
   );
 
   const handleInputChange = (e) => {
-    const value = e.target.value;
-    const regex = /^[A-Z]{1}[0-9]{0,9}$/;
-    if (regex.test(value) || value === "") {
+    const { value } = e.target;
+    if (/^[A-Z]{0,1}[0-9]{0,9}$/.test(value)) {
       setIdNumber(value);
     }
   };
 
-  const currentSchedule = schedule.find(
-    (schedule) => schedule.doctor_id === doctor.uid
-  );
+  const currentSchedule = schedule.find((s) => s.doctor_id === doctor?.uid);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSubmit(idNumber, birthday, name, phone, nextRegistrationNumber);
+  };
 
   return (
-    <FormContainer
-      onSubmit={() =>
-        onSubmit(idNumber, birthday, name, phone, nextRegistrationNumber)
-      }
-    >
+    <FormContainer onSubmit={handleSubmit}>
       <h2>您欲預約的掛號資料為</h2>
       <Table>
         <thead>
@@ -84,6 +93,7 @@ export default function RegistrationInformation({
           required: "請輸入身分證號碼",
           pattern: {
             value: /^[A-Z]{1}[0-9]{9}$/,
+            message: "請輸入有效的身分證號碼",
           },
         })}
         required
@@ -101,7 +111,8 @@ export default function RegistrationInformation({
       <Label>姓名:</Label>
       <Input
         type="text"
-        {...register("name")}
+        value={name}
+        {...register("name", { required: "請輸入姓名" })}
         onChange={(e) => setName(e.target.value)}
         required
       />

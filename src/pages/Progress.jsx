@@ -1,6 +1,14 @@
 import { create } from "zustand";
+import { useMemo, useCallback } from "react";
 import styled from "styled-components";
-import { useData } from "../contexts/DataContext";
+import { useQuery } from "@tanstack/react-query";
+import {
+  fetchDepartmentsData,
+  fetchDoctorsData,
+  fetchSchedulesData,
+  fetchRegistrationData,
+  fetchProgressData,
+} from "../api";
 import { filterRegistrationDataByCurrentDate } from "../utils/dateUtils";
 // K789456444
 // A123456789
@@ -17,25 +25,45 @@ const useProgressStore = create((set) => ({
 export default function ProgressPage() {
   const { idNumber, setIdNumber, error, setError, isOpened, setIsOpened } =
     useProgressStore();
-  const { queries } = useData();
-  const departmentData = queries[0]?.data || [];
-  const doctorData = queries[1]?.data || [];
-  const scheduleData = queries[2]?.data || [];
-  const registrationData = queries[3]?.data || [];
-  const progressData = queries[6]?.data || [];
+  const { data: departmentData } = useQuery({
+    queryKey: ["departments"],
+    queryFn: fetchDepartmentsData,
+  });
+  const { data: doctorData } = useQuery({
+    queryKey: ["doctors"],
+    queryFn: fetchDoctorsData,
+  });
+  const { data: scheduleData } = useQuery({
+    queryKey: ["schedules"],
+    queryFn: fetchSchedulesData,
+  });
+  const { data: registrationData } = useQuery({
+    queryKey: ["registration"],
+    queryFn: fetchRegistrationData,
+  });
+  const { data: progressData } = useQuery({
+    queryKey: ["progress"],
+    queryFn: fetchProgressData,
+  });
 
-  const mockDatabase = registrationData.filter(
-    (data) =>
-      data.personal_id_number === idNumber && data.status === "confirmed"
+  const mockDatabase = useMemo(() => 
+    registrationData?.filter(
+      (data) =>
+        data.personal_id_number === idNumber && data.status === "confirmed"
+    ),
+    [registrationData, idNumber]
   );
 
-  const result = filterRegistrationDataByCurrentDate(mockDatabase);
+  const result = useMemo(() => 
+    filterRegistrationDataByCurrentDate(mockDatabase),
+    [mockDatabase]
+  );
 
-  const handleInputChange = (e) => {
+  const handleInputChange = useCallback((e) => {
     setIdNumber(e.target.value.toUpperCase());
-  };
+  }, [setIdNumber]);
 
-  const handleSearch = () => {
+  const handleSearch = useCallback(() => {
     const regex = /^[A-Z]{1}[0-9]{9}$/;
     if (
       !idNumber.match(regex) ||
@@ -47,11 +75,11 @@ export default function ProgressPage() {
       setError("");
       setIsOpened(true);
     }
-  };
+  }, [idNumber, mockDatabase, setError, setIsOpened]);
 
   const handleKeyDown = (e, registrationData) => {
     if (e.key === "Enter") {
-      handleSearch(registrationData); 
+      handleSearch(registrationData);
     }
   };
 
@@ -60,8 +88,10 @@ export default function ProgressPage() {
       <Container>
         <Title>今日門診進度</Title>
         <SearchContainer>
-          <Label>身分證號碼查詢 </Label>
+          <Label htmlFor="idNumberInput">身分證號碼查詢 </Label>
           <Input
+            id="idNumberInput"
+            name="idNumber"
             type="text"
             placeholder="請輸入身分證號碼"
             maxLength={10}
@@ -165,7 +195,10 @@ const SearchContainer = styled.div`
   gap: 20px;
 `;
 
-const Input = styled.input`
+const Input = styled.input.attrs((props) => ({
+  id: props.id,
+  name: props.name,
+}))`
   width: auto;
   height: 50px;
   padding: 10px;

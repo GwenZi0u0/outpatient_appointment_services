@@ -1,15 +1,25 @@
 import styled from "styled-components";
+import { useMemo } from "react";
 import { useParams } from "react-router-dom";
-import { useData } from "../../contexts/DataContext";
+import { useQuery } from "@tanstack/react-query";
+import { fetchDepartmentsData, fetchDoctorsData } from "../../api";
 import AuthImage from "../../assets/auth.svg";
 
 export default function ProfileDemo({ calculateAge }) {
   const { doctorId } = useParams();
-  const { queries } = useData();
-  const departmentData = queries[0]?.data;
-  const doctorData = queries[1]?.data;
+  const { data: departmentData } = useQuery({
+    queryKey: ["departments"],
+    queryFn: fetchDepartmentsData,
+  });
+  const { data: doctorData } = useQuery({
+    queryKey: ["doctors"],
+    queryFn: fetchDoctorsData,
+  });
 
-  const selectedDoctor = doctorData?.find((doctor) => doctor.uid === doctorId);
+  const selectedDoctor = useMemo(() => 
+    doctorData?.find((doctor) => doctor.uid === doctorId),
+    [doctorData, doctorId]
+  );
 
   return (
     <MainContainer>

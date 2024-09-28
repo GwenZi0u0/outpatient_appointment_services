@@ -17,7 +17,7 @@ const fetchCollectionData = async (collectionName, limitCount = 100) => {
 
 export const fetchDepartmentsData = () => fetchCollectionData("departments");
 export const fetchDoctorsData = () => fetchCollectionData("doctors");
-export const fetchScheduleData = () => fetchCollectionData("schedules");
+export const fetchSchedulesData = () => fetchCollectionData("schedules");
 export const fetchRegistrationData = () => fetchCollectionData("registrations");
 export const fetchPatientData = () => fetchCollectionData("patients");
 export const fetchUserData = () => fetchCollectionData("users");
