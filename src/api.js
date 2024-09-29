@@ -29,7 +29,8 @@ export const fetchDoctorsDataWithLimit = async (limitCount = 50) => {
     const q = query(collection(fireDb, "doctors"), limit(limitCount));
     const querySnapshot = await getDocs(q);
     return querySnapshot.docs.map((doc) => ({
-      id: doc.uid, 
+      id: doc.id,
+      uid: doc.uid,
       ...doc.data(),
     }));
   } catch (error) {
