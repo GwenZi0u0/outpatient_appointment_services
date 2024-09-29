@@ -114,7 +114,7 @@ export const filterRegistrationDataByCurrentDate = (mockDatabase) => {
   const currentDateFormatted = getCurrentDateInfo(new Date());
   const filteredData = mockDatabase?.filter((data) => {
     const currentOPDDate = getCurrentDateInfo(data.OPD_date);
-    const isDateMatching = currentOPDDate.every(
+    const isDateMatching = currentOPDDate?.every(
       (component, index) => component >= currentDateFormatted[index]
     );
     const isStatus = data.status === "confirmed";
@@ -144,4 +144,15 @@ export const formatFirestoreTimestamp = (timestamp) => {
   const day = date.getDate();
 
   return `${year}/${month}/${day}`;
+};
+
+export const getToday = () => {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = today.getMonth() + 1;
+  const day = today.getDate();
+  const dayIndex = today.getDay();
+  const dayKey = getDayKey(dayIndex);
+
+  return { date: `${year}/${month}/${day}`, daysOfWeek: dayKey };
 };
