@@ -4,14 +4,21 @@ import { useAuth } from "../contexts/AuthContext";
 import Logo from "../assets/Logo.svg";
 import { useState } from "react";
 import AuthImage from "../assets/auth.svg";
+import { useQuery } from "@tanstack/react-query";
+import { fetchDoctorsData } from "../api";
 
 export default function ProtectedLayout() {
   const { user, loading, signOut } = useAuth((state) => ({
     user: state.user,
     loading: state.loading,
   }));
-  
+
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  const { data } = useQuery({
+    queryKey: ["fetchData"],
+    queryFn: fetchDoctorsData,
+  });
 
   if (loading) {
     return <div>Loading...</div>;
@@ -37,7 +44,13 @@ export default function ProtectedLayout() {
             <SelectLink to={`/doctor-profile/${user.uid}`}>醫師簡介</SelectLink>
           </Menu>
           <Profile onMouseEnter={handleMouseEnter}>
-            <AuthImg />
+            <AuthImg
+              src={
+                data?.find((doctor) => doctor.uid === user.uid)
+                  ?.physician_imag || AuthImage
+              }
+              alt="Profile"
+            />
             <Dropdown $isOpen={isDropdownOpen} onClick={signOut}>
               <DropSpan>Logout</DropSpan>
             </Dropdown>
@@ -113,13 +126,11 @@ const SelectLink = styled(Link)`
   border: none;
 `;
 
-const AuthImg = styled.div`
+const AuthImg = styled.img`
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  background-image: url(${AuthImage});
-  background-size: cover;
-  background-repeat: no-repeat;
+  object-fit: cover;
 `;
 
 const Profile = styled.div`
