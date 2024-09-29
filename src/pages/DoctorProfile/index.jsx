@@ -1,4 +1,6 @@
 import { useAuth } from "../../contexts/AuthContext";
+import { useQuery } from "@tanstack/react-query";
+import { fetchDoctorsData, fetchDepartmentsData } from "../../api";
 import ProtectedLayout from "../../components/ProtectedLayout";
 import Header from "../../components/Header";
 import ProfileDemo from "./ProfileDemo";
@@ -6,8 +8,17 @@ import EditProfile from "./EditProfile";
 
 export default function DoctorProfilePage() {
   const { user } = useAuth();
+  const { data: doctorData, refetch: refetchDoctorData } = useQuery({
+    queryKey: ["doctors"],
+    queryFn: fetchDoctorsData,
+  });
+  const { data: departmentData } = useQuery({
+    queryKey: ["departments"],
+    queryFn: fetchDepartmentsData,
+  });
 
   function calculateAge(timestamp) {
+    if (!timestamp) return null;
     const { seconds, nanoseconds } = timestamp;
     const birthDate = new Date(
       seconds * 1000 + Math.floor(nanoseconds / 1000000)
@@ -26,14 +37,24 @@ export default function DoctorProfilePage() {
     return (
       <>
         <ProtectedLayout />
-        <EditProfile calculateAge={calculateAge} />
+        <EditProfile
+          calculateAge={calculateAge}
+          user={user}
+          doctorData={doctorData}
+          departmentData={departmentData}
+          refetchDoctorData={refetchDoctorData}
+        />
       </>
     );
   } else {
     return (
       <>
         <Header />
-        <ProfileDemo calculateAge={calculateAge} />
+        <ProfileDemo
+          calculateAge={calculateAge}
+          doctorData={doctorData}
+          departmentData={departmentData}
+        />
       </>
     );
   }

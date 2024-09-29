@@ -1,23 +1,18 @@
 import styled from "styled-components";
 import { useMemo } from "react";
 import { useParams } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import { fetchDepartmentsData, fetchDoctorsData } from "../../api";
+import ProfileDoctor from "../../assets/profileDoctor.svg";
 import AuthImage from "../../assets/auth.svg";
 
-export default function ProfileDemo({ calculateAge }) {
+export default function ProfileDemo({
+  calculateAge,
+  departmentData,
+  doctorData,
+}) {
   const { doctorId } = useParams();
-  const { data: departmentData } = useQuery({
-    queryKey: ["departments"],
-    queryFn: fetchDepartmentsData,
-  });
-  const { data: doctorData } = useQuery({
-    queryKey: ["doctors"],
-    queryFn: fetchDoctorsData,
-  });
 
-  const selectedDoctor = useMemo(() => 
-    doctorData?.find((doctor) => doctor.uid === doctorId),
+  const selectedDoctor = useMemo(
+    () => doctorData?.find((doctor) => doctor.uid === doctorId),
     [doctorData, doctorId]
   );
 
@@ -25,51 +20,74 @@ export default function ProfileDemo({ calculateAge }) {
     <MainContainer>
       {selectedDoctor ? (
         <ProfileContainer key={selectedDoctor.uid}>
-          <Title>醫師簡介</Title>
+          <TitleContainer>
+            <Title>
+              <TitleImg src={ProfileDoctor} alt="profile" />
+              醫師簡介
+            </Title>
+          </TitleContainer>
           <ProfileContent>
-            <ImageContainer>
-              <ProfileImage
-                src={AuthImage}
-                alt={selectedDoctor.physician_name}
-              />
-            </ImageContainer>
-            <InfoContainer>
-              <Name>{selectedDoctor.physician_name}</Name>
+            <ProfileInfoContainer>
+              <ImageContainer>
+                <ProfileImage
+                  src={selectedDoctor?.physician_imag || AuthImage}
+                  alt={selectedDoctor?.physician_name}
+                />
+                <Name>{selectedDoctor?.physician_name || ""}</Name>
+              </ImageContainer>
+              <InfoContainer>
+                <DetailsList>
+                  <DetailItem>
+                    年齡：
+                    {calculateAge(selectedDoctor?.physician_birth_date) || ""}
+                  </DetailItem>
+                  {departmentData && (
+                    <>
+                      <DetailItem>
+                        系别：
+                        {
+                          departmentData.find(
+                            (department) =>
+                              department.id ===
+                              selectedDoctor.division.division_id
+                          )?.department
+                        }
+                      </DetailItem>
+                      <DetailItem>
+                        主治：
+                        {
+                          departmentData
+                            .find(
+                              (department) =>
+                                department.id ===
+                                selectedDoctor.division.division_id
+                            )
+                            ?.specialties.find(
+                              (specialty) =>
+                                specialty.id ===
+                                selectedDoctor.division.specialty_id
+                            )?.specialty
+                        }
+                      </DetailItem>
+                    </>
+                  )}
+                  <DetailItem>學歷：{selectedDoctor?.degree || ""}</DetailItem>
+                  <DetailItem>
+                    現任職務：{selectedDoctor?.duty || ""}
+                  </DetailItem>
+                </DetailsList>
+              </InfoContainer>
+            </ProfileInfoContainer>
+            <PositionContainer>
               <Position>專長</Position>
               <SpecialtiesContainer>
                 {selectedDoctor.expertises.map((expertise) => (
-                  <SpecialtyTag key={expertise}>{expertise}</SpecialtyTag>
+                  <SpecialtyTag key={expertise}>{expertise || ""}</SpecialtyTag>
                 ))}
               </SpecialtiesContainer>
-              <DetailsList>
-                <DetailItem>
-                  年齡：{calculateAge(selectedDoctor.physician_birth_date)}
-                </DetailItem>
-                {departmentData &&
-                  (() => {
-                    const department = departmentData
-                      .find(
-                        (department) =>
-                          department.id === selectedDoctor.division.division_id
-                      )
-                      ?.specialties.find(
-                        (specialty) =>
-                          specialty.id === selectedDoctor.division.specialty_id
-                      )?.specialty;
-
-                    return (
-                      <>
-                        <DetailItem>科別：{department}</DetailItem>
-                        <DetailItem>主治：{department}</DetailItem>
-                      </>
-                    );
-                  })()}
-                <DetailItem>學歷：{selectedDoctor.degree}</DetailItem>
-                <DetailItem>現任職務：{selectedDoctor.duty}</DetailItem>
-              </DetailsList>
-            </InfoContainer>
+            </PositionContainer>
+            <AdditionalInfo>{selectedDoctor?.content || ""}</AdditionalInfo>
           </ProfileContent>
-          <AdditionalInfo>{selectedDoctor.content}</AdditionalInfo>
         </ProfileContainer>
       ) : null}
     </MainContainer>
@@ -85,36 +103,55 @@ const MainContainer = styled.div`
 `;
 
 const ProfileContainer = styled.div`
-  width: 800px;
-  margin: 20px auto;
-  padding: 20px;
-  border: 1px solid #e0e0e0;
+  width: 850px;
+  margin: 0 auto;
   border-radius: 8px;
 `;
 
+const TitleContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
 const Title = styled.h2`
-  font-size: 30px;
+  display: flex;
+  align-items: center;
+  font-size: 32px;
   margin-bottom: 20px;
+`;
+
+const TitleImg = styled.img`
+  width: 40px;
+  height: 40px;
+  margin-right: 15px;
 `;
 
 const ProfileContent = styled.div`
   display: flex;
-  border: 1px solid #4a90e2;
+  flex-direction: column;
+  border: 5px dashed #B7C3DA;
   border-radius: 8px;
   padding: 20px;
+  gap: 20px;
 `;
 
 const ImageContainer = styled.div`
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: auto;
+  height: auto;
   overflow: hidden;
-  margin-right: 20px;
+  padding: 20px;
+  gap: 20px;
 `;
 
 const ProfileImage = styled.img`
-  width: 100%;
-  height: 100%;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
   object-fit: cover;
 `;
 
@@ -125,14 +162,29 @@ const InfoContainer = styled.div`
 const Name = styled.h3`
   letter-spacing: 4px;
   font-size: 25px;
-  color: #4a90e2;
+  color: #0267B5;
   margin-bottom: 10px;
 `;
 
-const Position = styled.p`
-  font-weight: bold;
-  margin-bottom: 10px;
+const PositionContainer = styled.div`
+  display: flex;
+  flex-direction: column;
   font-size: 22px;
+  font-weight: 400;
+  gap: 10px;
+  padding: 10px;
+`;
+
+const ProfileInfoContainer = styled.div`
+  display: flex;
+  align-items: flex-start;
+  gap: 25px;
+`;
+
+const Position = styled.p`
+  font-weight: 700;
+  font-size: 24px;
+  letter-spacing: 2px;
 `;
 
 const SpecialtiesContainer = styled.div`
@@ -144,25 +196,34 @@ const SpecialtiesContainer = styled.div`
 
 const SpecialtyTag = styled.span`
   background-color: #f0f0f0;
-  padding: 5px 10px;
+  align-items: center;
+  justify-content: center;
+  background-color: #f0f0f0;
+  padding: 8px 20px;
   border-radius: 20px;
   font-size: 22px;
+  letter-spacing: 2px;
 `;
 
 const DetailsList = styled.ul`
   list-style-type: none;
   padding: 0;
+  letter-spacing: 2px;
+  line-height: 2.2;
 `;
 
 const DetailItem = styled.li`
-  margin-bottom: 5px;
+  text-align: left;
   font-size: 22px;
+  font-weight: 450;
 `;
 
 const AdditionalInfo = styled.div`
   font-size: 20px;
-  background-color: #fff0f5;
+  background-color: #ffc18848;
   border-radius: 8px;
   padding: 15px;
-  margin-top: 20px;
+  letter-spacing: 2px;
+  line-height: 2.2;
+  min-height: 100px;
 `;
