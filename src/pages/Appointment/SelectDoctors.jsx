@@ -28,12 +28,12 @@ export default function SelectDoctors({
           doctor.division.division_id === department.id &&
           doctor.division.specialty_id === specialty.id ? (
             <DoctorItem
-              key={doctor.id || index}
+              key={doctor.uid || index}
               $borderBottom={index !== data.length - 1}
               onClick={() => onDoctorClick(doctor)}
               {...register("doctor")}
             >
-              <CheckInput type="radio" name="doctor" defaultValue={doctor.id} />
+              <CheckInput type="radio" name="doctor" defaultValue={doctor.uid} />
               <CheckIcon src={SelectedIcon} />
               <DoctorImage src={doctor.physician_imag} />
               <DoctorInfo>
