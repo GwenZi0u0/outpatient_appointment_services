@@ -57,7 +57,7 @@ export default function CancelRegistrationPage() {
   });
 
   useEffect(() => {
-    console.log("progressData:", progressData);
+    console.log(progressData);
   }, [progressData]);
 
   useEffect(() => {

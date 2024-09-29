@@ -9,22 +9,35 @@ import {
   fetchRegistrationData,
   fetchProgressData,
 } from "../api";
-import { filterRegistrationDataByCurrentDate } from "../utils/dateUtils";
+import {
+  filterRegistrationDataByCurrentDate,
+  getToday,
+} from "../utils/dateUtils";
 // K789456444
 // A123456789
 
 const useProgressStore = create((set) => ({
   idNumber: "A112234456",
-  setIdNumber: (idNumber) => set({ idNumber }),
   error: "",
-  setError: (error) => set({ error }),
   isOpened: false,
+  visibleRows: 5,
+  setIdNumber: (idNumber) => set({ idNumber }),
+  setError: (error) => set({ error }),
   setIsOpened: (isOpened) => set({ isOpened }),
+  setVisibleRows: (visibleRows) => set({ visibleRows }),
 }));
 
 export default function ProgressPage() {
-  const { idNumber, setIdNumber, error, setError, isOpened, setIsOpened } =
-    useProgressStore();
+  const {
+    idNumber,
+    setIdNumber,
+    error,
+    setError,
+    isOpened,
+    setIsOpened,
+    visibleRows,
+    setVisibleRows,
+  } = useProgressStore();
   const { data: departmentData } = useQuery({
     queryKey: ["departments"],
     queryFn: fetchDepartmentsData,
@@ -46,22 +59,26 @@ export default function ProgressPage() {
     queryFn: fetchProgressData,
   });
 
-  const mockDatabase = useMemo(() => 
-    registrationData?.filter(
-      (data) =>
-        data.personal_id_number === idNumber && data.status === "confirmed"
-    ),
+  const mockDatabase = useMemo(
+    () =>
+      registrationData?.filter(
+        (data) =>
+          data.personal_id_number === idNumber && data.status === "confirmed"
+      ),
     [registrationData, idNumber]
   );
 
-  const result = useMemo(() => 
-    filterRegistrationDataByCurrentDate(mockDatabase),
+  const result = useMemo(
+    () => filterRegistrationDataByCurrentDate(mockDatabase),
     [mockDatabase]
   );
 
-  const handleInputChange = useCallback((e) => {
-    setIdNumber(e.target.value.toUpperCase());
-  }, [setIdNumber]);
+  const handleInputChange = useCallback(
+    (e) => {
+      setIdNumber(e.target.value.toUpperCase());
+    },
+    [setIdNumber]
+  );
 
   const handleSearch = useCallback(() => {
     const regex = /^[A-Z]{1}[0-9]{9}$/;
@@ -82,6 +99,50 @@ export default function ProgressPage() {
       handleSearch(registrationData);
     }
   };
+
+  const allAppointmentProgress = useMemo(() => {
+    if (!departmentData || !doctorData || !scheduleData || !progressData) {
+      return [];
+    }
+
+    const today = getToday().daysOfWeek;
+
+    return departmentData.flatMap((department) =>
+      doctorData
+        .filter((doctor) => doctor.division.division_id === department.id)
+        .map((doctor) => {
+          const specialty =
+            department.specialties?.find(
+              (specialty) => specialty.id === doctor.division.specialty_id
+            )?.specialty || "";
+          const schedule = scheduleData.find(
+            (schedule) => schedule.doctor_id === doctor.uid
+          );
+
+          if (schedule && schedule.shift_rules) {
+            const todayShift = schedule.shift_rules[today];
+
+            if (todayShift) {
+              const progressInfo = progressData.find(
+                (progress) => progress.doctor_id === doctor.uid
+              );
+              return {
+                department: specialty,
+                doctor: doctor.physician_name,
+                room: schedule.room,
+                status:
+                  progressInfo?.number !== null &&
+                  progressInfo?.number !== undefined
+                    ? progressInfo.number
+                    : "未開診",
+              };
+            }
+          }
+          return null;
+        })
+        .filter(Boolean)
+    );
+  }, [departmentData, doctorData, scheduleData, progressData]);
 
   return (
     <MainContainer>
@@ -156,6 +217,36 @@ export default function ProgressPage() {
           </Table>
         )}
       </Container>
+      <AllContainer>
+        <Title>全院門診看診進度</Title>
+        <Table $isOpened={true}>
+          <TableHeader>
+            <tr>
+              <TableHeaderCell>科別</TableHeaderCell>
+              <TableHeaderCell>診間號碼</TableHeaderCell>
+              <TableHeaderCell>醫師</TableHeaderCell>
+              <TableHeaderCell>看診進度</TableHeaderCell>
+            </tr>
+          </TableHeader>
+          <tbody>
+            {allAppointmentProgress
+              .slice(0, visibleRows)
+              .map((appointment, index) => (
+                <TableRow key={index}>
+                  <TableCell>{appointment.department}</TableCell>
+                  <TableCell>{appointment.room}</TableCell>
+                  <TableCell>{appointment.doctor}</TableCell>
+                  <TableCell>{appointment.status}</TableCell>
+                </TableRow>
+              ))}
+          </tbody>
+        </Table>
+        {allAppointmentProgress.length > visibleRows && (
+          <Button onClick={() => setVisibleRows(visibleRows + 5)}>
+            查看更多
+          </Button>
+        )}
+      </AllContainer>
     </MainContainer>
   );
 }
@@ -166,23 +257,24 @@ const ErrorMessage = styled.p`
 
 const MainContainer = styled.div`
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   flex-direction: column;
   height: auto;
   min-height: 100vh;
+  padding: 0 350px;
 `;
 
 const Container = styled.div`
   display: flex;
   align-items: flex-start;
   flex-direction: column;
-  padding-top: 160px;
+  padding-top: 120px;
   background-color: transparent;
 `;
 
 const Title = styled.h1`
-  font-size: 24px;
-  font-weight: bold;
+  font-size: 28px;
+  font-weight: 700;
   color: #000000;
   margin-bottom: 20px;
   letter-spacing: 9.6px;
@@ -250,4 +342,29 @@ const TableCell = styled.td`
 const TableHeaderCell = styled(TableCell).attrs({ as: "th" })`
   text-align: center;
   font-weight: bold;
+`;
+
+const AllContainer = styled.div`
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  padding-top: 80px;
+  background-color: transparent;
+  width: 100%;
+`;
+
+const Button = styled.button`
+  display: block;
+  width: 100%;
+  padding: 10px;
+  background-color: #0066cc;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+
+  &:hover {
+    background-color: #0052a3;
+  }
 `;
