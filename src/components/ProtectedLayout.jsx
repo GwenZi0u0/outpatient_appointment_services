@@ -6,6 +6,7 @@ import { useState } from "react";
 import AuthImage from "../assets/auth.svg";
 import { useQuery } from "@tanstack/react-query";
 import { fetchDoctorsData } from "../api";
+import Loading from "../assets/loading.gif";
 
 export default function ProtectedLayout() {
   const { user, loading, signOut } = useAuth((state) => ({
@@ -21,7 +22,11 @@ export default function ProtectedLayout() {
   });
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <LoadingContainer>
+        <LoadingGif src={Loading} alt="載入中..." />
+      </LoadingContainer>
+    );
   }
 
   function handleMouseEnter() {
@@ -63,6 +68,19 @@ export default function ProtectedLayout() {
 
   return <Navigate to="/login" replace />;
 }
+
+const LoadingContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+`;
+
+const LoadingGif = styled.img`
+  width: 200px;
+  height: 200px;
+  object-fit: cover;
+`;
 
 const Container = styled.div`
   position: fixed;
