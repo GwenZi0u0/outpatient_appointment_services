@@ -1,3 +1,4 @@
+import styled from "styled-components";
 import { useAuth } from "../../contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { fetchDoctorsData, fetchDepartmentsData } from "../../api";
@@ -5,10 +6,15 @@ import ProtectedLayout from "../../components/ProtectedLayout";
 import Header from "../../components/Header";
 import ProfileDemo from "./ProfileDemo";
 import EditProfile from "./EditProfile";
+import Loading from "../../assets/loading.gif";
 
 export default function DoctorProfilePage() {
   const { user } = useAuth();
-  const { data: doctorData, refetch: refetchDoctorData } = useQuery({
+  const {
+    data: doctorData,
+    refetch: refetchDoctorData,
+    isLoading,
+  } = useQuery({
     queryKey: ["doctors"],
     queryFn: fetchDoctorsData,
   });
@@ -16,6 +22,14 @@ export default function DoctorProfilePage() {
     queryKey: ["departments"],
     queryFn: fetchDepartmentsData,
   });
+
+  if (isLoading) {
+    return (
+      <LoadingContainer>
+        <LoadingGif src={Loading} alt="載入中..." />
+      </LoadingContainer>
+    );
+  }
 
   function calculateAge(timestamp) {
     if (!timestamp) return null;
@@ -59,3 +73,16 @@ export default function DoctorProfilePage() {
     );
   }
 }
+
+const LoadingContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+`;
+
+const LoadingGif = styled.img`
+  width: 200px;
+  height: 200px;
+  object-fit: cover;
+`;

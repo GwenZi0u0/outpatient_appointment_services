@@ -4,6 +4,7 @@ import Lock from "../assets/Lock.svg";
 import { useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import Loading from "../assets/loading.gif";
 
 const useLoginStore = create((set) => ({
   email: "",
@@ -40,7 +41,11 @@ export default function LoginPage() {
   };
 
   if (loading) {
-    return <div>加載中...</div>;
+    return (
+      <LoadingContainer>
+        <LoadingGif src={Loading} alt="載入中..." />
+      </LoadingContainer>
+    );
   }
 
   return (
@@ -81,6 +86,19 @@ export default function LoginPage() {
     </>
   );
 }
+
+const LoadingContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+`;
+
+const LoadingGif = styled.img`
+  width: 200px;
+  height: 200px;
+  object-fit: cover;
+`;
 
 const Container = styled.div`
   display: flex;
