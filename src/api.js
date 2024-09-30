@@ -23,6 +23,7 @@ export const fetchPatientData = () => fetchCollectionData("patients");
 export const fetchUserData = () => fetchCollectionData("users");
 export const fetchProgressData = () => fetchCollectionData("progress");
 export const fetchRequestLeaveData = () => fetchCollectionData("request_leave");
+export const fetchNoticeData = () => fetchCollectionData("hospital_announcement");
 
 export const fetchDoctorsDataWithLimit = async (limitCount = 50) => {
   try {

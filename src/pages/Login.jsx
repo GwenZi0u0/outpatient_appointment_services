@@ -1,10 +1,14 @@
 import { create } from "zustand";
 import styled from "styled-components";
 import Lock from "../assets/Lock.svg";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { fetchNoticeData } from "../api";
 import Loading from "../assets/loading.gif";
+import KeyIcon from "../assets/login_key.svg";
+import UserIcon from "../assets/login_user.svg";
 
 const useLoginStore = create((set) => ({
   email: "",
@@ -17,6 +21,17 @@ export default function LoginPage() {
   const { email, password, setEmail, setPassword } = useLoginStore();
   const { signInWithEmail, error, loading } = useAuth();
   const navigate = useNavigate();
+  const { data: noticeData } = useQuery({
+    queryKey: ["noticeData"],
+    queryFn: fetchNoticeData,
+  });
+  const [animationDelay, setAnimationDelay] = useState(0.2);
+
+  useEffect(() => {
+    if (noticeData) {
+      setAnimationDelay(0.2);
+    }
+  }, [noticeData]);
 
   useEffect(() => {
     const savedEmail =
@@ -51,12 +66,30 @@ export default function LoginPage() {
   return (
     <>
       <Container onSubmit={handleLogin}>
-        <NoticeContainer />
+        <NoticeContainer>
+          <NoticeTitle style={{ animationDelay: "0s" }}>院內公告</NoticeTitle>
+          <NoticeContent>
+            {noticeData &&
+              noticeData
+                .sort((a, b) => b.created_at.toDate() - a.created_at.toDate())
+                .map((notice, index) => (
+                  <NoticeItem
+                    key={notice.id}
+                    style={{
+                      animationDelay: `${(index + 1) * animationDelay}s`,
+                    }}
+                  >
+                    <ItemTitle>{notice.title}</ItemTitle>
+                    <ItemContent>{notice.content}</ItemContent>
+                  </NoticeItem>
+                ))}
+          </NoticeContent>
+        </NoticeContainer>
         <LoginContainer>
           <LockIcon src={Lock} />
           <LoginContent>
             <Content htmlFor="email">
-              <LoginIcon />
+              <LoginIcon src={UserIcon} />
               <LoginInput
                 type="email"
                 value={email}
@@ -66,7 +99,7 @@ export default function LoginPage() {
               />
             </Content>
             <Content htmlFor="password">
-              <LoginIcon />
+              <LoginIcon src={KeyIcon} />
               <PassWord>
                 password 密 碼
                 <PasswordInput
@@ -86,6 +119,127 @@ export default function LoginPage() {
     </>
   );
 }
+
+const NoticeContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+  height: 100%;
+  background-color: transparent;
+  gap: 20px;
+`;
+
+const NoticeTitle = styled.div`
+  color: #244a8b;
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  padding: 10px;
+  width: auto;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInUp 1s ease forwards;
+
+  @keyframes fadeInUp {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+`;
+
+const NoticeContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  padding-right: 10px;
+  border-radius: 30px;
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 30px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: #d2cdcd;
+    border-radius: 30px;
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background: #b7c3da;
+  }
+`;
+
+const NoticeItem = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  background-color: transparent;
+  padding: 20px;
+  gap: 20px;
+  position: relative;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInUp 1.2s ease forwards;
+
+  &:hover {
+    color: #244a8b;
+    border-color: #b7c3da63;
+  }
+
+  @keyframes fadeInUp {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+`;
+const ItemTitle = styled.div`
+  height: 32px;
+  width: auto;
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: 1.5px;
+  position: relative;
+
+  ${NoticeItem}:hover &::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0px;
+    width: auto;
+    height: 2.5px;
+    background-color: #b7c3da;
+    border-radius: 30px;
+    color: #244a8b;
+    animation: borderExpand 0.5s forwards;
+  }
+
+  @keyframes borderExpand {
+    from {
+      width: 0;
+    }
+    to {
+      width: 100%;
+    }
+  }
+`;
+
+const ItemContent = styled.div`
+  font-size: 22px;
+  font-weight: 400;
+  letter-spacing: 1.5px;
+  line-height: 1.5;
+  text-align: justify;
+  text-justify: inter-word;
+`;
 
 const LoadingContainer = styled.div`
   display: flex;
@@ -108,13 +262,6 @@ const Container = styled.div`
   padding: 98px 211px;
   background-color: #fefefe;
   gap: 55px;
-`;
-
-const NoticeContainer = styled.div`
-  display: flex;
-  width: 50%;
-  height: 100%;
-  background-color: #cccccc;
 `;
 
 const LoginContainer = styled.div`
@@ -140,7 +287,8 @@ const LoginContent = styled.form`
   height: 70%;
   padding: 93px 71px;
   border: 1px solid #e0e0e0;
-  gap: 20px;
+  border-radius: 10px;
+  gap: 25px;
 `;
 
 const Content = styled.label`
@@ -148,37 +296,43 @@ const Content = styled.label`
   align-items: center;
   justify-content: center;
   width: 100%;
-  gap: 20px;
-  border-bottom: 1px solid #e0e0e0;
+  gap: 30px;
 `;
 
-const LoginIcon = styled.div`
-  width: 20px;
-  height: 20px;
-  background-color: #000000;
+const LoginIcon = styled.img`
+  width: 70px;
+  height: 70px;
+  background-color: transparent;
 `;
 
 const LoginInput = styled.input`
   width: 100%;
   height: 50px;
+  font-size: 22px;
   border: none;
+  border-bottom: 1px solid #e0e0e0;
   &:focus {
     outline: none;
+    border-bottom: 1px solid #244a8b;
   }
 `;
 
 const PasswordInput = styled.input`
   width: auto;
   height: 50px;
+  font-size: 22px;
   border: none;
+  border-bottom: 1px solid #e0e0e0;
   &:focus {
     outline: none;
+    border-bottom: 1px solid #244a8b;
   }
 `;
 
 const PassWord = styled.div`
   display: flex;
   flex-direction: column;
+  font-size: 18px;
   width: 100%;
   gap: 10px;
 `;
@@ -188,13 +342,14 @@ const Button = styled.button`
   height: 97px;
   font-size: 28px;
   letter-spacing: 5px;
-  background-color: #00b0c1;
+  background-color: #b7c3da;
   color: white;
   border: none;
-  border-radius: 5px;
+  border-radius: 10px;
+  margin-top: 20px;
   cursor: pointer;
   &:hover {
-    background-color: #b7c3da;
+    background-color: #00b0c1;
   }
 `;
 
