@@ -1,15 +1,21 @@
 import styled, { keyframes } from "styled-components";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchDepartmentsData } from "../../api";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import BackGround from "../../assets/background.svg";
 import AnnouncementImg from "../../assets/announcementImage.svg";
+import Loading from "../../assets/loading.gif";
+import CusService from "../../components/CusService";
+import AiRobot from "../../components/AiRobot";
 
 export default function Registration() {
   const { setValue } = useForm();
   const navigate = useNavigate();
-  const { data, isLoading, error } = useQuery({
+  const [showAI, setShowAI] = useState(false);
+  const [userQuestion, setUserQuestion] = useState("");
+  const { data, isLoading } = useQuery({
     queryKey: ["departments"],
     queryFn: fetchDepartmentsData,
   });
@@ -19,8 +25,13 @@ export default function Registration() {
     navigate("/appointment", { state: { department } });
   };
 
-  if (isLoading) return <div>載入中...</div>;
-  if (error) return <div>發生錯誤: {error.message}</div>;
+  if (isLoading) {
+    return (
+      <LoadingContainer>
+        <LoadingGif src={Loading} alt="載入中..." />
+      </LoadingContainer>
+    );
+  }
 
   const handleButtonClick = () => {
     navigate("/");
@@ -29,6 +40,15 @@ export default function Registration() {
         .getElementById("select-region")
         ?.scrollIntoView({ behavior: "smooth" });
     }, 100);
+  };
+
+  const handleClick = () => {
+    setShowAI(true);
+    setUserQuestion(userQuestion);
+  };
+
+  const handleCloseAI = () => {
+    setShowAI(false);
   };
 
   return (
@@ -87,9 +107,41 @@ export default function Registration() {
             ))}
         </SelectCards>
       </SelectRegion>
+      <CusService handleClick={handleClick} />
+      {showAI && (
+        <OverlayContainer>
+          <AiRobot userAsk={userQuestion} handleCloseAI={handleCloseAI} />
+        </OverlayContainer>
+      )}
     </MainContainer>
   );
 }
+
+const OverlayContainer = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 20000;
+`;
+
+const LoadingContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+`;
+
+const LoadingGif = styled.img`
+  width: 200px;
+  height: 200px;
+  object-fit: cover;
+`;
 
 const MainContainer = styled.div`
   display: flex;
@@ -238,9 +290,13 @@ const SelectCards = styled.div`
   grid-template-columns: repeat(3, 1fr);
   background-color: #ffffff;
   gap: 40px;
+  ${(props) =>
+    props.$specialty &&
+    `
+  `}
 `;
 
-const SelectCard = styled.button`
+export const SelectCard = styled.button`
   display: flex;
   border-radius: 10px;
   background-color: #fff;
@@ -256,20 +312,20 @@ const SelectCard = styled.button`
   }
 `;
 
-const ContentContainer = styled.div`
+export const ContentContainer = styled.div`
   flex: 2;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
 `;
 
-const SelectCardTitle = styled.span`
+export const SelectCardTitle = styled.span`
   font-size: 24px;
   color: #1e1e1e;
   margin-bottom: 10px;
 `;
 
-const SelectCardImage = styled.img`
+export const SelectCardImage = styled.img`
   flex: 1;
   margin-right: 20px;
   width: 160px;
