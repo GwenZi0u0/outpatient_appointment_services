@@ -77,7 +77,6 @@ export default function AiRobot({ handleCloseAI }) {
               return (
                 <SelectCard
                   key={index}
-                  $specialty={specialty}
                   style={{
                     transform: "none",
                     boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
