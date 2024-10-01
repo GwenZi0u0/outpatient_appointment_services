@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import styled from "styled-components";
-import { useMemo, useCallback } from "react";
+import { useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -17,6 +17,7 @@ import {
   formatFirestoreTimestamp,
   convertToTimestamp,
 } from "../../utils/dateUtils";
+import Return from "../../assets/return_Square.svg";
 
 const useAppointmentStore = create((set) => ({
   step: 1,
@@ -56,16 +57,16 @@ export default function Appointment() {
 
   const steps = useMemo(
     () => [
-      { step: 1, label: "請選擇科別" },
-      { step: 2, label: "請選擇醫生" },
-      { step: 3, label: "請選擇掛號時間" },
-      { step: 4, label: "掛號資訊確認" },
+      { step: 1, label: "選擇科別" },
+      { step: 2, label: "選擇醫生" },
+      { step: 3, label: "選擇掛號時間" },
+      { step: 4, label: "填寫掛號資訊" },
       { step: 5, label: "完成掛號" },
     ],
     []
   );
 
-  const handleReturnClick = useCallback(() => {
+  const handleReturnClick = () => {
     if (step === 1) {
       navigator("/");
       setTimeout(() => {
@@ -76,7 +77,7 @@ export default function Appointment() {
     } else {
       setStep(step - 1);
     }
-  }, [step, navigator]);
+  };
 
   const handleSpecialtyClick = (specialty) => {
     setValue("specialty", specialty);
@@ -155,7 +156,9 @@ export default function Appointment() {
   return (
     <Container>
       <Header>
-        <BackButton onClick={() => handleReturnClick()}>{"<< "}返回</BackButton>
+        <BackButton onClick={() => handleReturnClick()}>
+          <BackIcon src={Return} />
+        </BackButton>
         <Title>網路預約掛號流程</Title>
       </Header>
       <ProcessStep>
@@ -238,40 +241,57 @@ const Container = styled.div`
   max-width: 1000px;
   margin: 0 auto;
   padding-top: 100px;
+  height: auto;
+  min-height: 100vh;
 `;
 
 const Header = styled.div`
-  background-color: #b7c3da;
-  height: 46px;
+  background-color: #b7c3da8a;
+  width: 100%;
+  height: 45px;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  padding-right: 40%;
   gap: 150px;
-  border-radius: 2px;
+  border-radius: 10px;
+  position: relative;
 `;
 
 const BackButton = styled.button`
-  width: 148px;
-  height: 100%;
+  position: absolute;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  height: auto;
   border: none;
   color: #244a8b;
-  background-color: #ffc288;
+  background-color: transparent;
   font-size: 24px;
   font-weight: 700;
-  opacity: 0.8;
-  border-radius: 2px;
+  opacity: 0.7;
+  padding-left: 10px;
+  border-radius: 30px;
   cursor: pointer;
+  &:hover {
+    opacity: 1;
+  }
 `;
 
-const Title = styled.h1`
-  margin-left: 20px;
-  font-size: 18px;
+const BackIcon = styled.img`
+  width: 40px;
+  height: 40px;
+`;
+
+const Title = styled.span`
+  font-size: 28px;
+  font-weight: 600;
   color: #244a8b;
 `;
 
 const ProcessStep = styled.div`
-  font-size: 18px;
+  font-size: 19px;
   letter-spacing: 1px;
   background-color: transparent;
   padding: 11px 0;
@@ -305,7 +325,7 @@ const ServiceList = styled.form`
   min-height: 50px;
   overflow-y: auto;
   overflow-x: hidden;
-  border-radius: 2px;
+  border-radius: 45px;
   scroll-behavior: smooth;
   scrollbar-width: none;
   -ms-overflow-style: none;
