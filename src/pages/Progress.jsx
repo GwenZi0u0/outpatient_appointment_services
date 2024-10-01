@@ -164,14 +164,14 @@ export default function ProgressPage() {
         </SearchContainer>
         {isOpened && (
           <Table $isOpened={isOpened}>
-            <TableHeader>
-              <TableRow>
-                <TableHeaderCell>科別</TableHeaderCell>
-                <TableHeaderCell>診間號碼</TableHeaderCell>
-                <TableHeaderCell>醫師</TableHeaderCell>
-                <TableHeaderCell>看診號</TableHeaderCell>
-                <TableHeaderCell>看診進度</TableHeaderCell>
-              </TableRow>
+            <TableHeader $bgColor={false}>
+              <TableHeaderRow>
+                <TableHeaderCell $CellWidth={"auto"}>科別</TableHeaderCell>
+                <TableHeaderCell $CellWidth={"20%"}>診間號碼</TableHeaderCell>
+                <TableHeaderCell $CellWidth={"20%"}>醫師</TableHeaderCell>
+                <TableHeaderCell $CellWidth={"20%"}>看診號</TableHeaderCell>
+                <TableHeaderCell $CellWidth={"20%"}>看診進度</TableHeaderCell>
+              </TableHeaderRow>
             </TableHeader>
             <tbody>
               {result.length > 0 ? (
@@ -220,15 +220,15 @@ export default function ProgressPage() {
       <AllContainer>
         <Title>全院門診看診進度</Title>
         <Table $isOpened={true}>
-          <TableHeader>
-            <tr>
-              <TableHeaderCell>科別</TableHeaderCell>
-              <TableHeaderCell>診間號碼</TableHeaderCell>
-              <TableHeaderCell>醫師</TableHeaderCell>
-              <TableHeaderCell>看診進度</TableHeaderCell>
-            </tr>
+          <TableHeader $bgColor={true}>
+            <TableHeaderRow>
+              <TableHeaderCell $CellWidth={"40%"}>科別</TableHeaderCell>
+              <TableHeaderCell $CellWidth={"20%"}>診間號碼</TableHeaderCell>
+              <TableHeaderCell $CellWidth={"20%"}>醫師</TableHeaderCell>
+              <TableHeaderCell $CellWidth={"20%"}>看診進度</TableHeaderCell>
+            </TableHeaderRow>
           </TableHeader>
-          <tbody>
+          <Tbody>
             {allAppointmentProgress
               .slice(0, visibleRows)
               .map((appointment, index) => (
@@ -239,7 +239,7 @@ export default function ProgressPage() {
                   <TableCell>{appointment.status}</TableCell>
                 </TableRow>
               ))}
-          </tbody>
+          </Tbody>
         </Table>
         {allAppointmentProgress.length > visibleRows && (
           <Button onClick={() => setVisibleRows(visibleRows + 5)}>
@@ -261,54 +261,102 @@ const MainContainer = styled.div`
   flex-direction: column;
   height: auto;
   min-height: 100vh;
-  padding: 0 350px;
+  padding: 80px 316px 40px;
+  gap: 80px;
+  @media (max-width: 1440.1px) {
+    padding: 80px 200px 40px;
+  }
+  @media (max-width: 1280.1px) {
+    padding: 80px 180px 40px;
+  }
+  @media (max-width: 1024.1px) {
+    padding: 80px 150px 40px;
+  }
+  @media (max-width: 768.1px) {
+    padding: 80px 100px 40px;
+  }
+  @media (max-width: 480.1px) {
+    padding: 80px 50px 40px;
+  }
 `;
 
 const Container = styled.div`
   display: flex;
   align-items: flex-start;
   flex-direction: column;
-  padding-top: 120px;
   background-color: transparent;
+  width: 100%;
+  padding-top: 84px;
+  gap: 40px;
+  @media (max-width: 1024.1px) {
+    align-items: center;
+  }
 `;
 
-const Title = styled.h1`
-  font-size: 28px;
+const Title = styled.span`
+  font-size: 32px;
   font-weight: 700;
   color: #000000;
-  margin-bottom: 20px;
   letter-spacing: 9.6px;
+  @media (max-width: 1440.1px) {
+    font-size: 28px;
+  }
+  @media (max-width: 1024.1px) {
+    font-size: 24px;
+  }
 `;
 
 const SearchContainer = styled.div`
   display: flex;
+  font-weight: 700;
   align-items: center;
-  justify-content: center;
+  width: 100%;
   gap: 20px;
+  @media (max-width: 1024.1px) {
+    flex-direction: column;
+  }
 `;
 
-const Input = styled.input.attrs((props) => ({
-  id: props.id,
-  name: props.name,
-}))`
-  width: auto;
-  height: 50px;
+const Input = styled.input`
+  width: 73%;
+  height: 56px;
   padding: 10px;
-  font-size: 16px;
-  border: 1px solid #000000;
+  font-size: 20px;
+  border: 1px solid #cccccc;
   border-radius: 5px;
+  &:focus {
+    outline: none;
+    border: 2px solid #244a8b;
+  }
+
+  @media (max-width: 1440.1px) {
+    width: 70%;
+  }
+  @media (max-width: 1280.1px) {
+    width: 67%;
+  }
+  @media (max-width: 1024.1px) {
+    font-size: 18px;
+    width: 100%;
+  }
 `;
 
 const Label = styled.label`
   display: flex;
-  justify-content: center;
   align-items: center;
-  font-size: 24px;
+  font-size: 30px;
   font-weight: 700;
   letter-spacing: 10.4px;
-  width: 100%;
-  height: 93px;
   padding-left: 35px;
+  @media (max-width: 1440.1px) {
+    font-size: 24px;
+  }
+  @media (max-width: 1024.1px) {
+    font-size: 20px;
+    letter-spacing: 7.2px;
+    width: 100%;
+    padding-left: 0;
+  }
 `;
 
 const Table = styled.table`
@@ -316,55 +364,113 @@ const Table = styled.table`
   width: 100%;
   border-collapse: collapse;
   font-family: Arial, sans-serif;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1);
+`;
+
+const Tbody = styled.tbody`
+  border: none;
 `;
 
 const TableHeader = styled.thead`
-  background-color: #00b0c1;
+  background-color: ${(props) => (props.$bgColor ? "#0267B5" : "#00b0c1")};
   color: white;
-  font-size: 24px;
-  font-weight: 700;
-  letter-spacing: 10.4px;
   height: 93px;
+  border-radius: 10px;
 `;
 
+const TableHeaderRow = styled.tr``;
+
 const TableRow = styled.tr`
-  &:nth-child(even) {
-    background-color: #f2f2f2;
+  background-color: #ffffff;
+  height: 75px;
+  border-bottom: 1px solid #ddd;
+  @media (max-width: 1440.1px) {
+    height: 65px;
   }
 `;
 
 const TableCell = styled.td`
   text-align: center;
   padding: 8px;
-  border: 1px solid #ddd;
+  font-size: 24px;
+  font-weight: 500;
+  letter-spacing: 5.6px;
+  @media (max-width: 1440.1px) {
+    font-size: 20px;
+  }
+  @media (max-width: 1024.1px) {
+    font-size: 18px;
+    letter-spacing: 4.4px;
+  }
+  @media (max-width: 480.1px) {
+    font-size: 16px;
+    letter-spacing: 3.3px;
+  }
 `;
 
 const TableHeaderCell = styled(TableCell).attrs({ as: "th" })`
   text-align: center;
-  font-weight: bold;
+  font-weight: 600;
+  border: none;
+  padding: 0;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 11.4px;
+  width: ${(props) => props.$CellWidth || "auto"};
+  @media (max-width: 1440.1px) {
+    font-size: 24px;
+  }
+  @media (max-width: 1024.1px) {
+    font-size: 22px;
+    letter-spacing: 8.8px;
+  }
+  @media (max-width: 480.1px) {
+    font-size: 20px;
+    letter-spacing: 6.4px;
+  }
 `;
 
 const AllContainer = styled.div`
   display: flex;
   align-items: flex-start;
   flex-direction: column;
-  padding-top: 80px;
   background-color: transparent;
   width: 100%;
+  gap: 30px;
+  @media (max-width: 1024.1px) {
+    align-items: center;
+  }
 `;
 
 const Button = styled.button`
   display: block;
+  height: 75px;
   width: 100%;
-  padding: 10px;
-  background-color: #0066cc;
+  background-color: #0267B5;
   color: white;
   border: none;
-  border-radius: 5px;
+  border-radius: 10px;
   cursor: pointer;
-  font-size: 16px;
-
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 10.4px;
+  margin-top: 5px;
+  box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1);
   &:hover {
     background-color: #0052a3;
+  }
+  @media (max-width: 1440.1px) {
+    font-size: 24px;
+  }
+  @media (max-width: 1024.1px) {
+    font-size: 22px;
+    letter-spacing: 8.8px;
+  }
+  @media (max-width: 480.1px) {
+    font-size: 20px;
+    letter-spacing: 6.6px;
+    height: 60px;
   }
 `;
