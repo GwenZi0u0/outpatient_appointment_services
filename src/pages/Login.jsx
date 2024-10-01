@@ -127,6 +127,11 @@ const NoticeContainer = styled.div`
   height: 100%;
   background-color: transparent;
   gap: 20px;
+  @media (max-width: 1280.1px) {
+    width: 100%;
+    min-height: 250px;
+    gap: 10px;
+  }
 `;
 
 const NoticeTitle = styled.div`
@@ -170,6 +175,10 @@ const NoticeContent = styled.div`
   &::-webkit-scrollbar-thumb:hover {
     background: #b7c3da;
   }
+  @media (max-width: 1280.1px) {
+    width: 100%;
+    min-height: 250px;
+  }
 `;
 
 const NoticeItem = styled.div`
@@ -199,6 +208,9 @@ const NoticeItem = styled.div`
       opacity: 1;
       transform: translateY(0);
     }
+  }
+  @media (max-width: 1280.1px) {
+   font-size: 18px;
   }
 `;
 const ItemTitle = styled.div`
@@ -239,6 +251,9 @@ const ItemContent = styled.div`
   line-height: 1.5;
   text-align: justify;
   text-justify: inter-word;
+  @media (max-width: 1280.1px) {
+    font-size: 18px;
+  }
 `;
 
 const LoadingContainer = styled.div`
@@ -262,6 +277,15 @@ const Container = styled.div`
   padding: 98px 211px;
   background-color: #fefefe;
   gap: 55px;
+  @media (max-width: 1280.1px) {
+    flex-direction: column-reverse;
+    width: 100%;
+    padding: 98px 100px;
+    gap: 15px;
+  }
+  /* @media (max-width: 891.1px) {
+    padding: 98px 10px;
+  } */
 `;
 
 const LoginContainer = styled.div`
@@ -272,6 +296,9 @@ const LoginContainer = styled.div`
   width: 50%;
   height: 100%;
   background-color: #ffffff;
+  @media (max-width: 1280.1px) {
+    width: 100%;
+  }
 `;
 
 const LockIcon = styled.img`
@@ -289,6 +316,7 @@ const LoginContent = styled.form`
   border: 1px solid #e0e0e0;
   border-radius: 10px;
   gap: 25px;
+  
 `;
 
 const Content = styled.label`
