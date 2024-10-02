@@ -176,41 +176,43 @@ export default function CancelRegistrationPage() {
             </TableHeader>
             <Tbody>
               {result.length > 0 ? (
-                result.map((data, index) => {
-                  const doctor = doctorData?.find(
-                    (doctor) => doctor.uid === data.doctor_id
-                  );
-                  const department = departmentData?.find(
-                    (department) =>
-                      department.id === data.division.department_id
-                  );
-                  const specialtyData = department?.specialties.find(
-                    (specialty) => specialty.id === data.division.specialty_id
-                  );
-                  const schedule = scheduleData?.find(
-                    (schedule) => schedule.doctor_id === data.doctor_id
-                  );
+                result
+                  .sort((a, b) => a.OPD_date.toDate() - b.OPD_date.toDate())
+                  .map((data, index) => {
+                    const doctor = doctorData?.find(
+                      (doctor) => doctor.uid === data.doctor_id
+                    );
+                    const department = departmentData?.find(
+                      (department) =>
+                        department.id === data.division.department_id
+                    );
+                    const specialtyData = department?.specialties.find(
+                      (specialty) => specialty.id === data.division.specialty_id
+                    );
+                    const schedule = scheduleData?.find(
+                      (schedule) => schedule.doctor_id === data.doctor_id
+                    );
 
-                  return (
-                    <TableRow key={index}>
-                      <TableCell>{specialtyData?.specialty || ""}</TableCell>
-                      <TableCell>
-                        {formatFirestoreTimestamp(data.OPD_date).slice(5)}
-                      </TableCell>
-                      <TableCell>
-                        {timeSlots[data.appointment_timeslot] || ""}
-                      </TableCell>
-                      <TableCell>{schedule?.room || ""}</TableCell>
-                      <TableCell>{doctor?.physician_name || ""}</TableCell>
-                      <TableCell>{data.registration_number || ""}</TableCell>
-                      <TableCell>
-                        <Button onClick={() => handleCancel(index)}>
-                          取消
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })
+                    return (
+                      <TableRow key={index}>
+                        <TableCell>{specialtyData?.specialty || ""}</TableCell>
+                        <TableCell>
+                          {formatFirestoreTimestamp(data.OPD_date).slice(5)}
+                        </TableCell>
+                        <TableCell>
+                          {timeSlots[data.appointment_timeslot] || ""}
+                        </TableCell>
+                        <TableCell>{schedule?.room || ""}</TableCell>
+                        <TableCell>{doctor?.physician_name || ""}</TableCell>
+                        <TableCell>{data.registration_number || ""}</TableCell>
+                        <TableCell>
+                          <Button onClick={() => handleCancel(index)}>
+                            取消
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })
               ) : (
                 <TableRow>
                   <TableCell colSpan={7}>查無掛號資料</TableCell>
