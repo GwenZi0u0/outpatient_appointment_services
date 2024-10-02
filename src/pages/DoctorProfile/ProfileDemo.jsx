@@ -99,7 +99,7 @@ const MainContainer = styled.div`
   flex-direction: column;
   height: auto;
   min-height: 100vh;
-  padding-top: 80px;
+  padding: 80px 0 40px;
 `;
 
 const ProfileContainer = styled.div`
