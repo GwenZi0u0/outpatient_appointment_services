@@ -38,7 +38,7 @@ export default function SelectDoctors({
               <DoctorImage src={doctor.physician_imag} />
               <DoctorInfo>
                 <DoctorName>{doctor.physician_name} 醫師</DoctorName>
-                <DoctorTitle to={`/doctor-profile/${doctor.uid}`}>
+                <DoctorTitle to={`/doctor-profile/${doctor.uid}`} target="_blank" rel="noopener noreferrer">
                   醫師簡介
                 </DoctorTitle>
               </DoctorInfo>
