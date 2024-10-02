@@ -156,20 +156,24 @@ export default function CancelRegistrationPage() {
   );
 
   const handleNext = async () => {
-    const progressDataId = progressData?.filter(
+    const progressDoc = progressData?.find(
       (data) => data.doctor_id === user.uid
-    )[0]?.id;
+    );
     const firstValidNumber = filteredData[0]?.registration_number || null;
     if (firstValidNumber) {
       setCurrentNumber(firstValidNumber);
-      try {
-        const docRef = doc(fireDb, "progress", progressDataId);
-        await updateDoc(docRef, {
-          number: firstValidNumber,
-        });
-        console.log("Document updated successfully");
-      } catch (error) {
-        console.error("Error updating document: ", error);
+      if (progressDoc && progressDoc.id) {
+        try {
+          const docRef = doc(fireDb, "progress", progressDoc.id);
+          await updateDoc(docRef, {
+            number: firstValidNumber,
+          });
+          console.log("Document updated successfully");
+        } catch (error) {
+          console.error("Error updating document: ", error);
+        }
+      } else {
+        console.error("No valid progress document found");
       }
     }
   };
