@@ -16,22 +16,32 @@ import {
   formatFirestoreTimestamp,
   filterRegistrationDataByCurrentDate,
 } from "../utils/dateUtils";
+import { PopUp } from "../components/PopUp";
 
 const useCancelRegistrationStore = create((set) => ({
   idNumber: "",
   error: "",
   isOpened: false,
   result: [],
+  popupMessage: "",
+  confirmAction: null,
+  showPopup: false,
   setIdNumber: (idNumber) => set({ idNumber }),
   setError: (error) => set({ error }),
   setIsOpened: (isOpened) => set({ isOpened }),
   setResult: (result) => set({ result }),
+  setPopupMessage: (popupMessage) => set({ popupMessage }),
+  setConfirmAction: (confirmAction) => set({ confirmAction }),
+  setShowPopup: (showPopup) => set({ showPopup }),
   resetState: () =>
     set({
       idNumber: "",
       error: "",
       isOpened: false,
       result: [],
+      popupMessage: "",
+      showPopup: false,
+      confirmAction: null,
     }),
 }));
 
@@ -46,6 +56,12 @@ export default function CancelRegistrationPage() {
     setIsOpened,
     setResult,
     resetState,
+    popupMessage,
+    showPopup,
+    setPopupMessage,
+    setShowPopup,
+    confirmAction,
+    setConfirmAction,
   } = useCancelRegistrationStore();
 
   const location = useLocation();
@@ -122,26 +138,45 @@ export default function CancelRegistrationPage() {
   };
 
   const handleCancel = async (registrationId) => {
-    if (window.confirm("確定要取消掛號嗎？")) {
-      try {
-        const registrationToCancel = result.find(
-          (reg) => reg.id === registrationId
-        );
-        if (!registrationToCancel) {
-          throw new Error("找不到要取消的掛號記錄");
-        }
-        const docRef = doc(fireDb, "registrations", registrationId);
-        await updateDoc(docRef, {
-          status: "cancelled",
-        });
-        const updatedResult = result.filter((reg) => reg.id !== registrationId);
-        setResult(updatedResult);
-        await refetchRegistrationData();
-        alert("掛號已成功取消");
-      } catch (error) {
-        alert(`取消掛號時出現錯誤：${error.message}`);
+    setPopupMessage("確定要取消掛號嗎？");
+    setShowPopup(true);
+    setConfirmAction(() => cancelRegistration(registrationId));
+  };
+
+  const cancelRegistration = async (registrationId) => {
+    try {
+      const registrationToCancel = result.find(
+        (reg) => reg.id === registrationId
+      );
+      if (!registrationToCancel) {
+        throw new Error("找不到要取消的掛號記錄");
       }
+      const docRef = doc(fireDb, "registrations", registrationId);
+      await updateDoc(docRef, {
+        status: "cancelled",
+      });
+      const updatedResult = result.filter((reg) => reg.id !== registrationId);
+      setResult(updatedResult);
+      await refetchRegistrationData();
+      setPopupMessage("掛號已成功取消");
+      setShowPopup(true);
+    } catch (error) {
+      setPopupMessage(`取消掛號時出現錯誤：${error.message}`);
+      setShowPopup(true);
     }
+  };
+
+  const handleConfirm = async () => {
+    if (confirmAction) {
+      await confirmAction();
+      setConfirmAction(null);
+    }
+    setShowPopup(false);
+  };
+
+  const handleClosePopup = () => {
+    setShowPopup(false);
+    setConfirmAction(null);
   };
 
   useEffect(() => {
@@ -233,9 +268,68 @@ export default function CancelRegistrationPage() {
           </Table>
         )}
       </Container>
+      {showPopup && (
+        <PopUp>
+          <PopupContent>
+            <p>{popupMessage}</p>
+            {confirmAction ? (
+              <ButtonGroup>
+                <ConfirmButton onClick={handleConfirm}>確定</ConfirmButton>
+                <CancelButton onClick={handleClosePopup}>取消</CancelButton>
+              </ButtonGroup>
+            ) : (
+              <CloseButton onClick={handleClosePopup}>關閉</CloseButton>
+            )}
+          </PopupContent>
+        </PopUp>
+      )}
     </MainContainer>
   );
 }
+
+const PopupContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+`;
+
+const ButtonGroup = styled.div`
+  display: flex;
+  gap: 10px;
+`;
+
+const BaseButton = styled.button`
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+`;
+
+const ConfirmButton = styled(BaseButton)`
+  background-color: #244a8b;
+  color: white;
+  &:hover {
+    background-color: #1c3a6e;
+  }
+`;
+
+const CancelButton = styled(BaseButton)`
+  background-color: #f0f0f0;
+  color: #333;
+  &:hover {
+    background-color: #e0e0e0;
+  }
+`;
+
+const CloseButton = styled(BaseButton)`
+  background-color: #244a8b;
+  color: white;
+  &:hover {
+    background-color: #1c3a6e;
+  }
+`;
 
 const ErrorMessage = styled.span`
   color: red;
