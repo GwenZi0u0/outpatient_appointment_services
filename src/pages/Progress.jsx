@@ -150,17 +150,19 @@ export default function ProgressPage() {
         <Title>今日門診進度</Title>
         <SearchContainer>
           <Label htmlFor="idNumberInput">身分證號碼查詢 </Label>
-          <Input
-            id="idNumberInput"
-            name="idNumber"
-            type="text"
-            placeholder="請輸入身分證號碼"
-            maxLength={10}
-            value={idNumber}
-            onChange={handleInputChange}
-            onKeyDown={(e) => handleKeyDown(e, registrationData)}
-          />
-          {error && <ErrorMessage>{error}</ErrorMessage>}
+          <SearchFrame>
+            <Input
+              id="idNumberInput"
+              name="idNumber"
+              type="text"
+              placeholder="請輸入身分證號碼"
+              maxLength={10}
+              value={idNumber}
+              onChange={handleInputChange}
+              onKeyDown={(e) => handleKeyDown(e, registrationData)}
+            />
+            {error && <ErrorMessage>{error}</ErrorMessage>}
+          </SearchFrame>
         </SearchContainer>
         {isOpened && (
           <Table $isOpened={isOpened}>
@@ -302,24 +304,34 @@ const Title = styled.span`
     font-size: 28px;
   }
   @media (max-width: 1024.1px) {
-    font-size: 24px;
+    font-size: 25px;
   }
 `;
 
 const SearchContainer = styled.div`
   display: flex;
-  font-weight: 700;
   align-items: center;
+  font-weight: 700;
   width: 100%;
-  gap: 20px;
+  gap: 15px;
   @media (max-width: 1024.1px) {
+    align-items: center;
     flex-direction: column;
   }
 `;
 
+const SearchFrame = styled.div`
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  width: 65%;
+  gap: 10px;
+`;
+
 const Input = styled.input`
-  width: 73%;
-  height: 56px;
+  width: 100%;
+  height: auto;
+  min-height: 56px;
   padding: 10px;
   font-size: 20px;
   border: 1px solid #cccccc;
@@ -330,10 +342,10 @@ const Input = styled.input`
   }
 
   @media (max-width: 1440.1px) {
-    width: 70%;
+    width: 65%;
   }
   @media (max-width: 1280.1px) {
-    width: 67%;
+    width: 65%;
   }
   @media (max-width: 1024.1px) {
     font-size: 18px;
@@ -347,14 +359,14 @@ const Label = styled.label`
   font-size: 30px;
   font-weight: 700;
   letter-spacing: 10.4px;
-  padding-left: 35px;
+  padding: 10px 0 0 35px;
   @media (max-width: 1440.1px) {
     font-size: 24px;
+    align-items: center;
   }
   @media (max-width: 1024.1px) {
-    font-size: 20px;
+    font-size: 22px;
     letter-spacing: 7.2px;
-    width: 100%;
     padding-left: 0;
   }
 `;
@@ -448,7 +460,7 @@ const Button = styled.button`
   display: block;
   height: 75px;
   width: 100%;
-  background-color: #0267B5;
+  background-color: #0267b5;
   color: white;
   border: none;
   border-radius: 10px;
