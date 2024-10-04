@@ -277,6 +277,7 @@ export default function ProgressPage() {
 
 const ErrorMessage = styled.span`
   color: red;
+  font-weight: 400;
   letter-spacing: 5.6px;
 `;
 
