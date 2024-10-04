@@ -1,5 +1,6 @@
 import { create } from "zustand";
-import { useMemo, useCallback } from "react";
+import { useMemo, useCallback, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import styled from "styled-components";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -13,11 +14,9 @@ import {
   filterRegistrationDataByCurrentDate,
   getToday,
 } from "../utils/dateUtils";
-// K789456444
-// A123456789
 
 const useProgressStore = create((set) => ({
-  idNumber: "A112234456",
+  idNumber: "",
   error: "",
   isOpened: false,
   visibleRows: 5,
@@ -25,6 +24,13 @@ const useProgressStore = create((set) => ({
   setError: (error) => set({ error }),
   setIsOpened: (isOpened) => set({ isOpened }),
   setVisibleRows: (visibleRows) => set({ visibleRows }),
+  resetState: () =>
+    set({
+      idNumber: "",
+      error: "",
+      isOpened: false,
+      visibleRows: 5,
+    }),
 }));
 
 export default function ProgressPage() {
@@ -37,7 +43,15 @@ export default function ProgressPage() {
     setIsOpened,
     visibleRows,
     setVisibleRows,
+    resetState,
   } = useProgressStore();
+
+  const location = useLocation();
+
+  useEffect(() => {
+    return () => resetState();
+  }, [location, resetState]);
+
   const { data: departmentData } = useQuery({
     queryKey: ["departments"],
     queryFn: fetchDepartmentsData,
@@ -81,6 +95,11 @@ export default function ProgressPage() {
   );
 
   const handleSearch = useCallback(() => {
+    if (!idNumber.trim()) {
+      setError("請輸入身分證號碼");
+      setIsOpened(false);
+      return;
+    }
     const regex = /^[A-Z]{1}[0-9]{9}$/;
     if (
       !idNumber.match(regex) ||
@@ -88,9 +107,11 @@ export default function ProgressPage() {
     ) {
       setError("查無此身分證號碼");
       setIsOpened(false);
+      return;
     } else {
       setError("");
       setIsOpened(true);
+      return;
     }
   }, [idNumber, mockDatabase, setError, setIsOpened]);
 
@@ -161,6 +182,7 @@ export default function ProgressPage() {
               onChange={handleInputChange}
               onKeyDown={(e) => handleKeyDown(e, registrationData)}
             />
+            <Hint>K789456444 或 A234567890</Hint>
             {error && <ErrorMessage>{error}</ErrorMessage>}
           </SearchFrame>
         </SearchContainer>
@@ -253,8 +275,9 @@ export default function ProgressPage() {
   );
 }
 
-const ErrorMessage = styled.p`
+const ErrorMessage = styled.span`
   color: red;
+  letter-spacing: 5.6px;
 `;
 
 const MainContainer = styled.div`
@@ -310,7 +333,6 @@ const Title = styled.span`
 
 const SearchContainer = styled.div`
   display: flex;
-  align-items: center;
   font-weight: 700;
   width: 100%;
   gap: 15px;
@@ -322,10 +344,16 @@ const SearchContainer = styled.div`
 
 const SearchFrame = styled.div`
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   flex-direction: column;
   width: 65%;
   gap: 10px;
+`;
+
+const Hint = styled.span`
+  font-size: 14px;
+  font-weight: 400;
+  color: #666666;
 `;
 
 const Input = styled.input`
@@ -355,19 +383,19 @@ const Input = styled.input`
 
 const Label = styled.label`
   display: flex;
-  align-items: center;
   font-size: 30px;
   font-weight: 700;
   letter-spacing: 10.4px;
-  padding: 10px 0 0 35px;
+  padding-left: 35px;
+  margin-top: 15px;
   @media (max-width: 1440.1px) {
     font-size: 24px;
-    align-items: center;
   }
   @media (max-width: 1024.1px) {
     font-size: 22px;
     letter-spacing: 7.2px;
     padding-left: 0;
+    margin-top: 0;
   }
 `;
 
