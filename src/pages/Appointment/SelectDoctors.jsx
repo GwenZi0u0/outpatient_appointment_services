@@ -15,36 +15,40 @@ export default function SelectDoctors({
     queryFn: fetchDoctorsData,
   });
 
-  const hasDoctors = data?.some(
-    (doctor) =>
-      doctor.division.division_id === department.id &&
-      doctor.division.specialty_id === specialty.id
-  );
-
+  const filteredDoctors =
+    data?.filter(
+      (doctor) =>
+        doctor.division.division_id === department.id &&
+        doctor.division.specialty_id === specialty.id
+    ) || [];
   return (
     <>
-      {hasDoctors ? (
-        data?.map((doctor, index) =>
-          doctor.division.division_id === department.id &&
-          doctor.division.specialty_id === specialty.id ? (
-            <DoctorItem
-              key={doctor.uid || index}
-              $borderBottom={index !== data.length - 1}
-              onClick={() => onDoctorClick(doctor)}
-              {...register("doctor")}
-            >
-              <CheckInput type="radio" name="doctor" defaultValue={doctor.uid} />
-              <CheckIcon src={SelectedIcon} />
-              <DoctorImage src={doctor.physician_imag} />
-              <DoctorInfo>
-                <DoctorName>{doctor.physician_name} 醫師</DoctorName>
-                <DoctorTitle to={`/doctor-profile/${doctor.uid}`} target="_blank" rel="noopener noreferrer">
-                  醫師簡介
-                </DoctorTitle>
-              </DoctorInfo>
-            </DoctorItem>
-          ) : null
-        )
+      {filteredDoctors.length > 0 ? (
+        filteredDoctors.map((doctor, index) => (
+          <DoctorItem
+            key={doctor.uid || index}
+            $borderBottom={
+              filteredDoctors.length > 1 && index !== filteredDoctors.length - 1
+            }
+            onClick={() => onDoctorClick(doctor)}
+            {...register("doctor")}
+          >
+            <CheckInput type="radio" name="doctor" defaultValue={doctor.uid} />
+            <CheckIcon src={SelectedIcon} />
+            <DoctorImage src={doctor.physician_imag} />
+            <DoctorInfo>
+              <DoctorName>{doctor.physician_name} 醫師</DoctorName>
+              <DoctorTitle
+                to={`/doctor-profile/${doctor.uid}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+              >
+                醫師簡介
+              </DoctorTitle>
+            </DoctorInfo>
+          </DoctorItem>
+        ))
       ) : (
         <Text>暫無安排醫師</Text>
       )}
