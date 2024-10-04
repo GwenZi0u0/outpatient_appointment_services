@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import styled from "styled-components";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
+import { useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import {
   fetchRegistrationData,
@@ -17,39 +18,48 @@ import {
 } from "../utils/dateUtils";
 
 const useCancelRegistrationStore = create((set) => ({
-  idNumber: "K789456444",
+  idNumber: "",
   error: "",
   isOpened: false,
-  mockDatabase: [],
   result: [],
-  setIdNumber: (value) => set({ idNumber: value }),
-  setError: (value) => set({ error: value }),
-  setIsOpened: (value) => set({ isOpened: value }),
-  setMockDatabase: (value) => set({ mockDatabase: value }),
-  setResult: (value) => set({ result: value }),
+  setIdNumber: (idNumber) => set({ idNumber }),
+  setError: (error) => set({ error }),
+  setIsOpened: (isOpened) => set({ isOpened }),
+  setResult: (result) => set({ result }),
+  resetState: () =>
+    set({
+      idNumber: "",
+      error: "",
+      isOpened: false,
+      result: [],
+    }),
 }));
 
 export default function CancelRegistrationPage() {
   const {
     idNumber,
     isOpened,
-    mockDatabase,
     result,
+    error,
     setIdNumber,
     setError,
     setIsOpened,
-    setMockDatabase,
     setResult,
+    resetState,
   } = useCancelRegistrationStore();
 
-  const {
-    data: registrationData,
-    error,
-    refetch: refetchRegistrationData,
-  } = useQuery({
-    queryKey: ["registrations"],
-    queryFn: fetchRegistrationData,
-  });
+  const location = useLocation();
+
+  useEffect(() => {
+    return () => resetState();
+  }, [location, resetState]);
+
+  const { data: registrationData, refetch: refetchRegistrationData } = useQuery(
+    {
+      queryKey: ["registrations"],
+      queryFn: fetchRegistrationData,
+    }
+  );
 
   const { data: departmentData } = useQuery({
     queryKey: ["departments"],
@@ -66,31 +76,42 @@ export default function CancelRegistrationPage() {
     queryFn: fetchSchedulesData,
   });
 
+  const mockDatabase = useMemo(
+    () =>
+      registrationData?.filter(
+        (data) =>
+          data.personal_id_number === idNumber && data.status === "confirmed"
+      ),
+    [registrationData, idNumber]
+  );
+
   const handleInputChange = (e) => {
     const value = e.target.value.toUpperCase();
     setIdNumber(value);
+    setResult([]);
+    setError("");
+    setIsOpened(false);
   };
 
   const handleSearch = async () => {
-    const regex = /^[A-Z]{1}[0-9]{9}$/;
-    if (!idNumber.match(regex) || idNumber.length !== 10) {
-      setError("身分證號碼格式不正確");
+    if (!idNumber.trim()) {
+      setError("請輸入身分證號碼");
       setIsOpened(false);
-      setMockDatabase([]);
+      return;
+    }
+    const regex = /^[A-Z]{1}[0-9]{9}$/;
+    if (
+      !idNumber.match(regex) ||
+      !mockDatabase.some((data) => data.personal_id_number === idNumber)
+    ) {
+      setError("查無此身分證號碼");
+      setIsOpened(false);
+      return;
     } else {
+      const filteredData = filterRegistrationDataByCurrentDate(mockDatabase);
+      setResult(filteredData);
       setError("");
-      const filteredData = registrationData?.filter(
-        (data) =>
-          data.personal_id_number === idNumber && data.status === "confirmed"
-      );
-      if (filteredData && filteredData.length > 0) {
-        setMockDatabase(filteredData);
-        setIsOpened(true);
-      } else {
-        setError("查無此身分證號碼的掛號資料");
-        setIsOpened(false);
-        setMockDatabase([]);
-      }
+      setIsOpened(true);
     }
   };
 
@@ -100,37 +121,24 @@ export default function CancelRegistrationPage() {
     }
   };
 
-  const handleCancel = async (confirmData) => {
+  const handleCancel = async (registrationId) => {
     if (window.confirm("確定要取消掛號嗎？")) {
       try {
-        if (
-          !mockDatabase ||
-          !Array.isArray(mockDatabase) ||
-          confirmData < 0 ||
-          confirmData >= mockDatabase.length
-        ) {
-          throw new Error("無效的掛號數據");
-        }
-
-        const registrationToCancel = mockDatabase[confirmData];
-        if (!registrationToCancel || !registrationToCancel.id) {
+        const registrationToCancel = result.find(
+          (reg) => reg.id === registrationId
+        );
+        if (!registrationToCancel) {
           throw new Error("找不到要取消的掛號記錄");
         }
-
-        const docRef = doc(fireDb, "registrations", registrationToCancel.id);
-
+        const docRef = doc(fireDb, "registrations", registrationId);
         await updateDoc(docRef, {
           status: "cancelled",
         });
-        const updatedMockDatabase = mockDatabase.filter(
-          (_, index) => index !== confirmData
-        );
-        setMockDatabase(updatedMockDatabase);
+        const updatedResult = result.filter((reg) => reg.id !== registrationId);
+        setResult(updatedResult);
         await refetchRegistrationData();
-
-        alert("掛號已取消");
+        alert("掛號已成功取消");
       } catch (error) {
-        console.error("取消掛號時出現錯誤：", error);
         alert(`取消掛號時出現錯誤：${error.message}`);
       }
     }
@@ -149,18 +157,21 @@ export default function CancelRegistrationPage() {
         <Title>查詢/取消你的掛號</Title>
         <SearchContainer>
           <Label htmlFor="idNumberInput">身分證號碼查詢</Label>
-          <Input
-            id="idNumberInput"
-            name="idNumber"
-            type="text"
-            placeholder="請輸入身分證號碼"
-            maxLength={10}
-            value={idNumber}
-            onChange={handleInputChange}
-            onKeyDown={handleKeyDown}
-          />
+          <SearchFrame>
+            <Input
+              id="idNumberInput"
+              name="idNumber"
+              type="text"
+              placeholder="請輸入身分證號碼"
+              maxLength={10}
+              value={idNumber}
+              onChange={handleInputChange}
+              onKeyDown={handleKeyDown}
+            />
+            <Hint>K789456444 或 A234567890</Hint>
+          </SearchFrame>
+          {error && <ErrorMessage>{error}</ErrorMessage>}
         </SearchContainer>
-        {error && <ErrorMessage>{error}</ErrorMessage>}
         {isOpened && (
           <Table $isOpened={isOpened}>
             <TableHeader>
@@ -206,7 +217,7 @@ export default function CancelRegistrationPage() {
                         <TableCell>{doctor?.physician_name || ""}</TableCell>
                         <TableCell>{data.registration_number || ""}</TableCell>
                         <TableCell>
-                          <Button onClick={() => handleCancel(index)}>
+                          <Button onClick={() => handleCancel(data.id)}>
                             取消
                           </Button>
                         </TableCell>
@@ -226,8 +237,10 @@ export default function CancelRegistrationPage() {
   );
 }
 
-const ErrorMessage = styled.p`
+const ErrorMessage = styled.span`
   color: red;
+  font-weight: 400;
+  letter-spacing: 5.6px;
 `;
 
 const MainContainer = styled.div`
@@ -293,37 +306,49 @@ const SearchContainer = styled.div`
   }
 `;
 
+const SearchFrame = styled.div`
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  width: 65%;
+  gap: 10px;
+`;
+
 const Label = styled.label`
   font-size: 30px;
   font-weight: 700;
   letter-spacing: 10.4px;
-  /* padding-left: 35px; */
   @media (max-width: 1440.1px) {
     font-size: 24px;
   }
   @media (max-width: 1024.1px) {
     font-size: 20px;
     letter-spacing: 7.2px;
-    /* padding-left: 0; */
   }
 `;
 
 const Input = styled.input`
-  width: 500px;
+  width: auto;
+  min-width: 500px;
   height: 50px;
   padding: 10px;
   font-size: 18px;
   border: 1px solid #cccccc;
   border-radius: 5px;
-  margin-left: 35px;
   &:focus {
     outline: none;
     border: 2px solid #244a8b;
   }
   @media (max-width: 1024.1px) {
-    width: 300px;
+    min-width: 350px;
     margin-left: 0;
   }
+`;
+
+const Hint = styled.span`
+  font-size: 14px;
+  font-weight: 400;
+  color: #666666;
 `;
 
 const Table = styled.table`
