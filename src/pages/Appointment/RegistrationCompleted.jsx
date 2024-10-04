@@ -10,6 +10,8 @@ export default function RegistrationCompleted({
   schedule,
   idNumber,
   onCompletedClick,
+  name,
+  birthday,
 }) {
   const { data } = useQuery({
     queryKey: ["registrations"],
@@ -24,13 +26,16 @@ export default function RegistrationCompleted({
       const day = String(date.getDate()).padStart(2, "0");
       return `${year}/${month}/${day}`;
     }
+    if (typeof timestamp === "string") {
+      return timestamp.replace(/-/g, "/");
+    }
     return "";
   };
 
   const foundItem = Array.isArray(data)
     ? data.find((item) => item.personal_id_number === idNumber)
     : null;
-    
+
   const currentSchedule = schedule.find(
     (schedule) => schedule.doctor_id === doctor.uid
   );
@@ -69,11 +74,13 @@ export default function RegistrationCompleted({
                 <Td>{doctor?.physician_name || ""}</Td>
               </tr>
               <tr>
-                您的身分證字號為：{foundItem.personal_id_number || ""}
+                您的身分證字號為：
+                {idNumber || ""}
               </tr>
-              <tr>您的姓名為：{foundItem.name || ""}</tr>
+              <tr>您的姓名為：{name || ""}</tr>
               <tr>
-                您的生日為：{formatDate(foundItem.birth_date) || ""}
+                您的生日為：
+                {formatDate(birthday) || ""}
               </tr>
             </>
           ) : null}
