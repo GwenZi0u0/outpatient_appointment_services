@@ -75,6 +75,24 @@ export default function Appointment() {
           ?.scrollIntoView({ behavior: "smooth" });
       }, 0);
     } else {
+      switch (step) {
+        case 2:
+          setValue("specialty", "");
+          break;
+        case 3:
+          setValue("doctor", "");
+          break;
+        case 4:
+          setValue("date", "");
+          setValue("time", "");
+          break;
+        case 5:
+          setValue("idNumber", "");
+          setValue("birthday", "");
+          setValue("name", "");
+          setValue("phone", "");
+          break;
+      }
       setStep(step - 1);
     }
   };
@@ -96,6 +114,17 @@ export default function Appointment() {
   };
 
   const handleCompleted = () => {
+    setValue("department", "");
+    setValue("specialty", "");
+    setValue("doctor", "");
+    setValue("date", "");
+    setValue("time", "");
+    setValue("idNumber", "");
+    setValue("birthday", "");
+    setValue("name", "");
+    setValue("phone", "");
+    setValue("nextRegistrationNumber", "");
+    setStep(1);
     navigator("/");
   };
 
