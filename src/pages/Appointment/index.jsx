@@ -18,17 +18,29 @@ import {
   convertToTimestamp,
 } from "../../utils/dateUtils";
 import Return from "../../assets/return_Square.svg";
+import { PopUp } from "../../components/PopUp";
 
 const useAppointmentStore = create((set) => ({
   step: 1,
+  showPopup: false,
+  popupMessage: "",
   setStep: (newStep) => set({ step: newStep }),
+  setShowPopup: (newShowPopup) => set({ showPopup: newShowPopup }),
+  setPopupMessage: (popupMessage) => set({ popupMessage }),
 }));
 
 export default function Appointment() {
   const navigator = useNavigate();
   const { state } = useLocation();
   const { department } = state;
-  const { step, setStep } = useAppointmentStore();
+  const {
+    step,
+    setStep,
+    showPopup,
+    setShowPopup,
+    popupMessage,
+    setPopupMessage,
+  } = useAppointmentStore();
   const { data: scheduleData } = useQuery({
     queryKey: ["schedules"],
     queryFn: fetchSchedulesData,
@@ -151,7 +163,8 @@ export default function Appointment() {
 
   const onSubmit = async (data) => {
     if (!isValidTaiwanID(data.idNumber)) {
-      alert("身分證號碼輸入錯誤");
+      setShowPopup(true);
+      setPopupMessage("身分證號碼輸入錯誤");
       return;
     }
     const nextNumber = getNextRegistrationNumber(registrationData, data.time);
@@ -240,7 +253,13 @@ export default function Appointment() {
             schedule={scheduleData}
             getNextRegistrationNumber={getNextRegistrationNumber}
             registrationData={registrationData}
-            onResetClick={() => setStep(1)}
+            onResetClick={() => {
+              setStep(1);
+              setValue("idNumber", "");
+              setValue("birthday", "");
+              setValue("name", "");
+              setValue("phone", "");
+            }}
             onSubmit={(idNumber, birthday, name, phone) =>
               onSubmit({ idNumber, birthday, name, phone })
             }
@@ -261,9 +280,46 @@ export default function Appointment() {
           />
         )}
       </ServiceList>
+      {showPopup && (
+        <PopUp>
+          <PopupContent>
+            <PopupMessage>{popupMessage}</PopupMessage>
+            <CloseButton onClick={() => setShowPopup(false)}>確定</CloseButton>
+          </PopupContent>
+        </PopUp>
+      )}
     </Container>
   );
 }
+
+const PopupContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+`;
+
+const BaseButton = styled.button`
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+`;
+
+const PopupMessage = styled.p`
+  font-size: 18px;
+  margin-bottom: 20px;
+  text-align: center;
+`;
+
+const CloseButton = styled(BaseButton)`
+  background-color: #244a8b;
+  color: white;
+  &:hover {
+    background-color: #1c3a6e;
+  }
+`;
 
 const Container = styled.div`
   font-family: Arial, sans-serif;
