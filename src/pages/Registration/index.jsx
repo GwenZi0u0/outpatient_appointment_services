@@ -50,9 +50,14 @@ export default function Registration() {
   const handleButtonClick = () => {
     navigate("/");
     setTimeout(() => {
-      document
-        .getElementById("select-region")
-        ?.scrollIntoView({ behavior: "smooth" });
+      const element = document.getElementById("select-region");
+      if (element) {
+        element.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+          inline: "nearest",
+        });
+      }
     }, 100);
   };
 
@@ -118,7 +123,8 @@ export default function Registration() {
         </NoticeContainer>
       </AnnouncementContainer>
       <RemindText id="select-region">
-        預約掛號天數為28天內<br />
+        預約掛號天數為28天內
+        <br />
         就醫時請攜帶健保IC卡，未貼照片者請攜帶身分證、駕照、戶口名簿、
         <br />
         外籍居留證、敬老卡或身心障礙手冊等證明文件以核對。
