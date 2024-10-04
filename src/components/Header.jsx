@@ -29,6 +29,7 @@ export default function Header() {
     } else {
       setIsGradient(true);
     }
+    window.scrollTo(0, 0);
 
     return () => {
       if (isRootPath) {
@@ -40,9 +41,14 @@ export default function Header() {
   const handleButtonClick = () => {
     navigate("/");
     setTimeout(() => {
-      document
-        .getElementById("select-region")
-        ?.scrollIntoView({ behavior: "smooth" });
+      const element = document.getElementById("select-region");
+      if (element) {
+        element.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+          inline: "nearest",
+        });
+      }
     }, 100);
     setIsMenuOpen(false);
   };
@@ -65,10 +71,7 @@ export default function Header() {
           >
             網路掛號
           </SelectLink>
-            <SelectLink
-            to="/cancel-registration"
-            $isGradient={isGradient}
-          >
+          <SelectLink to="/cancel-registration" $isGradient={isGradient}>
             查詢取消掛號
           </SelectLink>
           <SelectLink to="/progress" $isGradient={isGradient}>
@@ -97,10 +100,7 @@ export default function Header() {
           >
             查詢取消掛號
           </SelectLink>
-          <SelectLink
-            to="/progress"
-            onClick={() => setIsMenuOpen(false)}
-          >
+          <SelectLink to="/progress" onClick={() => setIsMenuOpen(false)}>
             看診進度
           </SelectLink>
         </MenuMobile>
