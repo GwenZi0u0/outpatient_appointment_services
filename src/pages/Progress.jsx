@@ -340,15 +340,26 @@ const SearchContainer = styled.div`
   @media (max-width: 1024.1px) {
     align-items: center;
     flex-direction: column;
+    gap: 20px;
   }
 `;
 
 const SearchFrame = styled.div`
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   flex-direction: column;
-  width: 65%;
+  width: 74%;
   gap: 10px;
+  @media (max-width: 1440.1px) {
+    width: 70%;
+  }
+  @media (max-width: 1280.1px) {
+    width: 68%;
+  }
+  @media (max-width: 1024.1px) {
+    width: 80%;
+    align-items: center;
+  }
 `;
 
 const Hint = styled.span`
@@ -369,16 +380,8 @@ const Input = styled.input`
     outline: none;
     border: 2px solid #244a8b;
   }
-
-  @media (max-width: 1440.1px) {
-    width: 65%;
-  }
-  @media (max-width: 1280.1px) {
-    width: 65%;
-  }
   @media (max-width: 1024.1px) {
     font-size: 18px;
-    width: 100%;
   }
 `;
 
