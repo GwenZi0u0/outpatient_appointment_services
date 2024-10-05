@@ -41,6 +41,14 @@ export default function RegistrationInformation({
     time
   );
 
+  const handleReset = () => {
+    setIdNumber("");
+    setBirthday("");
+    setName("");
+    setPhone("");
+    onResetClick();
+  };
+
   const handleInputChange = (e) => {
     const { value } = e.target;
     if (/^[A-Z]{0,1}[0-9]{0,9}$/.test(value)) {
@@ -133,7 +141,7 @@ export default function RegistrationInformation({
       />
 
       <ButtonContainer>
-        <Button type="button" $btnColor={false} onClick={() => onResetClick()}>
+        <Button type="button" $btnColor={false} onClick={handleReset}>
           重新選擇
         </Button>
         <Button type="submit" $btnColor={true}>
