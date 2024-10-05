@@ -11,6 +11,7 @@ import EditProfileIcon from "../../assets/editProfileIcon.svg";
 import SaveProfile from "../../assets/save.svg";
 import CancelIcon from "../../assets/x-square.svg";
 import RemoveIcon from "../../assets/x.svg";
+import { PopUp } from "../../components/PopUp";
 
 export default function EditProfile({
   calculateAge,
@@ -26,6 +27,9 @@ export default function EditProfile({
   const [isEditing, setIsEditing] = useState(false);
   const [newExpertise, setNewExpertise] = useState("");
   const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
+  const [popupMessage, setPopupMessage] = useState("");
+  const [popupAction, setPopupAction] = useState(null);
 
   const isModified = useMemo(() => {
     if (!modifiedData || !userData) return false;
@@ -125,36 +129,39 @@ export default function EditProfile({
 
   const handleSaveProfile = async () => {
     if (!isModified) return;
-    const confirmSave = window.confirm("確定要儲存嗎？");
-    if (!confirmSave) return;
-    try {
-      const docRef = doc(fireDb, "doctors", userData.id);
-      const updatedFields = {
-        degree: modifiedData.degree || "",
-        duty: modifiedData.duty || "",
-        content: modifiedData.content || "",
-        expertises: modifiedData.expertises || [],
-      };
-      await updateDoc(docRef, updatedFields);
-      alert("儲存成功！");
-      refetchDoctorData();
-      setIsEditing(false);
-    } catch (error) {
-      console.error("儲存失敗：", error);
-      alert("儲存失敗，請重試。");
-    } finally {
-      setIsEditing(false);
-    }
+    setPopupMessage("確定要儲存嗎？");
+    setPopupAction(() => async () => {
+      try {
+        const docRef = doc(fireDb, "doctors", userData.id);
+        const updatedFields = {
+          degree: modifiedData.degree || "",
+          duty: modifiedData.duty || "",
+          content: modifiedData.content || "",
+          expertises: modifiedData.expertises || [],
+        };
+        await updateDoc(docRef, updatedFields);
+        setPopupMessage("儲存成功！");
+        setPopupAction(null);
+        refetchDoctorData();
+        setIsEditing(false);
+      } catch (error) {
+        console.error("儲存失敗：", error);
+        setPopupMessage("儲存失敗，請重試。");
+      } finally {
+        setIsEditing(false);
+      }
+    });
+    setShowPopup(true);
   };
 
   const handleCancelEdit = () => {
-    const confirmCancel = window.confirm(
-      "確定要放棄編輯嗎？所有更改將不會保存。"
-    );
-    if (confirmCancel) {
+    setPopupMessage("確定要放棄編輯嗎？所有更改將不會保存。");
+    setPopupAction(() => () => {
       setModifiedData(currentUser);
       setIsEditing(false);
-    }
+      setShowPopup(false);
+    });
+    setShowPopup(true);
   };
 
   useEffect(() => {
@@ -175,18 +182,25 @@ export default function EditProfile({
   useEffect(() => {
     const unblock = navigate(() => {
       if (isEditing) {
-        const confirmNavigation = window.confirm(
-          "確定要離開嗎？所有未保存的更改將丟失。"
-        );
-        if (!confirmNavigation) {
-          return false;
-        }
+        setPopupMessage("確定要離開嗎？所有未保存的更改將丟失。");
+        setPopupAction(() => () => {
+          setShowPopup(false);
+          return true;
+        });
+        setShowPopup(true);
+        return false;
       }
       return true;
     });
 
     return unblock;
   }, [isEditing, navigate]);
+
+
+  const handleClosePopup = () => {
+    setShowPopup(false);
+    setPopupAction(null);
+  };
 
   return (
     <MainContainer>
@@ -357,9 +371,73 @@ export default function EditProfile({
           </ProfileContent>
         </ProfileContainer>
       ) : null}
+      {showPopup && (
+        <PopUp>
+          <PopupContent>
+            <PopupMessage>{popupMessage}</PopupMessage>
+            {popupAction ? (
+              <ButtonGroup>
+                <ConfirmButton onClick={popupAction}>確定</ConfirmButton>
+                <CancelButton onClick={handleClosePopup}>取消</CancelButton>
+              </ButtonGroup>
+            ) : (
+              <CloseButton onClick={handleClosePopup}>關閉</CloseButton>
+            )}
+          </PopupContent>
+        </PopUp>
+      )}
     </MainContainer>
   );
 }
+
+const PopupContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+`;
+
+const ButtonGroup = styled.div`
+  display: flex;
+  gap: 10px;
+`;
+
+const BaseButton = styled.button`
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+`;
+
+const ConfirmButton = styled(BaseButton)`
+  background-color: #244a8b;
+  color: white;
+  &:hover {
+    background-color: #1c3a6e;
+  }
+`;
+
+const PopupMessage = styled.p`
+  font-size: 20px;
+  font-weight: 500;
+`;
+
+const CancelButton = styled(BaseButton)`
+  background-color: #f0f0f0;
+  color: #333;
+  &:hover {
+    background-color: #e0e0e0;
+  }
+`;
+
+const CloseButton = styled(BaseButton)`
+  background-color: #244a8b;
+  color: white;
+  &:hover {
+    background-color: #1c3a6e;
+  }
+`;
 
 const MainContainer = styled.div`
   display: flex;
@@ -577,7 +655,7 @@ const TagContainer = styled.div`
   align-items: stretch;
   height: 100%;
   gap: 10px;
-  margin-bottom: 10px
+  margin-bottom: 10px;
 `;
 
 const EditableTextArea = styled.textarea`
