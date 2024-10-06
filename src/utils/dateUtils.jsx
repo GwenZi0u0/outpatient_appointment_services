@@ -68,9 +68,31 @@ const formatWeeklyDates = (startDate) => {
   return weeks;
 };
 
+export const formatWeeklyDoctorDates = (startDate) => {
+  let formattedDates = [];
+  for (let i = 0; i < 56; i++) {
+    let currentDate = new Date(startDate);
+    currentDate.setDate(startDate.getDate() + i);
+
+    let day = currentDate.getDate();
+    let month = currentDate.getMonth() + 1;
+    let year = currentDate.getFullYear();
+
+    let dayKey = getDayKey(currentDate.getDay());
+
+    formattedDates.push(`${year}/${month}/${day} ${daysOfWeek[dayKey]}`);
+  }
+  let weeks = [];
+  for (let i = 0; i < formattedDates.length; i += 7) {
+    weeks.push(formattedDates.slice(i, i + 7));
+  }
+  return weeks;
+};
+
 const today = new Date();
 const monday = getMonday(today);
 export const weeks = formatWeeklyDates(monday);
+export const doctorWeeks = formatWeeklyDoctorDates(monday);
 
 export const isDisabled = (dateStr) => {
   const [datePart] = dateStr.split(" (");
@@ -89,6 +111,26 @@ export const isDisabled = (dateStr) => {
     return true;
   }
   return false;
+};
+
+export const isDoctorDisabled = (dateStr) => {
+  const [datePart] = dateStr.split(" (");
+  const [year, month, day] = datePart.split("/").map(Number);
+  const inputDate = new Date(year, month - 1, day);
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const fourWeeksLater = new Date(today);
+  fourWeeksLater.setDate(today.getDate() + 28);
+
+  if (inputDate < today) {
+    return true;
+  } else if (inputDate < fourWeeksLater) {
+    return true;
+  } else {
+    return false;
+  }
 };
 
 export const convertToTimestamp = (date) => {
