@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { create } from "zustand";
 import { fireDb, fireStorage } from "../../firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { doc, updateDoc } from "firebase/firestore";
@@ -13,6 +14,15 @@ import CancelIcon from "../../assets/x-square.svg";
 import RemoveIcon from "../../assets/x.svg";
 import { PopUp } from "../../components/PopUp";
 
+const useEditProfile = create((set) => ({
+  showPopup: false,
+  popupMessage: "",
+  popupAction: null,
+  setShowPopup: (show) => set({ showPopup: show }),
+  setPopupMessage: (message) => set({ popupMessage: message }),
+  setPopupAction: (action) => set({ popupAction: action }),
+}));
+
 export default function EditProfile({
   calculateAge,
   departmentData,
@@ -22,14 +32,20 @@ export default function EditProfile({
   const { doctorId } = useParams();
   const navigate = useNavigate();
   const currentUser = doctorData?.find((doctor) => doctor.uid === doctorId);
+  const {
+    showPopup,
+    popupMessage,
+    popupAction,
+    setShowPopup,
+    setPopupMessage,
+    setPopupAction,
+  } = useEditProfile();
+  
   const [userData, setUserData] = useState(currentUser);
   const [modifiedData, setModifiedData] = useState(userData || {});
   const [isEditing, setIsEditing] = useState(false);
   const [newExpertise, setNewExpertise] = useState("");
   const [isUploadingImage, setIsUploadingImage] = useState(false);
-  const [showPopup, setShowPopup] = useState(false);
-  const [popupMessage, setPopupMessage] = useState("");
-  const [popupAction, setPopupAction] = useState(null);
 
   const isModified = useMemo(() => {
     if (!modifiedData || !userData) return false;
@@ -195,7 +211,6 @@ export default function EditProfile({
 
     return unblock;
   }, [isEditing, navigate]);
-
 
   const handleClosePopup = () => {
     setShowPopup(false);
