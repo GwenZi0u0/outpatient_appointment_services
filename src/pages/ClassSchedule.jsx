@@ -13,14 +13,21 @@ import { collection, addDoc, Timestamp } from "firebase/firestore";
 import { fireDb } from "../firebase";
 import {
   timeSlots,
-  isDisabled,
-  weeks,
+  isDoctorDisabled,
+  doctorWeeks,
   convertToTimestamp,
   dayKeys,
 } from "../utils/dateUtils";
+import { PopUp } from "../components/PopUp";
 
 const useClassSchedule = create((set) => ({
   selectedDateTimes: [],
+  showPopup: false,
+  popupMessage: "",
+  confirmMessage: "",
+  setShowPopup: (show) => set({ showPopup: show }),
+  setPopupMessage: (message) => set({ popupMessage: message }),
+  setConfirmMessage: (message) => set({ confirmMessage: message }),
   setSelectedDateTimes: (updater) =>
     set((state) => {
       const newSelectedDateTimes = updater(state.selectedDateTimes);
@@ -64,7 +71,17 @@ const useClassSchedule = create((set) => ({
 }));
 
 export default function ClassSchedulePage() {
-  const { selectedDateTimes, toggleDateTime } = useClassSchedule();
+  const {
+    selectedDateTimes,
+    toggleDateTime,
+    showPopup,
+    popupMessage,
+    setShowPopup,
+    setPopupMessage,
+    confirmMessage,
+    setConfirmMessage,
+  } = useClassSchedule();
+
   const { user } = useAuth();
   const { data: departmentData } = useQuery({
     queryKey: ["departments"],
@@ -78,10 +95,12 @@ export default function ClassSchedulePage() {
     queryKey: ["schedules"],
     queryFn: fetchSchedulesData,
   });
-  const { data: requestLeaveData } = useQuery({
-    queryKey: ["request_leave"],
-    queryFn: fetchRequestLeaveData,
-  });
+  const { data: requestLeaveData, refetch: refetchRequestLeaveData } = useQuery(
+    {
+      queryKey: ["request_leave"],
+      queryFn: fetchRequestLeaveData,
+    }
+  );
   const doctor = doctorData?.find((doc) => doc.uid === user.uid) ?? {};
   const department = departmentData?.find(
     (dep) => dep.id === doctor?.division?.division_id
@@ -95,7 +114,7 @@ export default function ClassSchedulePage() {
     ?.flatMap((item) => item.date_times);
 
   const isLeaveDay = useMemo(() => {
-    return weeks
+    return doctorWeeks
       .map((week) =>
         week.filter((day) =>
           requestLeave?.some(
@@ -104,20 +123,20 @@ export default function ClassSchedulePage() {
         )
       )
       .flat();
-  }, [weeks, requestLeave]);
+  }, [doctorWeeks, requestLeave]);
 
   const handleCheckboxClick = (date, time) => {
-    if (isDisabled(date)) return;
+    if (isDoctorDisabled(date)) return;
     const firebaseTimestamp = convertToTimestamp(date);
     toggleDateTime(firebaseTimestamp, time);
   };
 
-  const handleSubmit = async () => {
-    const confirmSubmission = window.confirm("確定要休診嗎？");
+  const handleSubmit = () => {
+    setConfirmMessage("確定要休診嗎？");
+    setShowPopup(true);
+  };
 
-    if (!confirmSubmission) {
-      return;
-    }
+  const handleConfirm = async () => {
     try {
       const results = {
         create_time: Timestamp.now(),
@@ -128,10 +147,14 @@ export default function ClassSchedulePage() {
       await addDoc(collection(fireDb, "request_leave"), results);
       console.log("Document written with ID: ", results);
       toggleDateTime([]);
-      window.location.reload();
+      refetchRequestLeaveData();
+      setPopupMessage("提交成功");
     } catch (error) {
       console.error("Error adding document: ", error);
-      alert("提交失敗,請稍後再試");
+      setPopupMessage("提交失敗,請稍後再試");
+    } finally {
+      setConfirmMessage("");
+      setShowPopup(true);
     }
   };
 
@@ -151,8 +174,16 @@ export default function ClassSchedulePage() {
             </ConfirmedTitle>
           </Confirmed>
         </ConfirmedContainer>
+        <HintContainer>
+          <Hint>
+            <HintTitle>排診注意事項</HintTitle>
+            <HintContent>
+              病患可預約時間為4周內，如需休診請於開放病患可預約時間前2天提出申請。
+            </HintContent>
+          </Hint>
+        </HintContainer>
         <TableWrapper>
-          {weeks.map((week, weekIndex) => (
+          {doctorWeeks.map((week, weekIndex) => (
             <StyledTable key={weekIndex}>
               <Thead>
                 <Tr>
@@ -186,17 +217,30 @@ export default function ClassSchedulePage() {
                             ) &&
                             scheduleItem.shift_rules[
                               dayKeys[dayIndex]
-                            ].includes(time) &&
-                            !isLeaveDay.includes(date)
+                            ].includes(time)
                         ) ? (
-                          <CheckInput
-                            type="checkbox"
-                            name="doctor"
-                            onChange={() => handleCheckboxClick(date, time)}
-                            disabled={isDisabled(date)}
-                          />
+                          isLeaveDay.includes(date) ? (
+                            <LeaveDay>休</LeaveDay>
+                          ) : isDoctorDisabled(date) ? (
+                            <DisabledDay>
+                              <CheckInput
+                                type="checkbox"
+                                name="doctor"
+                                onChange={() => handleCheckboxClick(date, time)}
+                                disabled={true}
+                              />
+                              <DisabledOverlay>診</DisabledOverlay>
+                            </DisabledDay>
+                          ) : (
+                            <CheckInput
+                              type="checkbox"
+                              name="doctor"
+                              onChange={() => handleCheckboxClick(date, time)}
+                              disabled={false}
+                            />
+                          )
                         ) : (
-                          "休"
+                          "X"
                         )}
                       </TableData>
                     ))}
@@ -208,22 +252,148 @@ export default function ClassSchedulePage() {
           <Button onClick={handleSubmit}>休診提交</Button>
         </TableWrapper>
       </CalendarContainer>
+      {showPopup && (
+        <PopUp>
+          <PopupContent>
+            {confirmMessage ? (
+              <>
+                <PopupMessage>{confirmMessage}</PopupMessage>
+                <ButtonGroup>
+                  <ConfirmButton onClick={handleConfirm}>確定</ConfirmButton>
+                  <CancelButton onClick={() => setShowPopup(false)}>
+                    取消
+                  </CancelButton>
+                </ButtonGroup>
+              </>
+            ) : (
+              <>
+                <PopupMessage>{popupMessage}</PopupMessage>
+                <CloseButton onClick={() => setShowPopup(false)}>
+                  關閉
+                </CloseButton>
+              </>
+            )}
+          </PopupContent>
+        </PopUp>
+      )}
     </>
   );
 }
+
+const HintContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 85%;
+  padding: 20px;
+`;
+
+const Hint = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 20px;
+  border: 5px dashed #b7c3da;
+  border-radius: 10px;
+  background-color: #ffc18849;
+  gap: 10px;
+`;
+
+const HintTitle = styled.div`
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 2.5px;
+`;
+
+const HintContent = styled.div`
+  font-size: 18px;
+  font-weight: 400;
+  letter-spacing: 2.5px;
+`;
+
+const LeaveDay = styled.div`
+  background-color: #ffc288;
+  color: #244a8b;
+  font-weight: 700;
+  padding: 2px;
+  cursor: pointer;
+  &:hover {
+    background-color: #244a8b;
+    color: #fff;
+  }
+`;
+
+const PopupContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+`;
+
+const ButtonGroup = styled.div`
+  display: flex;
+  gap: 10px;
+`;
+
+const BaseButton = styled.button`
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+`;
+
+const ConfirmButton = styled(BaseButton)`
+  background-color: #244a8b;
+  color: white;
+  &:hover {
+    background-color: #1c3a6e;
+  }
+`;
+
+const PopupMessage = styled.p`
+  font-size: 20px;
+  font-weight: 500;
+`;
+
+const CancelButton = styled(BaseButton)`
+  background-color: #f0f0f0;
+  color: #333;
+  &:hover {
+    background-color: #e0e0e0;
+  }
+`;
+
+const CloseButton = styled(BaseButton)`
+  background-color: #244a8b;
+  color: white;
+  &:hover {
+    background-color: #1c3a6e;
+  }
+`;
 
 const CalendarContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
   border: 1px solid #ccc;
-  padding-top: 100px;
+  padding: 100px 200px 20px;
+  @media (max-width: 1440.1px) {
+    padding: 100px 150px 20px;
+  }
+  @media (max-width: 1280.1px) {
+    padding: 100px 100px 20px;
+  }
+  @media (max-width: 1024.1px) {
+    padding: 100px 50px 20px;
+  }
+  @media (max-width: 768.1px) {
+    padding: 100px 0px 20px;
+  }
 `;
 
 const ConfirmedContainer = styled.div`
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
   padding: 20px 30px;
   width: 85%;
 `;
@@ -231,7 +401,7 @@ const ConfirmedContainer = styled.div`
 const Confirmed = styled.div`
   display: flex;
   flex-direction: row;
-  width: 40%;
+  width: 100%;
   font-size: 20px;
 `;
 
@@ -243,8 +413,19 @@ const ConfirmedTitle = styled.div`
 `;
 
 const Button = styled.button`
+  background-color: #00b1c1de;
+  color: #ffffff;
+  border: none;
+  border-radius: 5px;
   width: 500px;
   height: 50px;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 5.5px;
+  cursor: pointer;
+  &:hover {
+    background-color: #00b1c1;
+  }
 `;
 
 const TableWrapper = styled.div`
@@ -254,6 +435,7 @@ const TableWrapper = styled.div`
   border-collapse: collapse;
   align-items: center;
   padding: 20px;
+  font-size: 20px;
 `;
 
 const StyledTable = styled.table`
@@ -268,7 +450,7 @@ const Tbody = styled.tbody``;
 const TableHeader = styled.th`
   text-align: center;
   padding: 15px;
-  background-color: #8282828a;
+  background-color: #b7c3da;
   color: #000;
   border: 1px solid #000;
   width: 80px;
@@ -297,4 +479,29 @@ const CheckInput = styled.input`
   top: 15%;
   left: 25%;
   cursor: pointer;
+
+  &:checked {
+    background-color: #ffc288;
+  }
+`;
+
+const DisabledDay = styled.div`
+  position: relative;
+  width: 100%;
+  height: 100%;
+`;
+
+const DisabledOverlay = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #666;
+  font-size: 20px;
+  font-weight: 700;
 `;
