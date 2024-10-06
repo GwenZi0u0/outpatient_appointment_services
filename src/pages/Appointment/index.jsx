@@ -198,12 +198,12 @@ export default function Appointment() {
   return (
     <Container>
       <Header>
-        <BackButton onClick={() => handleReturnClick()}>
-          <BackIcon src={Return} />
-        </BackButton>
         <Title>網路預約掛號流程</Title>
       </Header>
       <ProcessStep>
+        <BackButton onClick={() => handleReturnClick()}>
+          <BackIcon src={Return} />
+        </BackButton>
         {steps.map((item, index) => (
           <Step
             key={item.step}
@@ -343,8 +343,6 @@ const Header = styled.div`
 `;
 
 const BackButton = styled.button`
-  position: absolute;
-  left: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -383,6 +381,8 @@ const ProcessStep = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
+  width: 100%;
+  gap: 10px;
 `;
 
 const Step = styled.div`
