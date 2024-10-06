@@ -190,7 +190,7 @@ export default function CancelRegistrationPage() {
             當日掛號人數
             <PeopleNumber>{result?.length}</PeopleNumber>
           </NumberRegisteredPeopleText>
-          <OpenClinicButton onClick={handleNext} disabled={!isOpen}>
+          <OpenClinicButton onClick={handleNext} disabled={!isOpen} $isColor={true}>
             <Text>下一位</Text>
           </OpenClinicButton>
           <ProgressNumberDisplayArea $isOpen={isOpen}>
@@ -207,23 +207,26 @@ export default function CancelRegistrationPage() {
             <OpenClinicButton
               onClick={() => handleButtonClick("morning")}
               disabled={currentPeriod && currentPeriod !== "morning"}
+              $isColor={false}
             >
               <Text>上午</Text>
             </OpenClinicButton>
             <OpenClinicButton
               onClick={() => handleButtonClick("afternoon")}
               disabled={currentPeriod && currentPeriod !== "afternoon"}
+              $isColor={false}
             >
               <Text>下午</Text>
             </OpenClinicButton>
             <OpenClinicButton
               onClick={() => handleButtonClick("evening")}
               disabled={currentPeriod && currentPeriod !== "evening"}
+              $isColor={false}
             >
               <Text>夜間</Text>
             </OpenClinicButton>
           </ButtonArea>
-          <OpenClinicButton onClick={toggleClinic}>
+          <OpenClinicButton onClick={toggleClinic} $isColor={true}>
             <Text>{isOpen ? "結束就診" : "開始就診"}</Text>
           </OpenClinicButton>
         </Container>
@@ -234,6 +237,7 @@ export default function CancelRegistrationPage() {
 const ButtonArea = styled.div`
   display: flex;
   flex-direction: row;
+  gap: 20px;
 `;
 
 const MainContainer = styled.div`
@@ -274,6 +278,16 @@ const OpenClinicButton = styled.button`
   align-items: center;
   width: 100%;
   height: 50px;
+  background-color: ${(props) => (props.$isColor ? "#00b1c1de" : "#0267b5de")};
+  color: #ffffff;
+  border: 1px solid #cccccc;
+  border-radius: 10px;
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  &:hover {
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
+    opacity: 0.8;
+  }
 `;
 
 const NumberRegisteredPeopleText = styled.div`
