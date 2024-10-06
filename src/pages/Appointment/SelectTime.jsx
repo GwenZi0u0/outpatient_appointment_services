@@ -14,11 +14,11 @@ export default function SelectTime({
       <ConfirmedContainer>
         <Confirmed>
           <ConfirmedTitle>科別 : </ConfirmedTitle>
-          <ConfirmedValue type="text" value={specialty.specialty} readOnly />
+          <ConfirmedValue>{specialty.specialty}</ConfirmedValue>
         </Confirmed>
         <Confirmed>
           <ConfirmedTitle>醫師 : </ConfirmedTitle>
-          <ConfirmedValue type="text" value={doctor.physician_name} readOnly />
+          <ConfirmedValue>{doctor.physician_name}</ConfirmedValue>
         </Confirmed>
       </ConfirmedContainer>
       <TableWrapper>
@@ -104,17 +104,21 @@ const ConfirmedTitle = styled.div`
   display: flex;
   align-items: center;
   font-weight: bold;
-  width: 55px;
+  width: 80px;
+  font-size: 20px;
 `;
 
-const ConfirmedValue = styled.input`
+const ConfirmedValue = styled.span`
+  display: flex;
+  align-items: center;
+  font-size: 20px;
   font-weight: bold;
   height: 50px;
-  border: 1px solid #244a8b;
   border-radius: 4px;
-  background-color: #8282828a;
+  background-color: transparent;
   cursor: not-allowed;
   padding-left: 10px;
+  width: 100%;
 `;
 
 const TableWrapper = styled.div`
