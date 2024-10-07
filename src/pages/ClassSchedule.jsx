@@ -9,7 +9,13 @@ import {
   fetchRequestLeaveData,
 } from "../api";
 import { useAuth } from "../contexts/AuthContext";
-import { collection, addDoc, Timestamp } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  Timestamp,
+  deleteDoc,
+  doc,
+} from "firebase/firestore";
 import { fireDb } from "../firebase";
 import {
   timeSlots,
@@ -22,12 +28,14 @@ import { PopUp } from "../components/PopUp";
 
 const useClassSchedule = create((set) => ({
   selectedDateTimes: [],
+  leaveDayToCancel: [],
   showPopup: false,
   popupMessage: "",
   confirmMessage: "",
   setShowPopup: (show) => set({ showPopup: show }),
   setPopupMessage: (message) => set({ popupMessage: message }),
   setConfirmMessage: (message) => set({ confirmMessage: message }),
+  setLeaveDayToCancel: (days) => set({ leaveDayToCancel: days }),
   setSelectedDateTimes: (updater) =>
     set((state) => {
       const newSelectedDateTimes = updater(state.selectedDateTimes);
@@ -76,8 +84,10 @@ export default function ClassSchedulePage() {
     toggleDateTime,
     showPopup,
     popupMessage,
+    leaveDayToCancel,
     setShowPopup,
     setPopupMessage,
+    setLeaveDayToCancel,
     confirmMessage,
     setConfirmMessage,
   } = useClassSchedule();
@@ -138,24 +148,52 @@ export default function ClassSchedulePage() {
 
   const handleConfirm = async () => {
     try {
-      const results = {
-        create_time: Timestamp.now(),
-        doctor_id: user.uid,
-        date_times: selectedDateTimes,
-      };
+      if (confirmMessage === "確定要休診嗎？") {
+        const results = {
+          create_time: Timestamp.now(),
+          doctor_id: user.uid,
+          date_times: selectedDateTimes,
+        };
 
-      await addDoc(collection(fireDb, "request_leave"), results);
-      console.log("Document written with ID: ", results);
-      toggleDateTime([]);
-      refetchRequestLeaveData();
-      setPopupMessage("提交成功");
+        await addDoc(collection(fireDb, "request_leave"), results);
+        toggleDateTime([]);
+        setPopupMessage("提交成功");
+      } else if (confirmMessage === "確定要撤回這個休診申請嗎？") {
+        const firebaseTimestamp = leaveDayToCancel.date;
+        const findDoctor = requestLeaveData?.filter(
+          (item) => item.doctor_id === user.uid
+        );
+        const matchingLeaveDays = findDoctor
+          ?.flatMap((item) =>
+            item.date_times.map((dateTime) => ({ ...dateTime, id: item.id }))
+          )
+          .filter(
+            (dateTime) =>
+              dateTime && dateTime.date.seconds === firebaseTimestamp.seconds
+          );
+
+        if (matchingLeaveDays.length > 0) {
+          const leaveDayId = matchingLeaveDays[0].id;
+          await deleteDoc(doc(fireDb, "request_leave", leaveDayId));
+          setPopupMessage("休診申請已撤回");
+        }
+      }
+
+      await refetchRequestLeaveData();
     } catch (error) {
-      console.error("Error adding document: ", error);
-      setPopupMessage("提交失敗,請稍後再試");
+      console.error("Error: ", error);
+      setPopupMessage("操作失敗,請稍後再試");
     } finally {
       setConfirmMessage("");
       setShowPopup(true);
     }
+  };
+
+  const handleLeaveDayClick = (date, time) => {
+    const firebaseTimestamp = convertToTimestamp(date);
+    setLeaveDayToCancel({ date: firebaseTimestamp, time });
+    setConfirmMessage("確定要撤回這個休診申請嗎？");
+    setShowPopup(true);
   };
 
   return (
@@ -220,7 +258,12 @@ export default function ClassSchedulePage() {
                             ].includes(time)
                         ) ? (
                           isLeaveDay.includes(date) ? (
-                            <LeaveDay>休</LeaveDay>
+                            <LeaveDay
+                              onClick={isDoctorDisabled(date) ? undefined : () => handleLeaveDayClick(date, time)}
+                              isDisabled={isDoctorDisabled(date)}
+                            >
+                              休
+                            </LeaveDay>
                           ) : isDoctorDisabled(date) ? (
                             <DisabledDay>
                               <CheckInput
@@ -315,10 +358,10 @@ const LeaveDay = styled.div`
   color: #244a8b;
   font-weight: 700;
   padding: 2px;
-  cursor: pointer;
+  cursor: ${({ isDisabled }) => (isDisabled ? 'default' : 'pointer')};
   &:hover {
-    background-color: #244a8b;
-    color: #fff;
+    background-color: ${({ isDisabled }) => (isDisabled ? '#ffc288' : '#244a8b')};
+    color: ${({ isDisabled }) => (isDisabled ? '#244a8b' : '#fff')};
   }
 `;
 
