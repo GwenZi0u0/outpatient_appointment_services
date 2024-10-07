@@ -328,6 +328,12 @@ const Container = styled.div`
   padding-top: 100px;
   height: auto;
   min-height: 100vh;
+  @media (max-width: 1024.1px) {
+    padding: 100px 40px 0;
+  }
+  @media (max-width: 768.1px) {
+    padding: 100px 20px 0;
+  }
 `;
 
 const Header = styled.div`
@@ -390,7 +396,7 @@ const Step = styled.div`
   align-items: center;
   width: 200px;
   height: 45px;
-  padding-left: 40px;
+  padding-left: 36px;
   color: #ffffff;
   border-radius: 2px;
   background-color: ${(props) =>
@@ -401,6 +407,15 @@ const Step = styled.div`
       : props.$isLast
       ? "polygon(100% 0%, 0% 0%, 12% 50%, 0% 100%, 100% 100%)"
       : "polygon(0% 0%, 88% 0%, 100% 50%, 88% 100%, 0% 100%, 12% 50%)"};
+
+  @media (max-width: 1024.1px) {
+    font-size: 18px;
+    padding-left: 28px;
+  }
+  @media (max-width: 768.1px) {
+    font-size: 15px;
+    padding-left: 18px;
+  }
 `;
 
 const ServiceList = styled.form`
@@ -417,5 +432,8 @@ const ServiceList = styled.form`
 
   &::-webkit-scrollbar {
     display: none;
+  }
+  @media (max-width: 768.1px) {
+    overflow-x: auto;
   }
 `;
