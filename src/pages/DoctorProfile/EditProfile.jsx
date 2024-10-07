@@ -1,10 +1,10 @@
-import styled from "styled-components";
 import { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { create } from "zustand";
-import { fireDb, fireStorage } from "../../firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { doc, updateDoc } from "firebase/firestore";
+import styled from "styled-components";
+import { fireDb, fireStorage } from "../../firebase";
 import AuthImage from "../../assets/auth.svg";
 import ProfileDoctor from "../../assets/profileDoctor.svg";
 import EditImage from "../../assets/editImage.svg";
@@ -17,10 +17,12 @@ import { PopUp } from "../../components/PopUp";
 const useEditProfile = create((set) => ({
   showPopup: false,
   popupMessage: "",
-  popupAction: null,
+  confirmMessage: "",
+  currentAction: null,
   setShowPopup: (show) => set({ showPopup: show }),
   setPopupMessage: (message) => set({ popupMessage: message }),
-  setPopupAction: (action) => set({ popupAction: action }),
+  setConfirmMessage: (message) => set({ confirmMessage: message }),
+  setCurrentAction: (action) => set({ currentAction: action }),
 }));
 
 export default function EditProfile({
@@ -34,13 +36,14 @@ export default function EditProfile({
   const currentUser = doctorData?.find((doctor) => doctor.uid === doctorId);
   const {
     showPopup,
+    confirmMessage,
     popupMessage,
-    popupAction,
+    currentAction,
     setShowPopup,
-    setPopupMessage,
-    setPopupAction,
+    setConfirmMessage,
+    setCurrentAction,
   } = useEditProfile();
-  
+
   const [userData, setUserData] = useState(currentUser);
   const [modifiedData, setModifiedData] = useState(userData || {});
   const [isEditing, setIsEditing] = useState(false);
@@ -94,23 +97,15 @@ export default function EditProfile({
     }
   };
 
-  const handleDegreeChange = (value) => {
-    setModifiedData({ ...modifiedData, degree: value });
-  };
-
-  const handleDutyChange = (value) => {
-    setModifiedData({ ...modifiedData, duty: value });
-  };
-
-  const handleContentChange = (value) => {
-    setModifiedData({ ...modifiedData, content: value });
+  const handleInputChange = (field) => (value) => {
+    setModifiedData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleRemoveExpertise = (index) => {
-    setModifiedData({
-      ...modifiedData,
-      expertises: modifiedData.expertises.filter((_, i) => i !== index),
-    });
+    setModifiedData((prev) => ({
+      ...prev,
+      expertises: prev.expertises.filter((_, i) => i !== index),
+    }));
   };
 
   const handleDragStart = (e, index) => {
@@ -118,7 +113,7 @@ export default function EditProfile({
   };
 
   const handleDrop = (e, toIndex) => {
-    const fromIndex = e.dataTransfer.getData("text/plain");
+    const fromIndex = parseInt(e.dataTransfer.getData("text/plain"), 10);
     setModifiedData((prev) => {
       const updatedExpertises = [...prev.expertises];
       const [removed] = updatedExpertises.splice(fromIndex, 1);
@@ -140,263 +135,271 @@ export default function EditProfile({
   const handleEditProfile = () => {
     setIsEditing(true);
     setModifiedData(userData);
-    setUserData(userData);
   };
 
-  const handleSaveProfile = async () => {
+  const handleSaveProfile = () => {
     if (!isModified) return;
-    setPopupMessage("確定要儲存嗎？");
-    setPopupAction(() => async () => {
-      try {
-        const docRef = doc(fireDb, "doctors", userData.id);
-        const updatedFields = {
-          degree: modifiedData.degree || "",
-          duty: modifiedData.duty || "",
-          content: modifiedData.content || "",
-          expertises: modifiedData.expertises || [],
-        };
-        await updateDoc(docRef, updatedFields);
-        setPopupMessage("儲存成功！");
-        setPopupAction(null);
-        refetchDoctorData();
-        setIsEditing(false);
-      } catch (error) {
-        console.error("儲存失敗：", error);
-        setPopupMessage("儲存失敗，請重試。");
-      } finally {
-        setIsEditing(false);
-      }
-    });
+    setConfirmMessage("確定要儲存嗎？");
+    setCurrentAction("save");
     setShowPopup(true);
   };
 
   const handleCancelEdit = () => {
-    setPopupMessage("確定要放棄編輯嗎？所有更改將不會保存。");
-    setPopupAction(() => () => {
-      setModifiedData(currentUser);
-      setIsEditing(false);
-      setShowPopup(false);
-    });
+    setConfirmMessage("確定要放棄編輯嗎？所有更改將不會保存。");
+    setCurrentAction("cancel");
     setShowPopup(true);
   };
 
+  const handleClosePopup = () => {
+    setShowPopup(false);
+    if (currentAction === "leave") {
+      window.history.pushState(null, "", window.location.pathname);
+    }
+  };
+
+  const saveProfileChanges = async () => {
+    try {
+      const docRef = doc(fireDb, "doctors", userData.id);
+      const updatedFields = {
+        degree: modifiedData.degree || "",
+        duty: modifiedData.duty || "",
+        content: modifiedData.content || "",
+        expertises: modifiedData.expertises || [],
+      };
+      await updateDoc(docRef, updatedFields);
+      refetchDoctorData();
+      setIsEditing(false);
+    } catch (error) {
+      console.error("儲存失敗：", error);
+    }
+  };
+
   useEffect(() => {
-    const handleBeforeUnload = (e) => {
+    const handleBeforeUnload = (event) => {
       if (isEditing) {
-        e.preventDefault();
-        e.returnValue = "";
+        event.preventDefault();
+        event.returnValue = "";
+      }
+    };
+
+    const handlePopState = () => {
+      if (isEditing) {
+        setConfirmMessage("確定要離開嗎？所有未保存的更改將丟失。");
+        setCurrentAction("leave");
+        setShowPopup(true);
       }
     };
 
     window.addEventListener("beforeunload", handleBeforeUnload);
+    window.addEventListener("popstate", handlePopState);
 
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
+      window.removeEventListener("popstate", handlePopState);
     };
-  }, [isEditing]);
+  }, [isEditing, setConfirmMessage, setCurrentAction, setShowPopup]);
 
-  useEffect(() => {
-    const unblock = navigate(() => {
-      if (isEditing) {
-        setPopupMessage("確定要離開嗎？所有未保存的更改將丟失。");
-        setPopupAction(() => () => {
-          setShowPopup(false);
-          return true;
-        });
-        setShowPopup(true);
-        return false;
-      }
-      return true;
-    });
-
-    return unblock;
-  }, [isEditing, navigate]);
-
-  const handleClosePopup = () => {
+  const handleConfirmAction = async () => {
+    if (currentAction === "save") {
+      await saveProfileChanges();
+    } else if (currentAction === "cancel") {
+      setModifiedData(userData);
+      setIsEditing(false);
+    } else if (currentAction === "leave") {
+      setIsEditing(false);
+      navigate(-1);
+    }
     setShowPopup(false);
-    setPopupAction(null);
+    setCurrentAction(null);
   };
+
+  if (!userData) return null;
 
   return (
     <MainContainer>
-      {userData ? (
-        <ProfileContainer key={userData.uid}>
-          <TitleContainer>
-            <Title>
-              <TitleImg src={ProfileDoctor} alt="profile" />
-              醫師簡介
-            </Title>
-            <EditButtonContainer>
-              {isEditing ? (
-                <>
-                  <EditButton
-                    onClick={handleSaveProfile}
-                    disabled={!isModified}
-                  >
-                    <ProfileIcon src={SaveProfile} alt="save" />
-                  </EditButton>
-                  <EditButton onClick={handleCancelEdit}>
-                    <ProfileIcon src={CancelIcon} alt="cancel" />
-                  </EditButton>
-                </>
-              ) : (
-                <EditButton onClick={handleEditProfile}>
-                  <ProfileIcon src={EditProfileIcon} alt="edit" />
+      <ProfileContainer>
+        <TitleContainer>
+          <Title>
+            <TitleImg src={ProfileDoctor} alt="profile" />
+            醫師簡介
+          </Title>
+          <EditButtonContainer>
+            {isEditing ? (
+              <>
+                <EditButton onClick={handleSaveProfile} disabled={!isModified}>
+                  <ProfileIcon src={SaveProfile} alt="save" />
                 </EditButton>
-              )}
-            </EditButtonContainer>
-          </TitleContainer>
-          <ProfileContent>
-            <ProfileInfoContainer>
-              <ImageContainer>
-                <ProfileImage
-                  src={userData?.physician_imag || AuthImage}
-                  alt={userData?.physician_name}
-                />
-                <EditImageButton
-                  type="button"
-                  onClick={handleEditImage}
-                  disabled={isUploadingImage}
-                >
-                  <EditImageIcon src={EditImage} alt="editImage" />
-                </EditImageButton>
-                <Name>{userData.physician_name || ""}</Name>
-              </ImageContainer>
-              <InfoContainer>
-                <DetailsList>
-                  <DetailItem>
-                    年齡：
-                    {calculateAge(userData.physician_birth_date) || ""}
-                  </DetailItem>
-                  {departmentData && (
-                    <>
-                      <DetailItem>
-                        系别：
-                        {
-                          departmentData.find(
+                <EditButton onClick={handleCancelEdit}>
+                  <ProfileIcon src={CancelIcon} alt="cancel" />
+                </EditButton>
+              </>
+            ) : (
+              <EditButton onClick={handleEditProfile}>
+                <ProfileIcon src={EditProfileIcon} alt="edit" />
+              </EditButton>
+            )}
+          </EditButtonContainer>
+        </TitleContainer>
+        <ProfileContent>
+          <ProfileInfoContainer>
+            <ImageContainer>
+              <ProfileImage
+                src={userData.physician_imag || AuthImage}
+                alt={userData.physician_name}
+              />
+              <EditImageButton
+                type="button"
+                onClick={handleEditImage}
+                disabled={isUploadingImage}
+              >
+                <EditImageIcon src={EditImage} alt="editImage" />
+              </EditImageButton>
+              <Name>{userData.physician_name || ""}</Name>
+            </ImageContainer>
+            <InfoContainer>
+              <DetailsList>
+                <DetailItem>
+                  年齡：{calculateAge(userData.physician_birth_date) || ""}
+                </DetailItem>
+                {departmentData && (
+                  <>
+                    <DetailItem>
+                      系别：
+                      {
+                        departmentData.find(
+                          (department) =>
+                            department.id === userData.division.division_id
+                        )?.department
+                      }
+                    </DetailItem>
+                    <DetailItem>
+                      主治：
+                      {
+                        departmentData
+                          .find(
                             (department) =>
                               department.id === userData.division.division_id
-                          )?.department
-                        }
-                      </DetailItem>
-                      <DetailItem>
-                        主治：
-                        {
-                          departmentData
-                            .find(
-                              (department) =>
-                                department.id === userData.division.division_id
-                            )
-                            ?.specialties.find(
-                              (specialty) =>
-                                specialty.id === userData.division.specialty_id
-                            )?.specialty
-                        }
-                      </DetailItem>
-                    </>
+                          )
+                          ?.specialties.find(
+                            (specialty) =>
+                              specialty.id === userData.division.specialty_id
+                          )?.specialty
+                      }
+                    </DetailItem>
+                  </>
+                )}
+                <DetailItem>
+                  學歷：
+                  {isEditing ? (
+                    <EditableInput
+                      type="text"
+                      value={modifiedData?.degree || ""}
+                      onChange={(e) =>
+                        handleInputChange("degree")(e.target.value)
+                      }
+                      id="degree"
+                      name="degree"
+                    />
+                  ) : (
+                    userData?.degree || ""
                   )}
-                  <DetailItem>
-                    學歷：
-                    {isEditing ? (
-                      <EditableInput
-                        type="text"
-                        value={modifiedData?.degree || ""}
-                        onChange={(e) => handleDegreeChange(e.target.value)}
-                        id="degree"
-                        name="degree"
-                      />
-                    ) : (
-                      userData?.degree || ""
-                    )}
-                  </DetailItem>
-                  <DetailItem>
-                    現任職務：
-                    {isEditing ? (
-                      <EditableInput
-                        type="text"
-                        value={modifiedData?.duty || ""}
-                        onChange={(e) => handleDutyChange(e.target.value)}
-                        id="duty"
-                        name="duty"
-                      />
-                    ) : (
-                      userData?.duty || ""
-                    )}
-                  </DetailItem>
-                </DetailsList>
-              </InfoContainer>
-            </ProfileInfoContainer>
-            <PositionContainer>
-              <Position>專長</Position>
-              <SpecialtiesContainer>
-                {isEditing
-                  ? modifiedData?.expertises.map((expertise, index) => (
-                      <SpecialtyTag
-                        key={index}
-                        draggable={true}
-                        onDragStart={(e) => handleDragStart(e, index)}
-                        onDragOver={(e) => e.preventDefault()}
-                        onDrop={(e) => handleDrop(e, index)}
-                      >
-                        <>
-                          {expertise || ""}
-                          {expertise && (
-                            <RemoveExpertiseButton
-                              onClick={() => handleRemoveExpertise(index)}
-                            >
-                              <RemoveExpertiseIcon
-                                src={RemoveIcon}
-                                alt="remove"
-                              />
-                            </RemoveExpertiseButton>
-                          )}
-                        </>
-                      </SpecialtyTag>
-                    ))
-                  : userData?.expertises.map((expertise, index) => (
-                      <SpecialtyTag key={index}>{expertise || ""}</SpecialtyTag>
-                    ))}
-              </SpecialtiesContainer>
-              {isEditing && (
-                <TagContainer>
-                  <EditableInput
-                    type="text"
-                    value={newExpertise || ""}
-                    onChange={(e) => setNewExpertise(e.target.value)}
-                    placeholder="輸入新專長"
-                    id="newExpertise"
-                    name="newExpertise"
-                  />
-                  <AddExpertiseButton onClick={handleAddExpertise}>
-                    新增
-                  </AddExpertiseButton>
-                </TagContainer>
-              )}
-            </PositionContainer>
-            {isEditing ? (
-              <EditableTextArea
-                value={modifiedData?.content || ""}
-                onChange={(e) => handleContentChange(e.target.value)}
-                id="content"
-                name="content"
-              />
-            ) : (
-              <AdditionalInfo>{userData.content || ""}</AdditionalInfo>
+                </DetailItem>
+                <DetailItem>
+                  現任職務：
+                  {isEditing ? (
+                    <EditableInput
+                      type="text"
+                      value={modifiedData?.duty || ""}
+                      onChange={(e) =>
+                        handleInputChange("duty")(e.target.value)
+                      }
+                      id="duty"
+                      name="duty"
+                    />
+                  ) : (
+                    userData?.duty || ""
+                  )}
+                </DetailItem>
+              </DetailsList>
+            </InfoContainer>
+          </ProfileInfoContainer>
+          <PositionContainer>
+            <Position>專長</Position>
+            <SpecialtiesContainer>
+              {isEditing
+                ? modifiedData?.expertises.map((expertise, index) => (
+                    <SpecialtyTag
+                      key={index}
+                      draggable={true}
+                      onDragStart={(e) => handleDragStart(e, index)}
+                      onDragOver={(e) => e.preventDefault()}
+                      onDrop={(e) => handleDrop(e, index)}
+                    >
+                      <>
+                        {expertise || ""}
+                        {expertise && (
+                          <RemoveExpertiseButton
+                            onClick={() => handleRemoveExpertise(index)}
+                          >
+                            <RemoveExpertiseIcon
+                              src={RemoveIcon}
+                              alt="remove"
+                            />
+                          </RemoveExpertiseButton>
+                        )}
+                      </>
+                    </SpecialtyTag>
+                  ))
+                : userData?.expertises.map((expertise, index) => (
+                    <SpecialtyTag key={index}>{expertise || ""}</SpecialtyTag>
+                  ))}
+            </SpecialtiesContainer>
+            {isEditing && (
+              <TagContainer>
+                <EditableInput
+                  type="text"
+                  value={newExpertise || ""}
+                  onChange={(e) => setNewExpertise(e.target.value)}
+                  placeholder="輸入新專長"
+                  id="newExpertise"
+                  name="newExpertise"
+                />
+                <AddExpertiseButton onClick={handleAddExpertise}>
+                  新增
+                </AddExpertiseButton>
+              </TagContainer>
             )}
-          </ProfileContent>
-        </ProfileContainer>
-      ) : null}
+          </PositionContainer>
+          {isEditing ? (
+            <EditableTextArea
+              value={modifiedData?.content || ""}
+              onChange={(e) => handleInputChange("content")(e.target.value)}
+              id="content"
+              name="content"
+            />
+          ) : (
+            <AdditionalInfo>{userData.content || ""}</AdditionalInfo>
+          )}
+        </ProfileContent>
+      </ProfileContainer>
       {showPopup && (
         <PopUp>
           <PopupContent>
-            <PopupMessage>{popupMessage}</PopupMessage>
-            {popupAction ? (
-              <ButtonGroup>
-                <ConfirmButton onClick={popupAction}>確定</ConfirmButton>
-                <CancelButton onClick={handleClosePopup}>取消</CancelButton>
-              </ButtonGroup>
+            {confirmMessage ? (
+              <>
+                <PopupMessage>{confirmMessage}</PopupMessage>
+                <ButtonGroup>
+                  <ConfirmButton onClick={handleConfirmAction}>
+                    確定
+                  </ConfirmButton>
+                  <CancelButton onClick={handleClosePopup}>取消</CancelButton>
+                </ButtonGroup>
+              </>
             ) : (
-              <CloseButton onClick={handleClosePopup}>關閉</CloseButton>
+              <>
+                <PopupMessage>{popupMessage}</PopupMessage>
+                <CloseButton onClick={handleClosePopup}>關閉</CloseButton>
+              </>
             )}
           </PopupContent>
         </PopUp>
@@ -699,3 +702,44 @@ const RemoveExpertiseButton = styled.button`
 `;
 
 const RemoveExpertiseIcon = styled.img``;
+
+// useEffect(() => {
+//   const handleBeforeUnload = (e) => {
+//     if (isEditing) {
+//       e.preventDefault();
+//       e.returnValue = "";
+//     }
+//   };
+
+//   window.addEventListener("beforeunload", handleBeforeUnload);
+
+//   return () => {
+//     window.removeEventListener("beforeunload", handleBeforeUnload);
+//   };
+// }, [isEditing]);
+
+// useEffect(() => {
+//   const unblock = navigate(() => {
+//     if (isEditing) {
+//       setPopupMessage("確定要離開嗎？所有未保存的更改將丟失。");
+//       setCurrentAction("leave");
+//       setShowPopup(true);
+//       return false;
+//     }
+//     return true;
+//   });
+
+//   return unblock;
+// }, [isEditing, navigate, setPopupMessage, setCurrentAction, setShowPopup]);
+
+// const handleConfirmLeave = () => {
+//   navigate(() => {
+//     if (isEditing) {
+//       setConfirmMessage("確定要離開嗎？所有未保存的更改將丟失。");
+//       setCurrentAction("leave");
+//       setShowPopup(true);
+//       return false;
+//     }
+//     return true;
+//   });
+// };
