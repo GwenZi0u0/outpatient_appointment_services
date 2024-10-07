@@ -336,7 +336,7 @@ const SearchContainer = styled.div`
   display: flex;
   font-weight: 700;
   width: 100%;
-  gap: 15px;
+  gap: 20px;
   @media (max-width: 1024.1px) {
     align-items: center;
     flex-direction: column;
@@ -348,7 +348,7 @@ const SearchFrame = styled.div`
   display: flex;
   align-items: flex-start;
   flex-direction: column;
-  width: 74%;
+  width: 75%;
   gap: 10px;
   @media (max-width: 1440.1px) {
     width: 70%;
@@ -387,10 +387,9 @@ const Input = styled.input`
 
 const Label = styled.label`
   display: flex;
-  font-size: 30px;
+  font-size: 28px;
   font-weight: 700;
-  letter-spacing: 10.4px;
-  padding-left: 35px;
+  letter-spacing: 8.4px;
   margin-top: 15px;
   @media (max-width: 1440.1px) {
     font-size: 24px;
