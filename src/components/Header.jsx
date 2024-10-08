@@ -7,28 +7,45 @@ import CloseImg from "../assets/x-circle.svg";
 
 export default function Header() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [isGradient, setIsGradient] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const location = useLocation();
   const isRootPath = location.pathname === "/";
 
-  const handleScroll = () => {
-    window.requestAnimationFrame(() => {
-      if (window.scrollY > 80) {
-        setIsGradient(true);
-      } else {
-        setIsGradient(false);
-      }
-    });
+  const handleButtonClick = () => {
+    if (location.pathname !== "/") {
+      navigate("/", { state: { scrollToRegion: true } });
+    } else {
+      scrollToRegion();
+    }
+    setIsMenuOpen(false);
+  };
+
+  const scrollToRegion = () => {
+    const element = document.getElementById("select-region");
+    if (element) {
+      element.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+        inline: "nearest",
+      });
+    }
   };
 
   useEffect(() => {
+    const handleScroll = () => {
+      window.requestAnimationFrame(() => {
+        setIsGradient(window.scrollY > 80);
+      });
+    };
+
     if (isRootPath) {
       window.addEventListener("scroll", handleScroll);
       setIsGradient(false);
     } else {
       setIsGradient(true);
     }
+
     window.scrollTo(0, 0);
 
     return () => {
@@ -36,26 +53,14 @@ export default function Header() {
         window.removeEventListener("scroll", handleScroll);
       }
     };
-  }, [location.pathname]);
+  }, [isRootPath]);
 
-  const handleButtonClick = () => {
-    navigate("/");
-    setTimeout(() => {
-      const element = document.getElementById("select-region");
-      if (element) {
-        element.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-          inline: "nearest",
-        });
-      }
-    }, 100);
-    setIsMenuOpen(false);
-  };
-
-  const handleMenuClick = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
+  useEffect(() => {
+    if (location.state?.scrollToRegion) {
+      scrollToRegion();
+      navigate("/", { replace: true, state: {} });
+    }
+  }, [location, navigate]);
 
   return (
     <>
@@ -78,7 +83,11 @@ export default function Header() {
             看診進度
           </SelectLink>
         </Menu>
-        <MenuIcon src={MenuImg} alt="Menu" onClick={handleMenuClick} />
+        <MenuIcon
+          src={MenuImg}
+          alt="Menu"
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+        />
         <MenuMobile $isMenuOpen={isMenuOpen}>
           <CloseIcon
             src={CloseImg}
