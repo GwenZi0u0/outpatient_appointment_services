@@ -333,7 +333,7 @@ const Container = styled.div`
   font-family: Arial, sans-serif;
   max-width: 1000px;
   margin: 0 auto;
-  padding: 100px 0 50px;
+  padding: 100px 0 0px;
   height: auto;
   min-height: 100vh;
   @media (max-width: 1024.1px) {
@@ -373,7 +373,6 @@ const BackButton = styled.button`
   cursor: pointer;
   &:hover {
     opacity: 0.7;
-   
   }
 `;
 
@@ -430,7 +429,7 @@ const Step = styled.div`
 const ServiceList = styled.form`
   border: 5px solid #d2cdcd;
   height: auto;
-  max-height: 840px;
+  max-height: calc(100vh - 278px);
   min-height: 50px;
   overflow-y: auto;
   overflow-x: hidden;
