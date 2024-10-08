@@ -3,10 +3,11 @@ import { Outlet, Navigate, Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import Logo from "../assets/Logo.svg";
 import { useState } from "react";
-import AuthImage from "../assets/auth.svg";
 import { useQuery } from "@tanstack/react-query";
 import { fetchDoctorsData } from "../api";
 import Loading from "../assets/loading.gif";
+import AuthWomenImg from "../assets/authWomen.png";
+import AuthMenImg from "../assets/authMen.png";
 
 export default function ProtectedLayout() {
   const { user, loading, signOut } = useAuth((state) => ({
@@ -29,17 +30,19 @@ export default function ProtectedLayout() {
     );
   }
 
-  function handleMouseEnter() {
-    setIsDropdownOpen(true);
-  }
-  function handleMouseLeave() {
-    setIsDropdownOpen(false);
-  }
+  const getDefaultImage = (doctor) => {
+    if (doctor?.physician_gender === 1) {
+      return AuthMenImg;
+    } else if (doctor?.physician_gender === 2) {
+      return AuthWomenImg;
+    }
+    return AuthMenImg;
+  };
 
   if (user) {
     return (
       <>
-        <Container onMouseLeave={handleMouseLeave}>
+        <Container onMouseLeave={() => setIsDropdownOpen(false)}>
           <LogoLink href="/control-progress">
             <LogoIcon src={Logo} alt="Logo" />
           </LogoLink>
@@ -48,12 +51,12 @@ export default function ProtectedLayout() {
             <SelectLink to="/class-schedule">門診班表</SelectLink>
             <SelectLink to={`/doctor-profile/${user.uid}`}>醫師簡介</SelectLink>
           </Menu>
-          <Profile onMouseEnter={handleMouseEnter}>
+          <Profile onMouseEnter={() => setIsDropdownOpen(true)}>
             <AuthImg
-              src={
-                data?.find((doctor) => doctor.uid === user.uid)
-                  ?.physician_imag || AuthImage
-              }
+              src={(() => {
+                const doctor = data?.find((d) => d.uid === user.uid);
+                return doctor?.physician_imag || getDefaultImage(doctor);
+              })()}
               alt="Profile"
             />
             <Dropdown $isOpen={isDropdownOpen} onClick={signOut}>
