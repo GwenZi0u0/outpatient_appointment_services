@@ -25,6 +25,7 @@ const maskAnimation = keyframes`
 `;
 
 const Body = styled.div`
+  position: relative;
   margin: 0;
   width: 100%;
   height: 100vh;
@@ -33,6 +34,7 @@ const Body = styled.div`
   flex-flow: column;
   justify-content: center;
   background-color: #ffffff;
+  z-index: 10000;
 `;
 
 const Container = styled.div`
@@ -66,7 +68,7 @@ const HeartContainer = styled.div`
 const Heart = styled.div`
   width: 100px;
   height: 150px;
-  animation: ${heartAnimation} 2s infinite;
+  animation: ${heartAnimation} 2s;
 
   &::before,
   &::after {
@@ -96,7 +98,7 @@ const Mask = styled.div`
   position: absolute;
   top: 0;
   background-color: #ffffff;
-  animation: ${maskAnimation} 2s infinite;
+  animation: ${maskAnimation} 2.5s;
 `;
 
 const LoadingText = styled.div`

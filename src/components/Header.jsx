@@ -128,7 +128,7 @@ const Container = styled.div`
   height: 80px;
   width: 100%;
   padding: 0 20px;
-  z-index: 10000;
+  z-index: 5000;
 
   &::before {
     content: "";
