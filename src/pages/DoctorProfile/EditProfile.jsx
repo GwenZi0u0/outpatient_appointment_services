@@ -5,7 +5,8 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { doc, updateDoc } from "firebase/firestore";
 import styled from "styled-components";
 import { fireDb, fireStorage } from "../../firebase";
-import AuthImage from "../../assets/auth.svg";
+import AuthMenImg from "../../assets/authMen.png";
+import AuthWomenImg from "../../assets/authWomen.png";
 import ProfileDoctor from "../../assets/profileDoctor.svg";
 import EditImage from "../../assets/editImage.svg";
 import EditProfileIcon from "../../assets/editProfileIcon.svg";
@@ -213,6 +214,10 @@ export default function EditProfile({
     setCurrentAction(null);
   };
 
+  const getDefaultImage = (gender) => {
+    return gender === 1 ? AuthMenImg : AuthWomenImg;
+  };
+
   if (!userData) return null;
 
   return (
@@ -243,8 +248,8 @@ export default function EditProfile({
         <ProfileContent>
           <ProfileInfoContainer>
             <ImageContainer>
-              <ProfileImage
-                src={userData.physician_imag || AuthImage}
+            <ProfileImage
+                src={userData.physician_imag || getDefaultImage(userData.physician_gender)}
                 alt={userData.physician_name}
               />
               <EditImageButton

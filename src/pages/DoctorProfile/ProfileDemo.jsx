@@ -2,7 +2,8 @@ import styled from "styled-components";
 import { useMemo } from "react";
 import { useParams } from "react-router-dom";
 import ProfileDoctor from "../../assets/profileDoctor.svg";
-import AuthImage from "../../assets/auth.svg";
+import AuthMenImg from "../../assets/authMen.png";
+import AuthWomenImg from "../../assets/authWomen.png";
 
 export default function ProfileDemo({
   calculateAge,
@@ -30,17 +31,23 @@ export default function ProfileDemo({
             <ProfileInfoContainer>
               <ImageContainer>
                 <ProfileImage
-                  src={selectedDoctor?.physician_imag || AuthImage}
+                  src={
+                    selectedDoctor?.physician_imag ||
+                    (selectedDoctor?.physician_gender === 1
+                      ? AuthMenImg
+                      : selectedDoctor?.physician_gender === 2
+                      ? AuthWomenImg
+                      : null)
+                  }
                   alt={selectedDoctor?.physician_name}
                 />
-                <Name>{selectedDoctor?.physician_name || ""}</Name>
+                <Name>
+                  {selectedDoctor?.physician_name || ""}{" "}
+                  {calculateAge(selectedDoctor?.physician_birth_date) || ""}
+                </Name>
               </ImageContainer>
               <InfoContainer>
                 <DetailsList>
-                  <DetailItem>
-                    年齡：
-                    {calculateAge(selectedDoctor?.physician_birth_date) || ""}
-                  </DetailItem>
                   {departmentData && (
                     <>
                       <DetailItem>
@@ -130,7 +137,7 @@ const TitleImg = styled.img`
 const ProfileContent = styled.div`
   display: flex;
   flex-direction: column;
-  border: 5px dashed #B7C3DA;
+  border: 5px dashed #b7c3da;
   border-radius: 8px;
   padding: 20px;
   gap: 20px;
@@ -156,13 +163,14 @@ const ProfileImage = styled.img`
 `;
 
 const InfoContainer = styled.div`
+  padding: 10px;
   flex: 1;
 `;
 
 const Name = styled.h3`
   letter-spacing: 4px;
   font-size: 25px;
-  color: #0267B5;
+  color: #0267b5;
   margin-bottom: 10px;
 `;
 
