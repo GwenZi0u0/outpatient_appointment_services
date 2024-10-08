@@ -66,7 +66,7 @@ const HeartContainer = styled.div`
 const Heart = styled.div`
   width: 100px;
   height: 150px;
-  animation: ${heartAnimation} 3s infinite;
+  animation: ${heartAnimation} 2s infinite;
 
   &::before,
   &::after {
