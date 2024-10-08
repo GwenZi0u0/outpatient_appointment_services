@@ -33,7 +33,7 @@ const Body = styled.div`
   align-items: center;
   flex-flow: column;
   justify-content: center;
-  background-color: #ffffff;
+  background-color: #f2f2f2;
   z-index: 10000;
 `;
 
@@ -43,7 +43,7 @@ const Container = styled.div`
   position: relative;
   display: flex;
   align-items: center;
-  background-color: #ffffff;
+  background-color: #f2f2f2;
   background-color: transparent;
   overflow: hidden;
 `;
@@ -97,7 +97,7 @@ const Mask = styled.div`
   height: 100%;
   position: absolute;
   top: 0;
-  background-color: #ffffff;
+  background-color: #f2f2f2;
   animation: ${maskAnimation} 2.5s;
 `;
 
