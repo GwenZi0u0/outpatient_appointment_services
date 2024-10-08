@@ -14,7 +14,7 @@ import { fireDb } from "../firebase";
 import {
   timeSlots,
   formatFirestoreTimestamp,
-  filterRegistrationDataByCurrentDate,
+  filterRegistrationDataByFutureDate,
 } from "../utils/dateUtils";
 import { PopUp } from "../components/PopUp";
 
@@ -124,7 +124,7 @@ export default function CancelRegistrationPage() {
       setIsOpened(false);
       return;
     } else {
-      const filteredData = filterRegistrationDataByCurrentDate(mockDatabase);
+      const filteredData = filterRegistrationDataByFutureDate(mockDatabase);
       setResult(filteredData);
       setError("");
       setIsOpened(true);
@@ -181,7 +181,7 @@ export default function CancelRegistrationPage() {
 
   useEffect(() => {
     if (Array.isArray(mockDatabase)) {
-      const filteredResult = filterRegistrationDataByCurrentDate(mockDatabase);
+      const filteredResult = filterRegistrationDataByFutureDate(mockDatabase);
       setResult(filteredResult);
     }
   }, [mockDatabase]);
@@ -203,7 +203,7 @@ export default function CancelRegistrationPage() {
               onChange={handleInputChange}
               onKeyDown={handleKeyDown}
             />
-            <Hint>K789456444 或 A234567890</Hint>
+            <Hint>A234567890 / P496665295 / I727938760 / A169039643 </Hint>
           </SearchFrame>
           {error && <ErrorMessage>{error}</ErrorMessage>}
         </SearchContainer>

@@ -157,6 +157,20 @@ export const filterRegistrationDataByCurrentDate = (mockDatabase) => {
   const filteredData = mockDatabase?.filter((data) => {
     const currentOPDDate = getCurrentDateInfo(data.OPD_date);
     const isDateMatching = currentOPDDate?.every(
+      (component, index) => component === currentDateFormatted[index]
+    );
+    const isStatus = data.status === "confirmed";
+    return isDateMatching && isStatus;
+  });
+  return filteredData;
+};
+
+export const filterRegistrationDataByFutureDate = (mockDatabase) => {
+  if (!mockDatabase) return [];
+  const currentDateFormatted = getCurrentDateInfo(new Date());
+  const filteredData = mockDatabase?.filter((data) => {
+    const currentOPDDate = getCurrentDateInfo(data.OPD_date);
+    const isDateMatching = currentOPDDate?.every(
       (component, index) => component >= currentDateFormatted[index]
     );
     const isStatus = data.status === "confirmed";
