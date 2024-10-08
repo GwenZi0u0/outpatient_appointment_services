@@ -47,12 +47,8 @@ export default function Registration() {
         setLoadingProgress((prevProgress) => {
           if (prevProgress >= 100) {
             clearInterval(interval);
-            setTimeout(() => {
-              setLoadingProgress(100);
-              setTimeout(() => {
-                setIsLoading(false);
-              }, 50);
-            }, 50);
+            setLoadingProgress(100);
+            setIsLoading(false);
             return 100;
           }
           return prevProgress + 10;

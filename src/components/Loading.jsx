@@ -96,7 +96,7 @@ const Mask = styled.div`
   position: absolute;
   top: 0;
   background-color: #ffffff;
-  animation: ${maskAnimation} 3s infinite;
+  animation: ${maskAnimation} 2s infinite;
 `;
 
 const LoadingText = styled.div`
