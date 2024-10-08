@@ -64,7 +64,10 @@ export default function AiRobot({ handleCloseAI }) {
         );
 
         const parts = responseMessage.split(/(<[^>]+>)/);
-        const finalMessage = parts.map((part, index) => {
+        let textContent = '';
+        let selectCards = [];
+
+        parts.forEach((part, index) => {
           if (part.includes("<") && part.includes(">")) {
             const specialty = part.replace(/<|>/g, "");
             const matchedDepartment = departments?.find((department) =>
@@ -74,7 +77,7 @@ export default function AiRobot({ handleCloseAI }) {
             );
 
             if (matchedDepartment) {
-              return (
+              selectCards.push(
                 <SelectCard
                   key={index}
                   style={{
@@ -82,6 +85,7 @@ export default function AiRobot({ handleCloseAI }) {
                     boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
                     flexDirection: "column",
                     alignItems: "center",
+                    marginTop: "10px",
                   }}
                   onClick={() => {
                     console.log("SelectCard clicked");
@@ -99,10 +103,22 @@ export default function AiRobot({ handleCloseAI }) {
                 </SelectCard>
               );
             }
-            return null;
+            textContent += specialty;
+          } else {
+            textContent += part;
           }
-          return part;
         });
+
+        const finalMessage = (
+          <>
+            <div>{textContent}</div>
+            {selectCards.length > 0 && (
+              <div style={{ marginTop: "20px", display: "flex", flexWrap: "wrap", gap: "10px" }}>
+                {selectCards}
+              </div>
+            )}
+          </>
+        );
 
         setMessages((prevMessages) => [
           ...prevMessages,
