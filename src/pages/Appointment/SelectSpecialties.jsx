@@ -38,10 +38,14 @@ const ServiceItem = styled.label`
   background-color: ${(props) =>
     props.highlighted ? "#ffe6e6" : "transparent"};
   cursor: pointer;
+  &:hover {
+    background-color: #b7c3da8a;
+  }
 `;
 
 const CheckInput = styled.input`
   position: absolute;
+  top: 35px;
   left: 60px;
   border: none;
   z-index: -1;
@@ -50,7 +54,7 @@ const CheckInput = styled.input`
 const CheckIcon = styled.img`
   width: 50px;
   height: 50px;
-  background-color: #ffffff;
+  background-color: transparent;
   margin-right: 55px;
 `;
 

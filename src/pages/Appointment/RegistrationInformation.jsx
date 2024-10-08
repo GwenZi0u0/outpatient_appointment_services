@@ -6,7 +6,7 @@ const useRegistrationInformationStore = create((set) => ({
   idNumber: "",
   birthday: "",
   name: "",
-  phone: "0912345666",
+  phone: "",
   setIdNumber: (value) => set({ idNumber: value }),
   setBirthday: (value) => set({ birthday: value }),
   setName: (value) => set({ name: value }),
@@ -129,7 +129,7 @@ export default function RegistrationInformation({
       <Input
         type="tel"
         maxLength={10}
-        value="0912345666"
+        placeholder="0912345666"
         onChange={(e) => setPhone(e.target.value)}
         {...register("phone", {
           required: "請輸入聯絡電話",

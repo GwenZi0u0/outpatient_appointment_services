@@ -254,7 +254,15 @@ export default function Appointment() {
             getNextRegistrationNumber={getNextRegistrationNumber}
             registrationData={registrationData}
             onResetClick={() => {
+              navigator("/");
+              setTimeout(() => {
+                document
+                  .getElementById("select-department")
+                  ?.scrollIntoView({ behavior: "smooth" });
+              }, 0);
               setStep(1);
+              setValue("department", "");
+              setValue("specialty", "");
               setValue("idNumber", "");
               setValue("birthday", "");
               setValue("name", "");
@@ -325,14 +333,14 @@ const Container = styled.div`
   font-family: Arial, sans-serif;
   max-width: 1000px;
   margin: 0 auto;
-  padding-top: 100px;
+  padding: 100px 0 50px;
   height: auto;
   min-height: 100vh;
   @media (max-width: 1024.1px) {
-    padding: 100px 40px 0;
+    padding: 100px 40px 30px;
   }
   @media (max-width: 768.1px) {
-    padding: 100px 20px 0;
+    padding: 100px 20px 20px;
   }
 `;
 
@@ -356,15 +364,16 @@ const BackButton = styled.button`
   height: auto;
   border: none;
   color: #244a8b;
-  background-color: transparent;
-  font-size: 24px;
-  font-weight: 700;
-  opacity: 0.7;
-  padding-left: 10px;
-  border-radius: 30px;
+  background-color: #d3cdcd;
+  opacity: 1;
+  width: 40px;
+  height: 40px;
+  padding: 25px;
+  border-radius: 10px;
   cursor: pointer;
   &:hover {
-    opacity: 1;
+    opacity: 0.7;
+   
   }
 `;
 
@@ -425,7 +434,7 @@ const ServiceList = styled.form`
   min-height: 50px;
   overflow-y: auto;
   overflow-x: hidden;
-  border-radius: 45px;
+  border-radius: 25px;
   scroll-behavior: smooth;
   scrollbar-width: none;
   -ms-overflow-style: none;
