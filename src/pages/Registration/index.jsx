@@ -1,9 +1,9 @@
 import styled, { keyframes } from "styled-components";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchDepartmentsData } from "../../api";
 import { useForm } from "react-hook-form";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import BackGround from "../../assets/background.svg";
 import BackGroundMobile from "../../assets/background_mobile.svg";
 import AnnouncementImg from "../../assets/announcementImage.svg";
@@ -26,8 +26,6 @@ const carouselData = new Map([
 
 export default function Registration() {
   const { setValue } = useForm();
-  const location = useLocation();
-  const shouldScrollRef = useRef(false);
   const navigate = useNavigate();
   const [showAI, setShowAI] = useState(false);
   const [userQuestion, setUserQuestion] = useState("");
@@ -37,21 +35,6 @@ export default function Registration() {
     queryKey: ["departments"],
     queryFn: fetchDepartmentsData,
   });
-
-  useEffect(() => {
-    if (location.state?.scrollToRegion && !shouldScrollRef.current) {
-      shouldScrollRef.current = true;
-      const element = document.getElementById("select-region");
-      if (element) {
-        element.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-          inline: "nearest",
-        });
-      }
-    }
-  }, [location]);
-
 
   const handleCardClick = (department) => {
     setValue("department", department);
@@ -68,13 +51,13 @@ export default function Registration() {
               setLoadingProgress(100);
               setTimeout(() => {
                 setIsLoading(false);
-              }, 180);
-            }, 180);
+              }, 50);
+            }, 50);
             return 100;
           }
           return prevProgress + 10;
         });
-      }, 450);
+      }, 180);
 
       return interval;
     };
