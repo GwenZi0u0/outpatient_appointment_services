@@ -182,7 +182,7 @@ export default function ProgressPage() {
               onChange={handleInputChange}
               onKeyDown={(e) => handleKeyDown(e, registrationData)}
             />
-            <Hint>K789456444 或 A234567890</Hint>
+            <Hint>A234567890 / P496665295 / I727938760 / A169039643</Hint>
             {error && <ErrorMessage>{error}</ErrorMessage>}
           </SearchFrame>
         </SearchContainer>
@@ -197,7 +197,7 @@ export default function ProgressPage() {
                 <TableHeaderCell $CellWidth={"20%"}>看診進度</TableHeaderCell>
               </TableHeaderRow>
             </TableHeader>
-            <tbody>
+            <Tbody>
               {result.length > 0 ? (
                 result?.map((data, index) => {
                   const doctor =
@@ -237,7 +237,7 @@ export default function ProgressPage() {
                   <TableCell colSpan={5}>查無資料</TableCell>
                 </TableRow>
               )}
-            </tbody>
+            </Tbody>
           </Table>
         )}
       </Container>
