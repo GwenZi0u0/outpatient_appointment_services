@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchDepartmentsData } from "../../api";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import BackGround from "../../assets/background.svg";
 import BackGroundMobile from "../../assets/background_mobile.svg";
 import AnnouncementImg from "../../assets/announcementImage.svg";
@@ -27,9 +27,10 @@ const carouselData = new Map([
 export default function Registration() {
   const { setValue } = useForm();
   const navigate = useNavigate();
+  const location = useLocation();
   const [showAI, setShowAI] = useState(false);
   const [userQuestion, setUserQuestion] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(!location.state?.skipLoading);
   const [loadingProgress, setLoadingProgress] = useState(0);
   const { data, isLoading: isDataLoading } = useQuery({
     queryKey: ["departments"],
@@ -41,34 +42,34 @@ export default function Registration() {
     navigate("/appointment", { state: { department } });
   };
 
+  const simulateLoading = () => {
+    const interval = setInterval(() => {
+      setLoadingProgress((prevProgress) => {
+        if (prevProgress >= 100) {
+          clearInterval(interval);
+          setLoadingProgress(100);
+          setIsLoading(false);
+          return 100;
+        }
+        return prevProgress + 10;
+      });
+    }, 180);
+
+    return interval;
+  };
+
   useEffect(() => {
-    const simulateLoading = () => {
-      const interval = setInterval(() => {
-        setLoadingProgress((prevProgress) => {
-          if (prevProgress >= 100) {
-            clearInterval(interval);
-            setLoadingProgress(100);
-            setIsLoading(false);
-            return 100;
-          }
-          return prevProgress + 10;
-        });
-      }, 180);
-
-      return interval;
-    };
-
-    const interval = simulateLoading();
-
-    return () => clearInterval(interval);
-  }, []);
+    if (isLoading) {
+      const interval = simulateLoading();
+      return () => clearInterval(interval);
+    }
+  }, [isLoading]);
 
   if (isLoading || isDataLoading) {
     return <Loading isLoading={true} progress={loadingProgress} />;
   }
 
   const handleButtonClick = () => {
-    navigate("/");
     setTimeout(() => {
       const element = document.getElementById("select-region");
       if (element) {
@@ -143,7 +144,7 @@ export default function Registration() {
         <AnnouncementImage />
       </AnnouncementContainer>
       <RemindText id="select-region">
-        預約掛號天數為28天內
+        <Text>預約掛號天數為28天內</Text>
         <br />
         就醫時請攜帶健保IC卡，未貼照片者請攜帶身分證、駕照、戶口名簿、
         <br />
@@ -279,9 +280,9 @@ const Container = styled.div`
 `;
 const RemindText = styled.div`
   text-align: center;
-  font-size: 28px;
-  letter-spacing: 8px;
-  line-height: 56px;
+  font-size: 24px;
+  letter-spacing: 5px;
+  line-height: 50px;
   font-weight: 600;
   width: 100%;
   height: auto;
@@ -289,17 +290,47 @@ const RemindText = styled.div`
   color: #000000;
   padding: 100px 100px;
   @media (max-width: 1280.1px) {
+    font-size: 22px;
+  }
+  @media (max-width: 1024.1px) {
+    text-align: left;
+    font-size: 20px;
+    padding: 50px 72px;
+    line-height: 1.8;
+  }
+  @media (max-width: 768.1px) {
+    font-size: 18px;
+    padding: 40px 50px;
+  }
+  @media (max-width: 480.1px) {
+    font-size: 16px;
+    padding: 40px 40px;
+  }
+`;
+
+const Text = styled.div`
+  text-align: center;
+  font-size: 28px;
+  letter-spacing: 5px;
+  line-height: 10px;
+  font-weight: 600;
+  width: 100%;
+  height: auto;
+  background-color: #ffffffb5;
+  color: #000000;
+  @media (max-width: 1280.1px) {
     font-size: 24px;
   }
   @media (max-width: 1024.1px) {
     text-align: left;
     font-size: 22px;
-    padding: 50px 72px;
     line-height: 1.8;
   }
   @media (max-width: 768.1px) {
     font-size: 20px;
-    padding: 40px 50px;
+  }
+  @media (max-width: 480.1px) {
+    font-size: 18px;
   }
 `;
 
@@ -437,7 +468,7 @@ const SelectRegion = styled.div`
 `;
 
 const SelectTitle = styled.div`
-  font-size: 38px;
+  font-size: 34px;
   font-weight: 600;
   color: #000000;
   width: 100%;
@@ -468,6 +499,22 @@ const SelectCards = styled.div`
   }
 `;
 
+export const ContentContainer = styled.div`
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  transition: opacity 0.3s ease;
+
+  @media (max-width: 480.1px) {
+    position: absolute;
+    align-items: center;
+    width: 100%;
+    top: 90px;
+    left: 0;
+  }
+`;
+
 export const SelectCard = styled.button`
   display: flex;
   border-radius: 10px;
@@ -478,10 +525,41 @@ export const SelectCard = styled.button`
   border: 0.5px solid #d9d9d9;
   text-decoration: none;
   cursor: pointer;
-  &:hover {
-    transform: scale(1.1);
-    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+  position: relative;
+  overflow: hidden;
+  transform: box-shadow 0.5s ease;
+
+  &::before {
+    content: "掛號";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #ffffff;
+    font-size: 24px;
+    font-weight: bold;
+    letter-spacing: 5.5px;
   }
+
+  &:hover::before {
+    opacity: 1;
+  }
+
+  /* &:hover {
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+
+    &::before {
+      opacity: 1;
+    }
+  } */
+
   @media (max-width: 1440.1px) {
     flex-direction: column;
     align-items: center;
@@ -494,20 +572,17 @@ export const SelectCard = styled.button`
   @media (max-width: 480.1px) {
     position: relative;
     width: 80%;
-  }
-`;
 
-export const ContentContainer = styled.div`
-  flex: 2;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  @media (max-width: 480.1px) {
-    position: absolute;
-    align-items: center;
-    width: 100%;
-    top: 90px;
-    left: 0;
+    &::before {
+      z-index: 1;
+    }
+
+    &:hover {
+      ${ContentContainer} {
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+    }
   }
 `;
 
