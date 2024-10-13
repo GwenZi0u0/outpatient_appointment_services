@@ -23,13 +23,14 @@ const useControlProgressStore = create((set) => ({
   currentNumber: null,
   currentPeriod: null,
   period: "",
-
+  selectedPeriod: null,
   setIsOpen: (isOpen) => set({ isOpen }),
   setCurrentTime: (currentTime) => set({ currentTime }),
   setCurrentNumber: (currentNumber) => set({ currentNumber }),
   setCurrentPeriod: (currentPeriod) => set({ currentPeriod }),
   setPeriod: (period) => set({ period }),
   toggleIsOpen: () => set((state) => ({ isOpen: !state.isOpen })),
+  setSelectedPeriod: (selectedPeriod) => set({ selectedPeriod }),
 }));
 
 export default function CancelRegistrationPage() {
@@ -44,6 +45,8 @@ export default function CancelRegistrationPage() {
     setCurrentPeriod,
     setPeriod,
     toggleIsOpen,
+    selectedPeriod,
+    setSelectedPeriod,
   } = useControlProgressStore();
 
   const { user } = useAuth();
@@ -81,6 +84,7 @@ export default function CancelRegistrationPage() {
 
   const handleButtonClick = (selectedPeriod) => {
     setPeriod(selectedPeriod);
+    setSelectedPeriod(selectedPeriod);
   };
 
   const filterRegistrationDataByCurrentDate = (registrationData) => {
@@ -190,7 +194,11 @@ export default function CancelRegistrationPage() {
             當日掛號人數
             <PeopleNumber>{result?.length}</PeopleNumber>
           </NumberRegisteredPeopleText>
-          <OpenClinicButton onClick={handleNext} disabled={!isOpen} $isColor={true}>
+          <OpenClinicButton
+            onClick={handleNext}
+            disabled={!isOpen}
+            $isColor={true}
+          >
             <Text>下一位</Text>
           </OpenClinicButton>
           <ProgressNumberDisplayArea $isOpen={isOpen}>
@@ -207,6 +215,7 @@ export default function CancelRegistrationPage() {
             <OpenClinicButton
               onClick={() => handleButtonClick("morning")}
               disabled={currentPeriod && currentPeriod !== "morning"}
+              $isActive={selectedPeriod === "morning"}
               $isColor={false}
             >
               <Text>上午</Text>
@@ -214,6 +223,7 @@ export default function CancelRegistrationPage() {
             <OpenClinicButton
               onClick={() => handleButtonClick("afternoon")}
               disabled={currentPeriod && currentPeriod !== "afternoon"}
+              $isActive={selectedPeriod === "afternoon"}
               $isColor={false}
             >
               <Text>下午</Text>
@@ -221,6 +231,7 @@ export default function CancelRegistrationPage() {
             <OpenClinicButton
               onClick={() => handleButtonClick("evening")}
               disabled={currentPeriod && currentPeriod !== "evening"}
+              $isActive={selectedPeriod === "evening"}
               $isColor={false}
             >
               <Text>夜間</Text>
@@ -267,6 +278,7 @@ const DateText = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
+  justify-content: center;
   font-size: 24px;
   font-weight: 700;
   letter-spacing: 9.6px;
@@ -278,15 +290,20 @@ const OpenClinicButton = styled.button`
   align-items: center;
   width: 100%;
   height: 50px;
-  background-color: ${(props) => (props.$isColor ? "#00b1c1de" : "#0267b5de")};
+  background-color: ${(props) => {
+    if (props.disabled) return "#cccccc";
+    if (props.$isColor) return "#00b1c1de";
+    return props.$isActive ? "#0267b5de" : "#808080";
+  }};
   color: #ffffff;
   border: 1px solid #cccccc;
   border-radius: 10px;
   box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
-  cursor: pointer;
+  cursor: ${(props) => (props.disabled ? "not-allowed" : "pointer")};
+  opacity: ${(props) => (props.disabled ? 0.5 : 1)};
   &:hover {
     box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
-    opacity: 0.8;
+    opacity: ${(props) => (props.disabled ? 0.5 : 0.8)};
   }
 `;
 

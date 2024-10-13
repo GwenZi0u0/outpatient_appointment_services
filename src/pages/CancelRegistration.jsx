@@ -449,7 +449,6 @@ const Table = styled.table`
   display: ${(props) => (props.$isOpened ? "table" : "none")};
   width: 100%;
   border-collapse: collapse;
-  font-family: Arial, sans-serif;
   border-radius: 10px;
   overflow: hidden;
   box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1);
