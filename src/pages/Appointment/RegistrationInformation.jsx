@@ -89,10 +89,6 @@ export default function RegistrationInformation({
         </Tbody>
       </Table>
       <Label>身分證(10碼) :</Label>
-      {/* <Label>請選擇身分別格式:</Label> */}
-      {/* <Select>
-        <option>身分證(10碼)</option>
-      </Select> */}
       <Input
         type="text"
         maxLength={10}
@@ -107,16 +103,15 @@ export default function RegistrationInformation({
         })}
         required
       />
-
       <Label>出生年/月/日 :</Label>
       <Input
         type="date"
         defaultValue={birthday}
         onChange={(e) => setBirthday(e.target.value)}
         {...register("birthday", { required: "請選擇出生日期" })}
+        max={new Date().toISOString().split('T')[0]}
         required
       />
-
       <Label>姓名 :</Label>
       <Input
         type="text"
