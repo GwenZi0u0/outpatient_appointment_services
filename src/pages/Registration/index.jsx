@@ -288,7 +288,7 @@ const RemindText = styled.div`
   height: auto;
   background-color: #ffffffb5;
   color: #000000;
-  padding: 100px 100px;
+  padding: 100px 100px 40px;
   @media (max-width: 1280.1px) {
     font-size: 22px;
   }

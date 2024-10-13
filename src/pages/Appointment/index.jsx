@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import styled from "styled-components";
-import { useMemo } from "react";
+import { useMemo, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -30,8 +30,18 @@ const useAppointmentStore = create((set) => ({
 }));
 
 export default function Appointment() {
-  const navigator = useNavigate();
+  const navigate = useNavigate();
   const { state } = useLocation();
+  useEffect(() => {
+    if (!state || !state.department) {
+      navigate("/");
+    }
+  }, [state, navigate]);
+
+  if (!state || !state.department) {
+    return null;
+  }
+
   const { department } = state;
   const {
     step,
@@ -80,7 +90,7 @@ export default function Appointment() {
 
   const handleReturnClick = () => {
     if (step === 1) {
-      navigator("/");
+      navigate("/");
       setTimeout(() => {
         document
           .getElementById("select-department")
@@ -137,7 +147,7 @@ export default function Appointment() {
     setValue("phone", "");
     setValue("nextRegistrationNumber", "");
     setStep(1);
-    navigator("/");
+    navigate("/");
   };
 
   const birthdayStamp = (data) => {
@@ -203,7 +213,7 @@ export default function Appointment() {
       <ProcessStep>
         {step !== 5 && (
           <BackButton onClick={() => handleReturnClick()}>
-            <ReturnText>上一步</ReturnText>
+            <ReturnText>{step === 1 ? "掛號首頁" : "上一步"}</ReturnText>
             <BackIcon src={Return} />
           </BackButton>
         )}
@@ -257,7 +267,7 @@ export default function Appointment() {
             getNextRegistrationNumber={getNextRegistrationNumber}
             registrationData={registrationData}
             onResetClick={() => {
-              navigator("/");
+              navigate("/");
               setTimeout(() => {
                 document
                   .getElementById("select-department")
@@ -367,7 +377,8 @@ const BackButton = styled.div`
   color: #244a8b;
   background-color: #d3cdcd;
   opacity: 1;
-  width: 120px;
+  width: auto;
+  min-width: 120px;
   height: 40px;
   padding: 10px 5px;
   border-radius: 10px;
@@ -381,8 +392,7 @@ const ReturnText = styled.span`
   display: inline-block;
   font-size: 16px;
   text-align: center;
-  letter-spacing: 2.5px;
-  font-weight: 500;
+  font-weight: 600;
 `;
 
 const BackIcon = styled.img`
