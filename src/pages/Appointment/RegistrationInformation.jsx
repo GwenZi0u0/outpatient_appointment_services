@@ -51,9 +51,7 @@ export default function RegistrationInformation({
 
   const handleInputChange = (e) => {
     const { value } = e.target;
-    if (/^[A-Z]{0,1}[0-9]{0,9}$/.test(value)) {
-      setIdNumber(value);
-    }
+    setIdNumber(value);
   };
 
   const currentSchedule = schedule.find((s) => s.doctor_id === doctor?.uid);
@@ -92,7 +90,7 @@ export default function RegistrationInformation({
       <Input
         type="text"
         maxLength={10}
-        placeholder="A234567890"
+        placeholder="A123456789"
         onChange={handleInputChange}
         {...register("idNumber", {
           required: "請輸入身分證號碼",
@@ -109,7 +107,7 @@ export default function RegistrationInformation({
         defaultValue={birthday}
         onChange={(e) => setBirthday(e.target.value)}
         {...register("birthday", { required: "請選擇出生日期" })}
-        max={new Date().toISOString().split('T')[0]}
+        max={new Date().toISOString().split("T")[0]}
         required
       />
       <Label>姓名 :</Label>
