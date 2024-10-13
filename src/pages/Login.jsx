@@ -151,6 +151,10 @@ const NoticeTitle = styled.div`
       transform: translateY(0);
     }
   }
+  @media (max-width:  480.1px) {
+    font-size: 24px;
+    text-align: center;
+  }
 `;
 
 const NoticeContent = styled.div`
@@ -160,7 +164,8 @@ const NoticeContent = styled.div`
   height: 100%;
   overflow-y: auto;
   padding-right: 10px;
-  border-radius: 30px;
+  border-radius: 10px;
+  background-color: #b7c3da5f;
   &::-webkit-scrollbar {
     width: 8px;
   }
@@ -177,7 +182,6 @@ const NoticeContent = styled.div`
   }
   @media (max-width: 1280.1px) {
     width: 100%;
-    min-height: 250px;
   }
 `;
 
@@ -190,7 +194,7 @@ const NoticeItem = styled.div`
   font-weight: 500;
   letter-spacing: 1px;
   background-color: transparent;
-  padding: 20px;
+  padding: 25px;
   gap: 20px;
   position: relative;
   cursor: pointer;
@@ -211,6 +215,12 @@ const NoticeItem = styled.div`
   }
   @media (max-width: 1280.1px) {
     font-size: 18px;
+  }
+  @media (max-width: 768.1px) {
+    font-size: 16px;
+  }
+  @media (max-width: 480.1px) {
+    font-size: 14px;
   }
 `;
 const ItemTitle = styled.div`
@@ -242,6 +252,15 @@ const ItemTitle = styled.div`
       width: 100%;
     }
   }
+  @media (max-width: 1280.1px) {
+    font-size: 20px;
+  }
+  @media (max-width: 768.1px) {
+    font-size: 18px;
+  }
+  @media (max-width: 480.1px) {
+    font-size: 16px;
+  }
 `;
 
 const ItemContent = styled.div`
@@ -253,6 +272,12 @@ const ItemContent = styled.div`
   text-justify: inter-word;
   @media (max-width: 1280.1px) {
     font-size: 18px;
+  }
+  @media (max-width: 768.1px) {
+    font-size: 16px;
+  }
+  @media (max-width: 480.1px) {
+    font-size: 14px;
   }
 `;
 
@@ -278,13 +303,16 @@ const Container = styled.div`
   background-color: #fefefe;
   gap: 55px;
   @media (max-width: 1280.1px) {
-    flex-direction: column-reverse;
+    flex-direction: column;
     width: 100%;
-    padding: 40px 100px;
+    padding: 40px 80px;
     gap: 15px;
   }
   @media (max-width: 768.1px) {
-    padding: 30px 80px;
+    padding: 30px;
+  }
+  @media (max-width: 480.1px) {
+    padding: 20px;
   }
 `;
 
@@ -334,10 +362,10 @@ const Content = styled.label`
   justify-content: center;
   width: 100%;
   gap: 30px;
-  @media(max-width: 1280.1px) {
+  @media (max-width: 1280.1px) {
     gap: 20px;
   }
-  @media(max-width: 768.1px) {
+  @media (max-width: 768.1px) {
     gap: 10px;
   }
 `;
@@ -365,6 +393,10 @@ const LoginInput = styled.input`
   &:focus {
     outline: none;
     border-bottom: 1px solid #244a8b;
+  }
+  @media (max-width: 1280.1px) {
+    height: 40px;
+    font-size: 18px;
   }
 `;
 

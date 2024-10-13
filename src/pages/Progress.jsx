@@ -183,7 +183,7 @@ export default function ProgressPage() {
               onChange={handleInputChange}
               onKeyDown={(e) => handleKeyDown(e, registrationData)}
             />
-            <Hint>A234567890 / P496665295 / I727938760 / A169039643</Hint>
+            <Hint>A123456789 / M114576287 / C201027260 / S205751804</Hint>
             {error && <ErrorMessage>{error}</ErrorMessage>}
           </SearchFrame>
         </SearchContainer>

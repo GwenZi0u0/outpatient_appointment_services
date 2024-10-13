@@ -181,6 +181,7 @@ export default function ClassSchedulePage() {
             await deleteDoc(docRef);
           }
           setPopupMessage("休診申請已撤回");
+          window.location.reload();
         } else {
           setPopupMessage("未找到匹配的休診申請");
         }

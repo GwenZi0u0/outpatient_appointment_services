@@ -204,7 +204,7 @@ export default function CancelRegistrationPage() {
               onChange={handleInputChange}
               onKeyDown={handleKeyDown}
             />
-            <Hint>A234567890 / P496665295 / I727938760 / A169039643 </Hint>
+            <Hint>A123456789 / M114576287 / C201027260 / S205751804 </Hint>
           </SearchFrame>
           {error && <ErrorMessage>{error}</ErrorMessage>}
         </SearchContainer>
