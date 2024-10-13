@@ -334,10 +334,10 @@ const Content = styled.label`
   justify-content: center;
   width: 100%;
   gap: 30px;
-  @madia(max-width: 1280.1px) {
+  @media(max-width: 1280.1px) {
     gap: 20px;
   }
-  @madia(max-width: 768.1px) {
+  @media(max-width: 768.1px) {
     gap: 10px;
   }
 `;
