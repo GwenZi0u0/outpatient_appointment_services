@@ -201,10 +201,12 @@ export default function Appointment() {
         <Title>網路預約掛號流程</Title>
       </Header>
       <ProcessStep>
-        <BackButton onClick={() => handleReturnClick()}>
-          <ReturnText>上一步</ReturnText>
-          <BackIcon src={Return} />
-        </BackButton>
+        {step !== 5 && (
+          <BackButton onClick={() => handleReturnClick()}>
+            <ReturnText>上一步</ReturnText>
+            <BackIcon src={Return} />
+          </BackButton>
+        )}
         {steps.map((item, index) => (
           <Step
             key={item.step}
@@ -411,7 +413,7 @@ const Step = styled.div`
   align-items: center;
   width: 180px;
   height: 45px;
-  padding-left: 36px;
+  padding-left: 32px;
   color: #ffffff;
   border-radius: 2px;
   background-color: ${(props) =>
@@ -425,7 +427,7 @@ const Step = styled.div`
 
   @media (max-width: 1024.1px) {
     font-size: 18px;
-    padding-left: 28px;
+    padding-left: 25px;
   }
   @media (max-width: 768.1px) {
     font-size: 15px;
