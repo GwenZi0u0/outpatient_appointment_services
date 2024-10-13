@@ -7,9 +7,11 @@ import Header from "../../components/Header";
 import ProfileDemo from "./ProfileDemo";
 import EditProfile from "./EditProfile";
 import Loading from "../../assets/loading.gif";
+import { useParams } from "react-router-dom";
 
 export default function DoctorProfilePage() {
   const { user } = useAuth();
+  const { doctorId } = useParams();
   const {
     data: doctorData,
     refetch: refetchDoctorData,
@@ -46,8 +48,9 @@ export default function DoctorProfilePage() {
     }
     return age;
   }
+  const canAccessProfile = user && user.uid === doctorId;
 
-  if (user) {
+  if (user && canAccessProfile) {
     return (
       <>
         <ProtectedLayout />
