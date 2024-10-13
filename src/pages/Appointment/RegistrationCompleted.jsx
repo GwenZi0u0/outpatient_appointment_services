@@ -33,7 +33,10 @@ export default function RegistrationCompleted({
   };
 
   const foundItem = Array.isArray(data)
-    ? data.find((item) => item.personal_id_number === idNumber)
+    ? data.find(
+        (item) =>
+          item.personal_id_number === idNumber && item.status === "confirmed"
+      )
     : null;
 
   const currentSchedule = schedule.find(
@@ -145,7 +148,7 @@ const TableRow = styled.tr`
   background-color: #ffffff;
   height: 75px;
   border-bottom: 1px solid #ddd;
-  
+
   @media (max-width: 1440.1px) {
     height: 65px;
   }
@@ -179,7 +182,6 @@ const CellContainer = styled.div`
 `;
 
 const Cell = styled.span`
-
   text-align: left;
   padding: 10px;
   font-size: 22px;
