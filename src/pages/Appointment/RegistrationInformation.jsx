@@ -88,10 +88,11 @@ export default function RegistrationInformation({
           </TableRow>
         </Tbody>
       </Table>
-      <Label>請選擇身分別格式:</Label>
-      <Select>
+      <Label>身分證(10碼) :</Label>
+      {/* <Label>請選擇身分別格式:</Label> */}
+      {/* <Select>
         <option>身分證(10碼)</option>
-      </Select>
+      </Select> */}
       <Input
         type="text"
         maxLength={10}
@@ -107,7 +108,7 @@ export default function RegistrationInformation({
         required
       />
 
-      <Label>出生年/月/日:</Label>
+      <Label>出生年/月/日 :</Label>
       <Input
         type="date"
         defaultValue={birthday}
@@ -116,7 +117,7 @@ export default function RegistrationInformation({
         required
       />
 
-      <Label>姓名:</Label>
+      <Label>姓名 :</Label>
       <Input
         type="text"
         value={name}
@@ -125,7 +126,7 @@ export default function RegistrationInformation({
         required
       />
 
-      <Label>聯絡電話:</Label>
+      <Label>聯絡電話 :</Label>
       <Input
         type="tel"
         maxLength={10}
@@ -230,12 +231,12 @@ const Label = styled.label`
   margin-bottom: 15px;
 `;
 
-const Select = styled.select`
-  width: 100%;
-  padding: 15px;
-  margin-bottom: 10px;
-  font-size: 20px;
-`;
+// const Select = styled.select`
+//   width: 100%;
+//   padding: 15px;
+//   margin-bottom: 10px;
+//   font-size: 20px;
+// `;
 
 const Input = styled.input`
   width: 100%;

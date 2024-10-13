@@ -202,6 +202,7 @@ export default function Appointment() {
       </Header>
       <ProcessStep>
         <BackButton onClick={() => handleReturnClick()}>
+          <ReturnText>上一步</ReturnText>
           <BackIcon src={Return} />
         </BackButton>
         {steps.map((item, index) => (
@@ -330,7 +331,6 @@ const CloseButton = styled(BaseButton)`
 `;
 
 const Container = styled.div`
-  font-family: Arial, sans-serif;
   max-width: 1000px;
   margin: 0 auto;
   padding: 100px 0 0px;
@@ -356,19 +356,18 @@ const Header = styled.div`
   position: relative;
 `;
 
-const BackButton = styled.button`
+const BackButton = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  width: auto;
+  flex-direction: row;
   height: auto;
-  border: none;
   color: #244a8b;
   background-color: #d3cdcd;
   opacity: 1;
-  width: 40px;
+  width: 120px;
   height: 40px;
-  padding: 25px;
+  padding: 10px 5px;
   border-radius: 10px;
   cursor: pointer;
   &:hover {
@@ -376,9 +375,17 @@ const BackButton = styled.button`
   }
 `;
 
+const ReturnText = styled.span`
+  display: inline-block;
+  font-size: 16px;
+  text-align: center;
+  letter-spacing: 2.5px;
+  font-weight: 500;
+`;
+
 const BackIcon = styled.img`
-  width: 40px;
-  height: 40px;
+  width: 25px;
+  height: 25px;
 `;
 
 const Title = styled.span`
@@ -402,7 +409,7 @@ const ProcessStep = styled.div`
 const Step = styled.div`
   display: flex;
   align-items: center;
-  width: 200px;
+  width: 180px;
   height: 45px;
   padding-left: 36px;
   color: #ffffff;

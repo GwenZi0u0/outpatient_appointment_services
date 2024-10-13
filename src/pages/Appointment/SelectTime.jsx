@@ -216,12 +216,61 @@ const TimeSlot = styled(TableData)`
 `;
 
 const CheckInput = styled.input`
-  width: 50%;
-  height: 70%;
-  position: absolute;
-  top: 15%;
-  left: 25%;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border: 2px solid #b7c3da;
+  border-radius: 50%;
+  outline: none;
   cursor: pointer;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  transition: all 0.2s ease-in-out;
+
+  &:checked {
+    background-color: #0267b5;
+    border-color: #0267b5;
+  }
+
+  &:checked::after {
+    content: "";
+    position: absolute;
+    top: 48.2%;
+    left: 48.2%;
+    transform: translate(-50%, -50%);
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: white;
+  }
+
+  &:hover {
+    box-shadow: 0 0 5px rgba(2, 103, 181, 0.5);
+  }
+
+  &:disabled {
+    border-color: #ccc;
+    background-color: #f0f0f0;
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  &:disabled::before {
+    content: "\\2716";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 20px;
+    color: #999;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 `;
 
 const ButtonContainer = styled.div`
