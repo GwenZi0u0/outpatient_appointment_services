@@ -12,15 +12,6 @@ export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const isRootPath = location.pathname === "/";
 
-  const handleButtonClick = () => {
-    if (location.pathname !== "/") {
-      navigate("/", { state: { scrollToRegion: true } });
-    } else {
-      scrollToRegion();
-    }
-    setIsMenuOpen(false);
-  };
-
   const scrollToRegion = () => {
     const element = document.getElementById("select-region");
     if (element) {
@@ -71,13 +62,12 @@ export default function Header() {
         <Menu $isGradient={isGradient}>
           <SelectLink
             to="/"
-            onClick={handleButtonClick}
             $isGradient={isGradient}
           >
-            網路掛號
+            掛號首頁
           </SelectLink>
           <SelectLink to="/cancel-registration" $isGradient={isGradient}>
-            查詢取消掛號
+            查詢掛號
           </SelectLink>
           <SelectLink to="/progress" $isGradient={isGradient}>
             看診進度
@@ -97,11 +87,10 @@ export default function Header() {
           <SelectLink
             to="/"
             onClick={() => {
-              handleButtonClick();
               setIsMenuOpen(false);
             }}
           >
-            網路掛號
+            掛號首頁
           </SelectLink>
           <SelectLink
             to="/cancel-registration"
