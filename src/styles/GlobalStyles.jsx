@@ -7,7 +7,7 @@ const GlobalStyles = createGlobalStyle`
     }
     
     body {
-        font-family: 'Noto Sans', sans-serif;
+        font-family: 'Helvetica', 'Arial', 'Noto Sans TC', '黑體-繁','微軟正黑體';
         padding: 0;
         margin: 0;
         background-color: #FFFDF9;
