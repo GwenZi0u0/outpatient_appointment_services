@@ -180,16 +180,25 @@ export const filterRegistrationDataByFutureDate = (mockDatabase) => {
 };
 
 export const isValidTaiwanID = (id) => {
-  if (!/^[A-Z]\d{9}$/.test(id)) return false;
-
-  const weights = [1, 9, 8, 7, 6, 5, 4, 3, 2, 1];
-  const letterToNumber = (letter) => letter.charCodeAt(0) - 55;
-
-  let sum = letterToNumber(id[0]) % 10;
-  for (let i = 1; i < id.length; i++) {
-    sum += Number(id[i]) * weights[i];
+  id = id.trim();
+  let verification = id.match("^[A-Z][12]\\d{8}$");
+  if (!verification) {
+    return false;
   }
-  return sum % 10 === 0;
+
+  let convert = "ABCDEFGHJKLMNPQRSTUVXYWZIO";
+  let weights = [1, 9, 8, 7, 6, 5, 4, 3, 2, 1, 1];
+
+  id = String(convert.indexOf(id[0]) + 10) + id.slice(1);
+
+  let checkSum = 0;
+  for (let i = 0; i < id.length; i++) {
+    let c = parseInt(id[i]);
+    let w = weights[i];
+    checkSum += c * w;
+  }
+  console.log(checkSum);
+  return checkSum % 10 == 0;
 };
 
 export const formatFirestoreTimestamp = (timestamp) => {
