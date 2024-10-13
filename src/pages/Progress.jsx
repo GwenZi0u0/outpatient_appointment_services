@@ -168,7 +168,7 @@ export default function ProgressPage() {
   return (
     <MainContainer>
       <Container>
-        <Title>今日門診進度</Title>
+        <Title>你的今日門診進度</Title>
         <SearchContainer>
           <Label htmlFor="idNumberInput">身分證號碼查詢 </Label>
           <SearchFrame>
@@ -320,6 +320,7 @@ const Container = styled.div`
 `;
 
 const Title = styled.span`
+  width: auto;
   font-size: 32px;
   font-weight: 700;
   color: #000000;
@@ -348,16 +349,9 @@ const SearchFrame = styled.div`
   display: flex;
   align-items: flex-start;
   flex-direction: column;
-  width: 75%;
+  width: auto;
   gap: 10px;
-  @media (max-width: 1440.1px) {
-    width: 70%;
-  }
-  @media (max-width: 1280.1px) {
-    width: 68%;
-  }
   @media (max-width: 1024.1px) {
-    width: 80%;
     align-items: center;
   }
 `;
@@ -387,6 +381,7 @@ const Input = styled.input`
 
 const Label = styled.label`
   display: flex;
+  width: auto;
   font-size: 28px;
   font-weight: 700;
   letter-spacing: 8.4px;
@@ -406,7 +401,6 @@ const Table = styled.table`
   display: ${(props) => (props.$isOpened ? "table" : "none")};
   width: 100%;
   border-collapse: collapse;
-  font-family: Arial, sans-serif;
   border-radius: 10px;
   overflow: hidden;
   box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1);

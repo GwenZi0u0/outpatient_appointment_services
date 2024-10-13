@@ -87,6 +87,7 @@ export default function LoginPage() {
         </NoticeContainer>
         <LoginContainer>
           <LockIcon src={Lock} />
+          <ContentTitle>院內登入系統</ContentTitle>
           <LoginContent>
             <Content htmlFor="email">
               <LoginIcon src={UserIcon} />
@@ -101,7 +102,6 @@ export default function LoginPage() {
             <Content htmlFor="password">
               <LoginIcon src={KeyIcon} />
               <PassWord>
-                password 密 碼
                 <PasswordInput
                   type="password"
                   value={password}
@@ -210,7 +210,7 @@ const NoticeItem = styled.div`
     }
   }
   @media (max-width: 1280.1px) {
-   font-size: 18px;
+    font-size: 18px;
   }
 `;
 const ItemTitle = styled.div`
@@ -274,25 +274,24 @@ const Container = styled.div`
   align-items: flex-end;
   justify-content: center;
   height: 100vh;
-  padding: 98px 211px;
+  padding: 98px 180px;
   background-color: #fefefe;
   gap: 55px;
   @media (max-width: 1280.1px) {
     flex-direction: column-reverse;
     width: 100%;
-    padding: 98px 100px;
+    padding: 40px 100px;
     gap: 15px;
   }
-  /* @media (max-width: 891.1px) {
-    padding: 98px 10px;
-  } */
+  @media (max-width: 768.1px) {
+    padding: 30px 80px;
+  }
 `;
 
 const LoginContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-between;
   width: 50%;
   height: 100%;
   background-color: #ffffff;
@@ -302,21 +301,31 @@ const LoginContainer = styled.div`
 `;
 
 const LockIcon = styled.img`
-  width: 250px;
-  height: 250px;
+  width: 200px;
+  height: 200px;
+  @media (max-width: 1280.1px) {
+    display: none;
+  }
 `;
 
 const LoginContent = styled.form`
   display: flex;
   align-items: center;
   flex-direction: column;
+  justify-content: space-around;
   width: 100%;
-  height: 70%;
-  padding: 93px 71px;
+  height: 100%;
+  padding: 40px;
   border: 1px solid #e0e0e0;
   border-radius: 10px;
   gap: 25px;
-  
+`;
+
+const ContentTitle = styled.span`
+  font-size: 24px;
+  font-weight: 600;
+  text-align: left;
+  padding: 20px;
 `;
 
 const Content = styled.label`
@@ -325,12 +334,26 @@ const Content = styled.label`
   justify-content: center;
   width: 100%;
   gap: 30px;
+  @madia(max-width: 1280.1px) {
+    gap: 20px;
+  }
+  @madia(max-width: 768.1px) {
+    gap: 10px;
+  }
 `;
 
 const LoginIcon = styled.img`
   width: 70px;
   height: 70px;
   background-color: transparent;
+  @media (max-width: 1280.1px) {
+    width: 50px;
+    height: 50px;
+  }
+  @media (max-width: 480.1px) {
+    width: 40px;
+    height: 40px;
+  }
 `;
 
 const LoginInput = styled.input`
@@ -346,7 +369,7 @@ const LoginInput = styled.input`
 `;
 
 const PasswordInput = styled.input`
-  width: auto;
+  width: 100%;
   height: 50px;
   font-size: 22px;
   border: none;
@@ -375,9 +398,18 @@ const Button = styled.button`
   border: none;
   border-radius: 10px;
   margin-top: 20px;
+  padding: 10px;
   cursor: pointer;
   &:hover {
     background-color: #00b0c1;
+  }
+  @media (max-width: 1280.1px) {
+    height: 50px;
+    font-size: 22px;
+  }
+  @media (max-width: 768.1px) {
+    height: 40px;
+    font-size: 18px;
   }
 `;
 
