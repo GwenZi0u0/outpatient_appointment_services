@@ -133,6 +133,7 @@ export default function CancelRegistrationPage() {
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
+      e.preventDefault();
       handleSearch();
     }
   };

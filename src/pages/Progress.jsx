@@ -117,6 +117,7 @@ export default function ProgressPage() {
 
   const handleKeyDown = (e, registrationData) => {
     if (e.key === "Enter") {
+      e.preventDefault();
       handleSearch(registrationData);
     }
   };
