@@ -552,13 +552,9 @@ export const SelectCard = styled.button`
     opacity: 1;
   }
 
-  /* &:hover {
-    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
-
-    &::before {
-      opacity: 1;
-    }
-  } */
+  &:hover {
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.3);
+  }
 
   @media (max-width: 1440.1px) {
     flex-direction: column;
