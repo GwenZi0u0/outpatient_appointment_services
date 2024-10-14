@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { useMemo, useCallback, useEffect } from "react";
+import { useMemo, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import styled from "styled-components";
 import { useQuery } from "@tanstack/react-query";
@@ -55,22 +55,32 @@ export default function ProgressPage() {
   const { data: departmentData } = useQuery({
     queryKey: ["departments"],
     queryFn: fetchDepartmentsData,
+    staleTime: 5 * 60 * 1000,
   });
+
   const { data: doctorData } = useQuery({
     queryKey: ["doctors"],
     queryFn: fetchDoctorsData,
+    staleTime: 5 * 60 * 1000,
   });
+
   const { data: scheduleData } = useQuery({
     queryKey: ["schedules"],
     queryFn: fetchSchedulesData,
+    staleTime: 5 * 60 * 1000,
   });
+
   const { data: registrationData } = useQuery({
     queryKey: ["registration"],
     queryFn: fetchRegistrationData,
+    staleTime: 5 * 60 * 1000,
   });
-  const { data: progressData } = useQuery({
+
+  const { data: progressData, refetch: refetchProgressData } = useQuery({
     queryKey: ["progress"],
     queryFn: fetchProgressData,
+    refetchInterval: 1 * 1000,
+    staleTime: 0,
   });
 
   const mockDatabase = useMemo(
@@ -87,14 +97,13 @@ export default function ProgressPage() {
     [mockDatabase]
   );
 
-  const handleInputChange = useCallback(
-    (e) => {
-      setIdNumber(e.target.value.toUpperCase());
-    },
-    [setIdNumber]
-  );
+  const handleInputChange = (e) => {
+    setIdNumber(e.target.value.toUpperCase());
+    setError("");
+    setIsOpened(false);
+  };
 
-  const handleSearch = useCallback(() => {
+  const handleSearch = async () => {
     if (!idNumber.trim()) {
       setError("請輸入身分證號碼");
       setIsOpened(false);
@@ -111,9 +120,9 @@ export default function ProgressPage() {
     } else {
       setError("");
       setIsOpened(true);
-      return;
+      await refetchProgressData();
     }
-  }, [idNumber, mockDatabase, setError, setIsOpened]);
+  };
 
   const handleKeyDown = (e, registrationData) => {
     if (e.key === "Enter") {
@@ -173,16 +182,19 @@ export default function ProgressPage() {
         <SearchContainer>
           <Label htmlFor="idNumberInput">身分證號碼查詢 </Label>
           <SearchFrame>
-            <Input
-              id="idNumberInput"
-              name="idNumber"
-              type="text"
-              placeholder="請輸入身分證號碼"
-              maxLength={10}
-              value={idNumber}
-              onChange={handleInputChange}
-              onKeyDown={(e) => handleKeyDown(e, registrationData)}
-            />
+            <InputWrapper>
+              <Input
+                id="idNumberInput"
+                name="idNumber"
+                type="text"
+                placeholder="請輸入身分證號碼"
+                maxLength={10}
+                value={idNumber}
+                onChange={handleInputChange}
+                onKeyDown={(e) => handleKeyDown(e, registrationData)}
+              />
+              <SearchButton onClick={handleSearch}>搜尋</SearchButton>
+            </InputWrapper>
             <Hint>A123456789 / M114576287 / C201027260 / S205751804</Hint>
             {error && <ErrorMessage>{error}</ErrorMessage>}
           </SearchFrame>
@@ -300,7 +312,7 @@ const MainContainer = styled.div`
     padding: 80px 150px 40px;
   }
   @media (max-width: 768.1px) {
-    padding: 80px 100px 40px;
+    padding: 80px 80px 40px;
   }
   @media (max-width: 480.1px) {
     padding: 80px 50px 40px;
@@ -336,6 +348,7 @@ const Title = styled.span`
 
 const SearchContainer = styled.div`
   display: flex;
+  align-items: center;
   font-weight: 700;
   width: 100%;
   gap: 20px;
@@ -350,10 +363,18 @@ const SearchFrame = styled.div`
   display: flex;
   align-items: flex-start;
   flex-direction: column;
-  width: auto;
+  width: 65%;
   gap: 10px;
   @media (max-width: 1024.1px) {
-    align-items: center;
+    width: 90%;
+    padding-left: 15px;
+  }
+  @media (max-width: 768.1px) {
+    width: 100%;
+  }
+  @media (max-width: 480.1px) {
+    align-items: flex-start;
+    padding-left: 0;
   }
 `;
 
@@ -363,14 +384,45 @@ const Hint = styled.span`
   color: #666666;
 `;
 
+const InputWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 10px;
+  @media (max-width: 480.1px) {
+    width: 90%;
+  }
+`;
+
+const SearchButton = styled.button`
+  background-color: #00b0c1;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  width: 100px;
+  height: 50px;
+  padding: 0px 20px;
+  font-size: 18px;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.3s;
+
+  &:hover {
+    background-color: #1c3a6e;
+  }
+
+  @media (max-width: 1024.1px) {
+    font-size: 18px;
+  }
+`;
+
 const Input = styled.input`
   width: 100%;
-  height: auto;
-  min-height: 56px;
+  height: 50px;
   padding: 10px;
   font-size: 20px;
   border: 1px solid #cccccc;
-  border-radius: 5px;
+  border-radius: 10px;
   &:focus {
     outline: none;
     border: 2px solid #244a8b;
@@ -386,7 +438,7 @@ const Label = styled.label`
   font-size: 28px;
   font-weight: 700;
   letter-spacing: 8.4px;
-  margin-top: 15px;
+  margin-bottom: 15px;
   @media (max-width: 1440.1px) {
     font-size: 24px;
   }

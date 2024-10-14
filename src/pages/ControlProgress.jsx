@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import styled from "styled-components";
 import { useAuth } from "../contexts/AuthContext";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchProgressData, fetchRegistrationData } from "../api";
 import { Timestamp } from "firebase/firestore";
 import { useEffect, useMemo } from "react";
@@ -14,6 +14,7 @@ import {
   where,
   deleteDoc,
   doc,
+  getDoc,
   updateDoc,
 } from "firebase/firestore";
 
@@ -50,18 +51,22 @@ export default function CancelRegistrationPage() {
   } = useControlProgressStore();
 
   const { user } = useAuth();
+  const queryClient = useQueryClient();
+
   const { data: registrationData } = useQuery({
     queryKey: ["registration"],
-    queryFn: fetchRegistrationData,
-  });
-  const { data: progressData } = useQuery({
-    queryKey: ["progress"],
-    queryFn: fetchProgressData,
+    queryFn: () => fetchRegistrationData(),
+    staleTime: 30 * 1000,
+    cacheTime: 1 * 60 * 1000,
+    refetchOnWindowFocus: true,
   });
 
-  useEffect(() => {
-    console.log(progressData);
-  }, [progressData]);
+  const { data: progressData, refetch: refetchProgressData } = useQuery({
+    queryKey: ["progress"],
+    queryFn: () => fetchProgressData(),
+    staleTime: 30 * 1000,
+    cacheTime: 1 * 60 * 1000,
+  });
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -69,7 +74,7 @@ export default function CancelRegistrationPage() {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [setCurrentTime]);
 
   const getCurrentDateInfo = (data) => {
     const date = data instanceof Timestamp ? data.toDate() : new Date(data);
@@ -97,10 +102,9 @@ export default function CancelRegistrationPage() {
       const isPeriodMatching = period === data.appointment_timeslot;
       return isDateMatching && isDoctorMatching && isStatus && isPeriodMatching;
     });
-    const sortedData = filteredData?.sort(
+    return filteredData?.sort(
       (a, b) => a.registration_number - b.registration_number
     );
-    return sortedData;
   };
 
   const toggleClinic = async () => {
@@ -136,6 +140,7 @@ export default function CancelRegistrationPage() {
       }
     }
     toggleIsOpen();
+    queryClient.invalidateQueries(["progress"]);
   };
 
   const filterProgressData = (result) =>
@@ -160,19 +165,42 @@ export default function CancelRegistrationPage() {
   );
 
   const handleNext = async () => {
-    const progressDoc = progressData?.find(
-      (data) => data.doctor_id === user.uid
+    await refetchProgressData();
+    let progressDoc = progressData?.find(
+      (data) => data.doctor_id === user.uid && data.time === period
     );
+    if (!progressDoc) {
+      const querySnapshot = await getDocs(
+        query(
+          collection(fireDb, "progress"),
+          where("doctor_id", "==", user.uid),
+          where("time", "==", period)
+        )
+      );
+      if (!querySnapshot.empty) {
+        progressDoc = {
+          id: querySnapshot.docs[0].id,
+          ...querySnapshot.docs[0].data(),
+        };
+      }
+    }
+
     const firstValidNumber = filteredData[0]?.registration_number || null;
     if (firstValidNumber) {
       setCurrentNumber(firstValidNumber);
       if (progressDoc && progressDoc.id) {
         try {
           const docRef = doc(fireDb, "progress", progressDoc.id);
-          await updateDoc(docRef, {
-            number: firstValidNumber,
-          });
-          console.log("Document updated successfully");
+          const docSnap = await getDoc(docRef);
+          if (docSnap.exists()) {
+            await updateDoc(docRef, {
+              number: firstValidNumber,
+            });
+            console.log("Document updated successfully");
+            queryClient.invalidateQueries(["progress"]);
+          } else {
+            console.error("No such document");
+          }
         } catch (error) {
           console.error("Error updating document: ", error);
         }
@@ -253,6 +281,7 @@ const ButtonArea = styled.div`
 
 const MainContainer = styled.div`
   display: flex;
+  align-items: center;
   flex-direction: column;
   height: auto;
   min-height: 100vh;
@@ -263,8 +292,23 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   background-color: transparent;
-  padding: 70px 320px 0;
+  padding: 80px 316px 40px;
   gap: 80px;
+  @media (max-width: 1440.1px) {
+    padding: 80px 200px 40px;
+  }
+  @media (max-width: 1280.1px) {
+    padding: 80px 180px 40px;
+  }
+  @media (max-width: 1024.1px) {
+    padding: 80px 150px 40px;
+  }
+  @media (max-width: 768.1px) {
+    padding: 80px 50px 40px;
+  }
+  @media (max-width: 480.1px) {
+    padding: 80px 20px 40px;
+  }
 `;
 
 const DateContext = styled.div`
