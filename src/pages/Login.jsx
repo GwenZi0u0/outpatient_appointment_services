@@ -24,6 +24,8 @@ export default function LoginPage() {
   const { data: noticeData } = useQuery({
     queryKey: ["noticeData"],
     queryFn: fetchNoticeData,
+    staleTime: 30 * 1000,
+    cacheTime: 1 * 60 * 1000,
   });
   const [animationDelay, setAnimationDelay] = useState(0.2);
 
@@ -151,7 +153,7 @@ const NoticeTitle = styled.div`
       transform: translateY(0);
     }
   }
-  @media (max-width:  480.1px) {
+  @media (max-width: 480.1px) {
     font-size: 24px;
     text-align: center;
   }

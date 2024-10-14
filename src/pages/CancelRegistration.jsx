@@ -194,16 +194,19 @@ export default function CancelRegistrationPage() {
         <SearchContainer>
           <Label htmlFor="idNumberInput">身分證號碼查詢</Label>
           <SearchFrame>
-            <Input
-              id="idNumberInput"
-              name="idNumber"
-              type="text"
-              placeholder="請輸入身分證號碼"
-              maxLength={10}
-              value={idNumber}
-              onChange={handleInputChange}
-              onKeyDown={handleKeyDown}
-            />
+            <InputWrapper>
+              <Input
+                id="idNumberInput"
+                name="idNumber"
+                type="text"
+                placeholder="請輸入身分證號碼"
+                maxLength={10}
+                value={idNumber}
+                onChange={handleInputChange}
+                onKeyDown={handleKeyDown}
+              />
+              <SearchButton onClick={handleSearch}>搜索</SearchButton>
+            </InputWrapper>
             <Hint>A123456789 / M114576287 / C201027260 / S205751804 </Hint>
           </SearchFrame>
           {error && <ErrorMessage>{error}</ErrorMessage>}
@@ -371,9 +374,6 @@ const Container = styled.div`
   width: 100%;
   padding-top: 84px;
   gap: 40px;
-  @media (max-width: 1024.1px) {
-    align-items: center;
-  }
 `;
 
 const Title = styled.span`
@@ -403,10 +403,21 @@ const SearchContainer = styled.div`
 
 const SearchFrame = styled.div`
   display: flex;
-  align-items: center;
   flex-direction: column;
-  width: 65%;
+  width: 60%;
+  padding-left: 35px;
   gap: 10px;
+  @media (max-width: 1024.1px) {
+    width: 80%;
+    padding-left: 10px;
+  }
+  @media (max-width: 768.1px) {
+    padding-left: 5px;
+  }
+  @media (max-width: 480.1px) {
+    width: 90%;
+    padding-left: 0px;
+  }
 `;
 
 const Label = styled.label`
@@ -422,23 +433,64 @@ const Label = styled.label`
   }
 `;
 
+const InputWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 10px;
+`;
+
+const SearchButton = styled.button`
+  background-color: #00b0c1;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  width: 100px;
+  height: 50px;
+  padding: 0 20px;
+  font-size: 18px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+
+  &:hover {
+    background-color: #1c3a6e;
+  }
+`;
+
 const Input = styled.input`
-  width: auto;
-  min-width: 500px;
+  width: 100%;
+  min-width: 400px;
   height: 50px;
   padding: 10px;
   font-size: 18px;
   border: 1px solid #cccccc;
-  border-radius: 5px;
+  border-radius: 10px;
   &:focus {
     outline: none;
     border: 2px solid #244a8b;
   }
   @media (max-width: 1024.1px) {
-    min-width: 350px;
-    margin-left: 0;
+    min-width: 300px;
   }
 `;
+
+// const Input = styled.input`
+//   width: auto;
+//   min-width: 500px;
+//   height: 50px;
+//   padding: 10px;
+//   font-size: 18px;
+//   border: 1px solid #cccccc;
+//   border-radius: 5px;
+//   &:focus {
+//     outline: none;
+//     border: 2px solid #244a8b;
+//   }
+//   @media (max-width: 1024.1px) {
+//     min-width: 350px;
+//     margin-left: 0;
+//   }
+// `;
 
 const Hint = styled.span`
   font-size: 14px;
