@@ -23,6 +23,7 @@ export default function DoctorProfilePage() {
   const { data: departmentData } = useQuery({
     queryKey: ["departments"],
     queryFn: fetchDepartmentsData,
+    staleTime: Infinity,
   });
 
   if (isLoading) {

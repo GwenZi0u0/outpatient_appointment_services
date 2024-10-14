@@ -16,6 +16,8 @@ export default function RegistrationCompleted({
   const { data } = useQuery({
     queryKey: ["registrations"],
     queryFn: fetchRegistrationData,
+    staleTime: 0,
+    cacheTime: 0,
   });
 
   const formatDate = (timestamp) => {

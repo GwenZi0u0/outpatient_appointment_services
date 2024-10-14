@@ -35,6 +35,10 @@ export default function Registration() {
   const { data, isLoading: isDataLoading } = useQuery({
     queryKey: ["departments"],
     queryFn: fetchDepartmentsData,
+    staleTime: Infinity,
+    cacheTime: Infinity,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
   });
 
   const handleCardClick = (department) => {

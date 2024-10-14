@@ -97,19 +97,27 @@ export default function ClassSchedulePage() {
   const { data: departmentData } = useQuery({
     queryKey: ["departments"],
     queryFn: fetchDepartmentsData,
+    staleTime: 5 * 60 * 1000,
+    cacheTime: 10 * 60 * 1000,
   });
   const { data: doctorData } = useQuery({
     queryKey: ["doctors"],
     queryFn: fetchDoctorsData,
+    staleTime: 5 * 60 * 1000,
+    cacheTime: 10 * 60 * 1000,
   });
   const { data: scheduleData } = useQuery({
     queryKey: ["schedules"],
     queryFn: fetchSchedulesData,
+    staleTime: 5 * 60 * 1000,
+    cacheTime: 10 * 60 * 1000,
   });
   const { data: requestLeaveData, refetch: refetchRequestLeaveData } = useQuery(
     {
       queryKey: ["request_leave"],
       queryFn: fetchRequestLeaveData,
+      staleTime: 2 * 60 * 1000,
+      cacheTime: 5 * 60 * 1000,
     }
   );
   const doctor = doctorData?.find((doc) => doc.uid === user.uid) ?? {};
@@ -136,7 +144,7 @@ export default function ClassSchedulePage() {
       .flat();
   }, [doctorWeeks, requestLeave]);
 
-  const handleCheckboxClick = (date, time) => {
+  const handleCheckboxChange = (date, time) => {
     if (isDoctorDisabled(date)) return;
     const firebaseTimestamp = convertToTimestamp(date);
     toggleDateTime(firebaseTimestamp, time);
@@ -288,8 +296,8 @@ export default function ClassSchedulePage() {
                                     convertToTimestamp(date).seconds &&
                                   item.times.includes(time)
                               )}
-                              onClick={() => handleCheckboxClick(date, time)}
-                              disabled={false}
+                              onChange={() => handleCheckboxChange(date, time)}
+                              disabled={isDoctorDisabled(date)}
                             />
                           )
                         ) : (

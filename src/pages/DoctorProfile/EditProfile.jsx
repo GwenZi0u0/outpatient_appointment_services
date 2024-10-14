@@ -91,7 +91,7 @@ export default function EditProfile({
         physician_imag: downloadURL,
       };
       await updateDoc(docRef, updatedFields);
-      refetchDoctorData();
+      await refetchDoctorData();
     } catch (error) {
       console.error("上傳失敗：", error);
     } finally {
@@ -171,7 +171,7 @@ export default function EditProfile({
         expertises: modifiedData.expertises || [],
       };
       await updateDoc(docRef, updatedFields);
-      refetchDoctorData();
+      await refetchDoctorData();
       setIsEditing(false);
     } catch (error) {
       console.error("儲存失敗：", error);

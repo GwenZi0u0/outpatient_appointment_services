@@ -54,10 +54,12 @@ export default function Appointment() {
   const { data: scheduleData } = useQuery({
     queryKey: ["schedules"],
     queryFn: fetchSchedulesData,
+    refetchInterval: 60000,
   });
   const { data: registrationData } = useQuery({
     queryKey: ["registrations"],
     queryFn: fetchRegistrationData,
+    refetchInterval: 30000,
   });
 
   const { register, handleSubmit, setValue, watch, getValues } = useForm({
@@ -179,7 +181,6 @@ export default function Appointment() {
     }
     const nextNumber = getNextRegistrationNumber(registrationData, data.time);
     setValue("nextRegistrationNumber", nextNumber);
-
     setValue("idNumber", data.idNumber);
     try {
       const docRef = await addDoc(collection(fireDb, "registrations"), {

@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import styled from "styled-components";
 import { useAuth } from "../contexts/AuthContext";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { fetchProgressData, fetchRegistrationData } from "../api";
 import { Timestamp } from "firebase/firestore";
 import { useEffect, useMemo } from "react";
@@ -18,23 +18,23 @@ import {
   updateDoc,
 } from "firebase/firestore";
 
-const useControlProgressStore = create((set) => ({
-  isOpen: false,
-  currentTime: new Date(),
-  currentNumber: null,
-  currentPeriod: null,
-  period: "",
-  selectedPeriod: null,
-  setIsOpen: (isOpen) => set({ isOpen }),
-  setCurrentTime: (currentTime) => set({ currentTime }),
-  setCurrentNumber: (currentNumber) => set({ currentNumber }),
-  setCurrentPeriod: (currentPeriod) => set({ currentPeriod }),
-  setPeriod: (period) => set({ period }),
-  toggleIsOpen: () => set((state) => ({ isOpen: !state.isOpen })),
-  setSelectedPeriod: (selectedPeriod) => set({ selectedPeriod }),
-}));
-
 export default function CancelRegistrationPage() {
+  const useControlProgressStore = create((set) => ({
+    isOpen: false,
+    currentTime: new Date(),
+    currentNumber: null,
+    currentPeriod: null,
+    period: "",
+    selectedPeriod: null,
+    setIsOpen: (isOpen) => set({ isOpen }),
+    setCurrentTime: (currentTime) => set({ currentTime }),
+    setCurrentNumber: (currentNumber) => set({ currentNumber }),
+    setCurrentPeriod: (currentPeriod) => set({ currentPeriod }),
+    setPeriod: (period) => set({ period }),
+    toggleIsOpen: () => set((state) => ({ isOpen: !state.isOpen })),
+    setSelectedPeriod: (selectedPeriod) => set({ selectedPeriod }),
+  }));
+
   const {
     isOpen,
     currentTime,
@@ -51,7 +51,6 @@ export default function CancelRegistrationPage() {
   } = useControlProgressStore();
 
   const { user } = useAuth();
-  const queryClient = useQueryClient();
 
   const { data: registrationData } = useQuery({
     queryKey: ["registration"],
@@ -140,7 +139,6 @@ export default function CancelRegistrationPage() {
       }
     }
     toggleIsOpen();
-    queryClient.invalidateQueries(["progress"]);
   };
 
   const filterProgressData = (result) =>
@@ -197,7 +195,6 @@ export default function CancelRegistrationPage() {
               number: firstValidNumber,
             });
             console.log("Document updated successfully");
-            queryClient.invalidateQueries(["progress"]);
           } else {
             console.error("No such document");
           }

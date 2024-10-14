@@ -15,6 +15,8 @@ export default function SelectDoctors({
   const { data } = useQuery({
     queryKey: ["doctors"],
     queryFn: fetchDoctorsData,
+    staleTime: 5 * 60 * 1000,
+    cacheTime: 60 * 60 * 1000,
   });
 
   const filteredDoctors =
