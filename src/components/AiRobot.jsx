@@ -198,7 +198,7 @@ const ChatWindow = styled.div`
   height: 800px;
   border: 1px solid #ccc;
   border-radius: 35px;
-  padding: 20px;
+  padding: 25px;
   margin: 20px auto;
   background-color: #00b0c1;
   display: flex;
@@ -238,7 +238,7 @@ const Input = styled.input`
   width: calc(100% - 22px);
   padding: 10px;
   border: 1px solid #ccc;
-  border-radius: 4px;
+  border-radius: 5px;
   background-color: #fff;
   color: #000;
   font-size: 20px;
@@ -253,6 +253,7 @@ const MessagesContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  width: 100%;
   height: 75%;
   overflow-y: auto;
   border: 1px solid #ddd;
@@ -260,7 +261,7 @@ const MessagesContainer = styled.div`
   padding: 20px;
   background-color: #fff;
   color: #000;
-  border-radius: 20px;
+  border-radius: 5px;
   &::-webkit-scrollbar {
     width: 12px;
   }
