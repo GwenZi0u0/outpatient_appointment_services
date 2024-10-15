@@ -97,7 +97,7 @@ export default function AiRobot({ handleCloseAI }) {
                     alt={matchedDepartment.department}
                     style={{ width: "80px", height: "80px" }}
                   />
-                  <SelectCardTitle>
+                  <SelectCardTitle style={{ color: "#000" }}>
                     {matchedDepartment.department}
                   </SelectCardTitle>
                 </SelectCard>
@@ -194,9 +194,8 @@ const ChatContainer = styled.div`
 
 const ChatWindow = styled.div`
   position: relative;
-  width: 80%;
+  width: 65%;
   height: 800px;
-  min-height: 80%;
   border: 1px solid #ccc;
   border-radius: 35px;
   padding: 20px;
@@ -205,7 +204,12 @@ const ChatWindow = styled.div`
   display: flex;
   flex-direction: column;
   @media (max-width: 768.1px) {
+    width: 80%;
+    height: 700px;
+  }
+  @media (max-width: 480.1px) {
     width: 90%;
+    height: 650px;
   }
 `;
 
@@ -264,8 +268,7 @@ const MessagesContainer = styled.div`
     background: #f1f1f1;
   }
   &::-webkit-scrollbar-thumb {
-    background: #888;
-    border-radius: 6px;
+    background: #ccc;
   }
   &::-webkit-scrollbar-thumb:hover {
     background: #555;
@@ -290,6 +293,10 @@ const MessageWrapper = styled.div`
   @media (max-width: 768.1px) {
     max-width: 80%;
   }
+  @media (max-width: 480.1px) {
+    max-width: 90%;
+    font-size: 18px;
+  }
 `;
 
 const MessageEnd = styled.div`
@@ -303,6 +310,10 @@ const SentImg = styled.img`
   height: 50px;
   margin-left: 10px;
   margin-right: 5px;
+  @media (max-width: 768.1px) {
+    width: 40px;
+    height: 40px;
+  }
 `;
 
 const Title = styled.span`
@@ -318,13 +329,13 @@ const Title = styled.span`
 const Note = styled.div`
   color: #bb3131;
   font-size: 20px;
-  font-weight: 500;
+  font-weight: 600;
   padding: 15px 0;
   letter-spacing: 1px;
   @media (max-width: 768.1px) {
     font-size: 18px;
   }
   @media (max-width: 480.1px) {
-    font-size: 16px;
+    font-size: 14px;
   }
 `;
