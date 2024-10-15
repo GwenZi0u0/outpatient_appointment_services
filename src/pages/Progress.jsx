@@ -79,7 +79,7 @@ export default function ProgressPage() {
   const { data: progressData, refetch: refetchProgressData } = useQuery({
     queryKey: ["progress"],
     queryFn: fetchProgressData,
-    refetchInterval: 1 * 1000,
+    refetchInterval: 5000,
     staleTime: 0,
   });
 

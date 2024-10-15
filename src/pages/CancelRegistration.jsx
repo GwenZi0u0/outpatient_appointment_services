@@ -205,7 +205,7 @@ export default function CancelRegistrationPage() {
                 onChange={handleInputChange}
                 onKeyDown={handleKeyDown}
               />
-              <SearchButton onClick={handleSearch}>搜索</SearchButton>
+              <SearchButton onClick={handleSearch}>搜尋</SearchButton>
             </InputWrapper>
             <Hint>A123456789 / M114576287 / C201027260 / S205751804 </Hint>
           </SearchFrame>
