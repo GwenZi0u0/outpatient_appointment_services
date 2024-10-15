@@ -14,25 +14,27 @@ import {
   where,
   deleteDoc,
   doc,
+  getDoc,
   updateDoc,
 } from "firebase/firestore";
 
-const useControlProgressStore = create((set) => ({
-  isOpen: false,
-  currentTime: new Date(),
-  currentNumber: null,
-  currentPeriod: null,
-  period: "",
-
-  setIsOpen: (isOpen) => set({ isOpen }),
-  setCurrentTime: (currentTime) => set({ currentTime }),
-  setCurrentNumber: (currentNumber) => set({ currentNumber }),
-  setCurrentPeriod: (currentPeriod) => set({ currentPeriod }),
-  setPeriod: (period) => set({ period }),
-  toggleIsOpen: () => set((state) => ({ isOpen: !state.isOpen })),
-}));
-
 export default function CancelRegistrationPage() {
+  const useControlProgressStore = create((set) => ({
+    isOpen: false,
+    currentTime: new Date(),
+    currentNumber: null,
+    currentPeriod: null,
+    period: "",
+    selectedPeriod: null,
+    setIsOpen: (isOpen) => set({ isOpen }),
+    setCurrentTime: (currentTime) => set({ currentTime }),
+    setCurrentNumber: (currentNumber) => set({ currentNumber }),
+    setCurrentPeriod: (currentPeriod) => set({ currentPeriod }),
+    setPeriod: (period) => set({ period }),
+    toggleIsOpen: () => set((state) => ({ isOpen: !state.isOpen })),
+    setSelectedPeriod: (selectedPeriod) => set({ selectedPeriod }),
+  }));
+
   const {
     isOpen,
     currentTime,
@@ -44,21 +46,26 @@ export default function CancelRegistrationPage() {
     setCurrentPeriod,
     setPeriod,
     toggleIsOpen,
+    selectedPeriod,
+    setSelectedPeriod,
   } = useControlProgressStore();
 
   const { user } = useAuth();
+
   const { data: registrationData } = useQuery({
     queryKey: ["registration"],
-    queryFn: fetchRegistrationData,
-  });
-  const { data: progressData } = useQuery({
-    queryKey: ["progress"],
-    queryFn: fetchProgressData,
+    queryFn: () => fetchRegistrationData(),
+    staleTime: 30 * 1000,
+    cacheTime: 1 * 60 * 1000,
+    refetchOnWindowFocus: true,
   });
 
-  useEffect(() => {
-    console.log("progressData:", progressData);
-  }, [progressData]);
+  const { data: progressData, refetch: refetchProgressData } = useQuery({
+    queryKey: ["progress"],
+    queryFn: () => fetchProgressData(),
+    staleTime: 30 * 1000,
+    cacheTime: 1 * 60 * 1000,
+  });
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -66,7 +73,7 @@ export default function CancelRegistrationPage() {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [setCurrentTime]);
 
   const getCurrentDateInfo = (data) => {
     const date = data instanceof Timestamp ? data.toDate() : new Date(data);
@@ -81,6 +88,7 @@ export default function CancelRegistrationPage() {
 
   const handleButtonClick = (selectedPeriod) => {
     setPeriod(selectedPeriod);
+    setSelectedPeriod(selectedPeriod);
   };
 
   const filterRegistrationDataByCurrentDate = (registrationData) => {
@@ -93,10 +101,9 @@ export default function CancelRegistrationPage() {
       const isPeriodMatching = period === data.appointment_timeslot;
       return isDateMatching && isDoctorMatching && isStatus && isPeriodMatching;
     });
-    const sortedData = filteredData?.sort(
+    return filteredData?.sort(
       (a, b) => a.registration_number - b.registration_number
     );
-    return sortedData;
   };
 
   const toggleClinic = async () => {
@@ -156,20 +163,46 @@ export default function CancelRegistrationPage() {
   );
 
   const handleNext = async () => {
-    const progressDataId = progressData?.filter(
-      (data) => data.doctor_id === user.uid
-    )[0]?.id;
+    await refetchProgressData();
+    let progressDoc = progressData?.find(
+      (data) => data.doctor_id === user.uid && data.time === period
+    );
+    if (!progressDoc) {
+      const querySnapshot = await getDocs(
+        query(
+          collection(fireDb, "progress"),
+          where("doctor_id", "==", user.uid),
+          where("time", "==", period)
+        )
+      );
+      if (!querySnapshot.empty) {
+        progressDoc = {
+          id: querySnapshot.docs[0].id,
+          ...querySnapshot.docs[0].data(),
+        };
+      }
+    }
+
     const firstValidNumber = filteredData[0]?.registration_number || null;
     if (firstValidNumber) {
       setCurrentNumber(firstValidNumber);
-      try {
-        const docRef = doc(fireDb, "progress", progressDataId);
-        await updateDoc(docRef, {
-          number: firstValidNumber,
-        });
-        console.log("Document updated successfully");
-      } catch (error) {
-        console.error("Error updating document: ", error);
+      if (progressDoc && progressDoc.id) {
+        try {
+          const docRef = doc(fireDb, "progress", progressDoc.id);
+          const docSnap = await getDoc(docRef);
+          if (docSnap.exists()) {
+            await updateDoc(docRef, {
+              number: firstValidNumber,
+            });
+            console.log("Document updated successfully");
+          } else {
+            console.error("No such document");
+          }
+        } catch (error) {
+          console.error("Error updating document: ", error);
+        }
+      } else {
+        console.error("No valid progress document found");
       }
     }
   };
@@ -186,7 +219,11 @@ export default function CancelRegistrationPage() {
             當日掛號人數
             <PeopleNumber>{result?.length}</PeopleNumber>
           </NumberRegisteredPeopleText>
-          <OpenClinicButton onClick={handleNext} disabled={!isOpen}>
+          <OpenClinicButton
+            onClick={handleNext}
+            disabled={!isOpen}
+            $isColor={true}
+          >
             <Text>下一位</Text>
           </OpenClinicButton>
           <ProgressNumberDisplayArea $isOpen={isOpen}>
@@ -203,23 +240,29 @@ export default function CancelRegistrationPage() {
             <OpenClinicButton
               onClick={() => handleButtonClick("morning")}
               disabled={currentPeriod && currentPeriod !== "morning"}
+              $isActive={selectedPeriod === "morning"}
+              $isColor={false}
             >
               <Text>上午</Text>
             </OpenClinicButton>
             <OpenClinicButton
               onClick={() => handleButtonClick("afternoon")}
               disabled={currentPeriod && currentPeriod !== "afternoon"}
+              $isActive={selectedPeriod === "afternoon"}
+              $isColor={false}
             >
               <Text>下午</Text>
             </OpenClinicButton>
             <OpenClinicButton
               onClick={() => handleButtonClick("evening")}
               disabled={currentPeriod && currentPeriod !== "evening"}
+              $isActive={selectedPeriod === "evening"}
+              $isColor={false}
             >
               <Text>夜間</Text>
             </OpenClinicButton>
           </ButtonArea>
-          <OpenClinicButton onClick={toggleClinic}>
+          <OpenClinicButton onClick={toggleClinic} $isColor={true}>
             <Text>{isOpen ? "結束就診" : "開始就診"}</Text>
           </OpenClinicButton>
         </Container>
@@ -230,10 +273,15 @@ export default function CancelRegistrationPage() {
 const ButtonArea = styled.div`
   display: flex;
   flex-direction: row;
+  gap: 20px;
+  @media (max-width: 768.1px) {
+    gap: 10px;
+  }
 `;
 
 const MainContainer = styled.div`
   display: flex;
+  align-items: center;
   flex-direction: column;
   height: auto;
   min-height: 100vh;
@@ -244,8 +292,25 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   background-color: transparent;
-  padding: 70px 320px 0;
+  padding: 80px 316px 40px;
   gap: 80px;
+  @media (max-width: 1440.1px) {
+    padding: 80px 200px 40px;
+  }
+  @media (max-width: 1280.1px) {
+    padding: 80px 180px 40px;
+  }
+  @media (max-width: 1024.1px) {
+    padding: 80px 150px 40px;
+  }
+  @media (max-width: 768.1px) {
+    width: 100%;
+    padding: 50px 50px 40px;
+  }
+  @media (max-width: 480.1px) {
+    padding: 40px 20px 40px;
+    gap: 50px;
+  }
 `;
 
 const DateContext = styled.div`
@@ -253,15 +318,27 @@ const DateContext = styled.div`
   flex-direction: row;
   align-items: center;
   gap: 50px;
+  @media (max-width: 768.1px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 30px;
+  }
 `;
 
 const DateText = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
+  justify-content: center;
   font-size: 24px;
   font-weight: 700;
   letter-spacing: 9.6px;
+  @media (max-width: 768.1px) {
+    justify-content: flex-start;
+    width: 100%;
+    font-size: 20px;
+    letter-spacing: 8.2px;
+  }
 `;
 
 const OpenClinicButton = styled.button`
@@ -270,6 +347,21 @@ const OpenClinicButton = styled.button`
   align-items: center;
   width: 100%;
   height: 50px;
+  background-color: ${(props) => {
+    if (props.disabled) return "#cccccc";
+    if (props.$isColor) return "#00b1c1de";
+    return props.$isActive ? "#0267b5de" : "#808080";
+  }};
+  color: #ffffff;
+  border: 1px solid #cccccc;
+  border-radius: 10px;
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+  cursor: ${(props) => (props.disabled ? "not-allowed" : "pointer")};
+  opacity: ${(props) => (props.disabled ? 0.5 : 1)};
+  &:hover {
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
+    opacity: ${(props) => (props.disabled ? 0.5 : 0.8)};
+  }
 `;
 
 const NumberRegisteredPeopleText = styled.div`
@@ -280,6 +372,11 @@ const NumberRegisteredPeopleText = styled.div`
   font-weight: 700;
   letter-spacing: 9.6px;
   gap: 50px;
+  @media (max-width: 768.1px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 30px;
+  }
 `;
 
 const PeopleNumber = styled.span`

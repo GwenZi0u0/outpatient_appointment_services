@@ -3,6 +3,8 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchDoctorsData } from "../../api";
 import { Link } from "react-router-dom";
 import SelectedIcon from "../../assets/selected.svg";
+import AuthWomenImg from "../../assets/authWomen.png";
+import AuthMenImg from "../../assets/authMen.png";
 
 export default function SelectDoctors({
   register,
@@ -13,38 +15,49 @@ export default function SelectDoctors({
   const { data } = useQuery({
     queryKey: ["doctors"],
     queryFn: fetchDoctorsData,
+    staleTime: 5 * 60 * 1000,
+    cacheTime: 60 * 60 * 1000,
   });
 
-  const hasDoctors = data?.some(
-    (doctor) =>
-      doctor.division.division_id === department.id &&
-      doctor.division.specialty_id === specialty.id
-  );
-
+  const filteredDoctors =
+    data?.filter(
+      (doctor) =>
+        doctor.division.division_id === department.id &&
+        doctor.division.specialty_id === specialty.id
+    ) || [];
   return (
     <>
-      {hasDoctors ? (
-        data?.map((doctor, index) =>
-          doctor.division.division_id === department.id &&
-          doctor.division.specialty_id === specialty.id ? (
-            <DoctorItem
-              key={doctor.id || index}
-              $borderBottom={index !== data.length - 1}
-              onClick={() => onDoctorClick(doctor)}
-              {...register("doctor")}
-            >
-              <CheckInput type="radio" name="doctor" defaultValue={doctor.id} />
-              <CheckIcon src={SelectedIcon} />
-              <DoctorImage src={doctor.physician_imag} />
-              <DoctorInfo>
-                <DoctorName>{doctor.physician_name} 醫師</DoctorName>
-                <DoctorTitle to={`/doctor-profile/${doctor.uid}`}>
-                  醫師簡介
-                </DoctorTitle>
-              </DoctorInfo>
-            </DoctorItem>
-          ) : null
-        )
+      {filteredDoctors.length > 0 ? (
+        filteredDoctors.map((doctor, index) => (
+          <DoctorItem
+            key={doctor.uid || index}
+            $borderBottom={
+              filteredDoctors.length > 1 && index !== filteredDoctors.length - 1
+            }
+            onClick={() => onDoctorClick(doctor)}
+            {...register("doctor")}
+          >
+            <CheckInput type="radio" name="doctor" defaultValue={doctor.uid} />
+            <CheckIcon src={SelectedIcon} />
+            <DoctorImage
+              src={
+                doctor.physician_imag ||
+                (doctor.physician_gender === 1 ? AuthMenImg : AuthWomenImg)
+              }
+            />
+            <DoctorInfo>
+              <DoctorName>{doctor.physician_name} 醫師</DoctorName>
+              <DoctorTitle
+                to={`/doctor-profile/${doctor.uid}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+              >
+                醫師簡介
+              </DoctorTitle>
+            </DoctorInfo>
+          </DoctorItem>
+        ))
       ) : (
         <Text>暫無安排醫師</Text>
       )}
@@ -68,6 +81,9 @@ const DoctorItem = styled.div`
     props.highlighted ? "#ffe6e6" : "transparent"};
   gap: 35px;
   cursor: pointer;
+  &:hover {
+    background-color: #b7c3da8a;
+  }
 `;
 
 const DoctorInfo = styled.div`
@@ -83,20 +99,48 @@ const DoctorName = styled.span`
   font-size: 24px;
 `;
 
+// Start of Selection
 const DoctorTitle = styled(Link)`
   text-decoration: none;
+  color: #0267b5;
+  font-size: 16px;
+  letter-spacing: 1px;
+  width: fit-content;
+  height: 20px;
+  position: relative;
+  &:hover {
+    &::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 100%;
+      height: 1px;
+      background-color: #0267b5;
+      transform: scaleX(0);
+      transform-origin: left;
+      animation: borderAnimation 0.2s forwards;
+    }
+  }
+
+  @keyframes borderAnimation {
+    to {
+      transform: scaleX(1);
+    }
+  }
 `;
 
 const CheckInput = styled.input`
   position: absolute;
-  margin-right: 65px;
+  top: 35px;
+  left: 60px;
   z-index: -1;
 `;
 
 const CheckIcon = styled.img`
   width: 50px;
   height: 50px;
-  background-color: #ffffff;
+  background-color: transparent;
 `;
 
 const DoctorImage = styled.img`
@@ -105,4 +149,5 @@ const DoctorImage = styled.img`
   background-color: gray;
   border-radius: 50%;
   object-fit: cover;
+  border: 1px solid #8282828a;
 `;

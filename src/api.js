@@ -1,9 +1,14 @@
 import { collection, getDocs, query, limit } from "firebase/firestore";
 import { fireDb } from "./firebase";
 
-const fetchCollectionData = async (collectionName, limitCount = 100) => {
+const FETCH_LIMIT = 100;
+
+const fetchCollectionData = async (
+  collectionName,
+  limitCount = FETCH_LIMIT
+) => {
   try {
-    const q = query(collection(fireDb, collectionName), limit(limitCount));
+    let q = query(collection(fireDb, collectionName), limit(limitCount));
     const querySnapshot = await getDocs(q);
     return querySnapshot.docs.map((doc) => ({
       id: doc.id,
@@ -15,21 +20,34 @@ const fetchCollectionData = async (collectionName, limitCount = 100) => {
   }
 };
 
-export const fetchDepartmentsData = () => fetchCollectionData("departments");
-export const fetchDoctorsData = () => fetchCollectionData("doctors");
-export const fetchSchedulesData = () => fetchCollectionData("schedules");
-export const fetchRegistrationData = () => fetchCollectionData("registrations");
-export const fetchPatientData = () => fetchCollectionData("patients");
-export const fetchUserData = () => fetchCollectionData("users");
-export const fetchProgressData = () => fetchCollectionData("progress");
-export const fetchRequestLeaveData = () => fetchCollectionData("request_leave");
+export const fetchDepartmentsData = () =>
+  fetchCollectionData("departments", FETCH_LIMIT, );
+export const fetchDoctorsData = () =>
+  fetchCollectionData("doctors", FETCH_LIMIT, );
+export const fetchSchedulesData = () =>
+  fetchCollectionData("schedules", FETCH_LIMIT, );
+export const fetchRegistrationData = () =>
+  fetchCollectionData("registrations", FETCH_LIMIT, );
+export const fetchPatientData = () =>
+  fetchCollectionData("patients", FETCH_LIMIT, );
+export const fetchUserData = () =>
+  fetchCollectionData("users", FETCH_LIMIT, );
+export const fetchProgressData = () =>
+  fetchCollectionData("progress", FETCH_LIMIT, );
+export const fetchRequestLeaveData = () =>
+  fetchCollectionData("request_leave", FETCH_LIMIT, );
+export const fetchNoticeData = () =>
+  fetchCollectionData("hospital_announcement", FETCH_LIMIT, );
 
-export const fetchDoctorsDataWithLimit = async (limitCount = 50) => {
+export const fetchDoctorsDataWithLimit = async (
+  limitCount = 50,
+) => {
   try {
-    const q = query(collection(fireDb, "doctors"), limit(limitCount));
+    let q = query(collection(fireDb, "doctors"), limit(limitCount));
     const querySnapshot = await getDocs(q);
     return querySnapshot.docs.map((doc) => ({
-      id: doc.uid, 
+      id: doc.id,
+      uid: doc.uid,
       ...doc.data(),
     }));
   } catch (error) {

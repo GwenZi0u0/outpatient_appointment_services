@@ -68,9 +68,31 @@ const formatWeeklyDates = (startDate) => {
   return weeks;
 };
 
+export const formatWeeklyDoctorDates = (startDate) => {
+  let formattedDates = [];
+  for (let i = 0; i < 56; i++) {
+    let currentDate = new Date(startDate);
+    currentDate.setDate(startDate.getDate() + i);
+
+    let day = currentDate.getDate();
+    let month = currentDate.getMonth() + 1;
+    let year = currentDate.getFullYear();
+
+    let dayKey = getDayKey(currentDate.getDay());
+
+    formattedDates.push(`${year}/${month}/${day} ${daysOfWeek[dayKey]}`);
+  }
+  let weeks = [];
+  for (let i = 0; i < formattedDates.length; i += 7) {
+    weeks.push(formattedDates.slice(i, i + 7));
+  }
+  return weeks;
+};
+
 const today = new Date();
 const monday = getMonday(today);
 export const weeks = formatWeeklyDates(monday);
+export const doctorWeeks = formatWeeklyDoctorDates(monday);
 
 export const isDisabled = (dateStr) => {
   const [datePart] = dateStr.split(" (");
@@ -89,6 +111,26 @@ export const isDisabled = (dateStr) => {
     return true;
   }
   return false;
+};
+
+export const isDoctorDisabled = (dateStr) => {
+  const [datePart] = dateStr.split(" (");
+  const [year, month, day] = datePart.split("/").map(Number);
+  const inputDate = new Date(year, month - 1, day);
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const fourWeeksLater = new Date(today);
+  fourWeeksLater.setDate(today.getDate() + 28);
+
+  if (inputDate < today) {
+    return true;
+  } else if (inputDate < fourWeeksLater) {
+    return true;
+  } else {
+    return false;
+  }
 };
 
 export const convertToTimestamp = (date) => {
@@ -114,7 +156,21 @@ export const filterRegistrationDataByCurrentDate = (mockDatabase) => {
   const currentDateFormatted = getCurrentDateInfo(new Date());
   const filteredData = mockDatabase?.filter((data) => {
     const currentOPDDate = getCurrentDateInfo(data.OPD_date);
-    const isDateMatching = currentOPDDate.every(
+    const isDateMatching = currentOPDDate?.every(
+      (component, index) => component === currentDateFormatted[index]
+    );
+    const isStatus = data.status === "confirmed";
+    return isDateMatching && isStatus;
+  });
+  return filteredData;
+};
+
+export const filterRegistrationDataByFutureDate = (mockDatabase) => {
+  if (!mockDatabase) return [];
+  const currentDateFormatted = getCurrentDateInfo(new Date());
+  const filteredData = mockDatabase?.filter((data) => {
+    const currentOPDDate = getCurrentDateInfo(data.OPD_date);
+    const isDateMatching = currentOPDDate?.every(
       (component, index) => component >= currentDateFormatted[index]
     );
     const isStatus = data.status === "confirmed";
@@ -124,16 +180,25 @@ export const filterRegistrationDataByCurrentDate = (mockDatabase) => {
 };
 
 export const isValidTaiwanID = (id) => {
-  if (!/^[A-Z]\d{9}$/.test(id)) return false;
-
-  const weights = [1, 9, 8, 7, 6, 5, 4, 3, 2, 1];
-  const letterToNumber = (letter) => letter.charCodeAt(0) - 55;
-
-  let sum = letterToNumber(id[0]) % 10;
-  for (let i = 1; i < id.length; i++) {
-    sum += Number(id[i]) * weights[i];
+  id = id.trim();
+  let verification = id.match("^[A-Z][12]\\d{8}$");
+  if (!verification) {
+    return false;
   }
-  return sum % 10 === 0;
+
+  let convert = "ABCDEFGHJKLMNPQRSTUVXYWZIO";
+  let weights = [1, 9, 8, 7, 6, 5, 4, 3, 2, 1, 1];
+
+  id = String(convert.indexOf(id[0]) + 10) + id.slice(1);
+
+  let checkSum = 0;
+  for (let i = 0; i < id.length; i++) {
+    let c = parseInt(id[i]);
+    let w = weights[i];
+    checkSum += c * w;
+  }
+  console.log(checkSum);
+  return checkSum % 10 == 0;
 };
 
 export const formatFirestoreTimestamp = (timestamp) => {
@@ -144,4 +209,15 @@ export const formatFirestoreTimestamp = (timestamp) => {
   const day = date.getDate();
 
   return `${year}/${month}/${day}`;
+};
+
+export const getToday = () => {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = today.getMonth() + 1;
+  const day = today.getDate();
+  const dayIndex = today.getDay();
+  const dayKey = getDayKey(dayIndex);
+
+  return { date: `${year}/${month}/${day}`, daysOfWeek: dayKey };
 };

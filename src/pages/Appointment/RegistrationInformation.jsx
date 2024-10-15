@@ -6,7 +6,7 @@ const useRegistrationInformationStore = create((set) => ({
   idNumber: "",
   birthday: "",
   name: "",
-  phone: "0912345666",
+  phone: "",
   setIdNumber: (value) => set({ idNumber: value }),
   setBirthday: (value) => set({ birthday: value }),
   setName: (value) => set({ name: value }),
@@ -41,11 +41,17 @@ export default function RegistrationInformation({
     time
   );
 
+  const handleReset = () => {
+    setIdNumber("");
+    setBirthday("");
+    setName("");
+    setPhone("");
+    onResetClick();
+  };
+
   const handleInputChange = (e) => {
     const { value } = e.target;
-    if (/^[A-Z]{0,1}[0-9]{0,9}$/.test(value)) {
-      setIdNumber(value);
-    }
+    setIdNumber(value);
   };
 
   const currentSchedule = schedule.find((s) => s.doctor_id === doctor?.uid);
@@ -57,37 +63,34 @@ export default function RegistrationInformation({
 
   return (
     <FormContainer onSubmit={handleSubmit}>
-      <h2>您欲預約的掛號資料為</h2>
+      <Title>您欲預約的掛號資料為</Title>
       <Table>
-        <thead>
-          <tr>
-            <Th>預約日期</Th>
-            <Th>時段</Th>
-            <Th>院區</Th>
-            <Th>科別</Th>
-            <Th>診間代號</Th>
-            <Th>醫師姓名</Th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <Td>{date || ""}</Td>
-            <Td>{timeSlots[time] || ""}</Td>
-            <Td>YOI Hospital</Td>
-            <Td>{specialty.specialty || ""}</Td>
-            <Td>{currentSchedule?.room || ""}</Td>
-            <Td>{doctor?.physician_name || ""}</Td>
-          </tr>
-        </tbody>
+        <TableHeader>
+          <TableHeaderRow>
+            <TableHeaderCell>預約日期</TableHeaderCell>
+            <TableHeaderCell>時段</TableHeaderCell>
+            <TableHeaderCell>院區</TableHeaderCell>
+            <TableHeaderCell>科別</TableHeaderCell>
+            <TableHeaderCell>診間代號</TableHeaderCell>
+            <TableHeaderCell>醫師姓名</TableHeaderCell>
+          </TableHeaderRow>
+        </TableHeader>
+        <Tbody>
+          <TableRow>
+            <TableCell>{date || ""}</TableCell>
+            <TableCell>{timeSlots[time] || ""}</TableCell>
+            <TableCell>YOI Hospital</TableCell>
+            <TableCell>{specialty.specialty || ""}</TableCell>
+            <TableCell>{currentSchedule?.room || ""}</TableCell>
+            <TableCell>{doctor?.physician_name || ""}</TableCell>
+          </TableRow>
+        </Tbody>
       </Table>
-      <Label>請選擇身分別格式:</Label>
-      <Select>
-        <option>身分證(10碼)</option>
-      </Select>
+      <Label>身分證(10碼) :</Label>
       <Input
         type="text"
         maxLength={10}
-        placeholder="A234567890"
+        placeholder="A123456789"
         onChange={handleInputChange}
         {...register("idNumber", {
           required: "請輸入身分證號碼",
@@ -98,17 +101,16 @@ export default function RegistrationInformation({
         })}
         required
       />
-
-      <Label>出生年/月/日:</Label>
+      <Label>出生年/月/日 :</Label>
       <Input
         type="date"
         defaultValue={birthday}
         onChange={(e) => setBirthday(e.target.value)}
         {...register("birthday", { required: "請選擇出生日期" })}
+        max={new Date().toISOString().split("T")[0]}
         required
       />
-
-      <Label>姓名:</Label>
+      <Label>姓名 :</Label>
       <Input
         type="text"
         value={name}
@@ -117,11 +119,11 @@ export default function RegistrationInformation({
         required
       />
 
-      <Label>聯絡電話:</Label>
+      <Label>聯絡電話 :</Label>
       <Input
         type="tel"
         maxLength={10}
-        value="0912345666"
+        placeholder="0912345666"
         onChange={(e) => setPhone(e.target.value)}
         {...register("phone", {
           required: "請輸入聯絡電話",
@@ -133,7 +135,7 @@ export default function RegistrationInformation({
       />
 
       <ButtonContainer>
-        <Button type="button" $btnColor={false} onClick={() => onResetClick()}>
+        <Button type="button" $btnColor={false} onClick={handleReset}>
           重新選擇
         </Button>
         <Button type="submit" $btnColor={true}>
@@ -152,6 +154,12 @@ const FormContainer = styled.div`
   border-radius: 5px;
 `;
 
+const Title = styled.p`
+  font-size: 28px;
+  font-weight: 500;
+  letter-spacing: 2px;
+`;
+
 const Table = styled.table`
   width: 100%;
   border-collapse: collapse;
@@ -159,16 +167,55 @@ const Table = styled.table`
   font-size: 22px;
 `;
 
-const Th = styled.th`
-  background-color: #f2f2f2;
+const TableHeader = styled.thead`
+  background-color: #cccccc;
+  color: #000000;
+  height: 50px;
+  border-radius: 10px;
+`;
+
+const TableHeaderRow = styled.tr`
+  font-size: 22px;
+  font-weight: 400;
+  letter-spacing: 5.6px;
+`;
+
+const TableHeaderCell = styled.th`
+  text-align: center;
+  background-color: #b7c3da;
   padding: 10px;
-  text-align: left;
   border: 1px solid #ddd;
 `;
 
-const Td = styled.td`
-  padding: 10px;
+const Tbody = styled.tbody`
+  height: 55px;
+`;
+
+const TableRow = styled.tr`
+  background-color: #ffffff;
+  height: 55px;
+  border-bottom: 1px solid #ddd;
+  @media (max-width: 1440.1px) {
+    height: 65px;
+  }
+`;
+
+const TableCell = styled.td`
+  text-align: center;
+  padding: 8px;
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: 2px;
   border: 1px solid #ddd;
+  @media (max-width: 1440.1px) {
+    font-size: 18px;
+  }
+  @media (max-width: 1024.1px) {
+    font-size: 18px;
+  }
+  @media (max-width: 480.1px) {
+    font-size: 16px;
+  }
 `;
 
 const Label = styled.label`
@@ -177,12 +224,12 @@ const Label = styled.label`
   margin-bottom: 15px;
 `;
 
-const Select = styled.select`
-  width: 100%;
-  padding: 15px;
-  margin-bottom: 10px;
-  font-size: 20px;
-`;
+// const Select = styled.select`
+//   width: 100%;
+//   padding: 15px;
+//   margin-bottom: 10px;
+//   font-size: 20px;
+// `;
 
 const Input = styled.input`
   width: 100%;

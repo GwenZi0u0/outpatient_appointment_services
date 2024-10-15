@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import styled from "styled-components";
-import { useMemo, useCallback } from "react";
+import { useMemo, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -17,24 +17,49 @@ import {
   formatFirestoreTimestamp,
   convertToTimestamp,
 } from "../../utils/dateUtils";
+import Return from "../../assets/return_Square.svg";
+import { PopUp } from "../../components/PopUp";
 
 const useAppointmentStore = create((set) => ({
   step: 1,
+  showPopup: false,
+  popupMessage: "",
   setStep: (newStep) => set({ step: newStep }),
+  setShowPopup: (newShowPopup) => set({ showPopup: newShowPopup }),
+  setPopupMessage: (popupMessage) => set({ popupMessage }),
 }));
 
 export default function Appointment() {
-  const navigator = useNavigate();
+  const navigate = useNavigate();
   const { state } = useLocation();
+  useEffect(() => {
+    if (!state || !state.department) {
+      navigate("/");
+    }
+  }, [state, navigate]);
+
+  if (!state || !state.department) {
+    return null;
+  }
+
   const { department } = state;
-  const { step, setStep } = useAppointmentStore();
+  const {
+    step,
+    setStep,
+    showPopup,
+    setShowPopup,
+    popupMessage,
+    setPopupMessage,
+  } = useAppointmentStore();
   const { data: scheduleData } = useQuery({
     queryKey: ["schedules"],
     queryFn: fetchSchedulesData,
+    refetchInterval: 60000,
   });
   const { data: registrationData } = useQuery({
     queryKey: ["registrations"],
     queryFn: fetchRegistrationData,
+    refetchInterval: 30000,
   });
 
   const { register, handleSubmit, setValue, watch, getValues } = useForm({
@@ -56,27 +81,45 @@ export default function Appointment() {
 
   const steps = useMemo(
     () => [
-      { step: 1, label: "請選擇科別" },
-      { step: 2, label: "請選擇醫生" },
-      { step: 3, label: "請選擇掛號時間" },
-      { step: 4, label: "掛號資訊確認" },
+      { step: 1, label: "選擇科別" },
+      { step: 2, label: "選擇醫生" },
+      { step: 3, label: "選擇掛號時間" },
+      { step: 4, label: "填寫掛號資訊" },
       { step: 5, label: "完成掛號" },
     ],
     []
   );
 
-  const handleReturnClick = useCallback(() => {
+  const handleReturnClick = () => {
     if (step === 1) {
-      navigator("/");
+      navigate("/");
       setTimeout(() => {
         document
           .getElementById("select-department")
           ?.scrollIntoView({ behavior: "smooth" });
       }, 0);
     } else {
+      switch (step) {
+        case 2:
+          setValue("specialty", "");
+          break;
+        case 3:
+          setValue("doctor", "");
+          break;
+        case 4:
+          setValue("date", "");
+          setValue("time", "");
+          break;
+        case 5:
+          setValue("idNumber", "");
+          setValue("birthday", "");
+          setValue("name", "");
+          setValue("phone", "");
+          break;
+      }
       setStep(step - 1);
     }
-  }, [step, navigator]);
+  };
 
   const handleSpecialtyClick = (specialty) => {
     setValue("specialty", specialty);
@@ -95,7 +138,18 @@ export default function Appointment() {
   };
 
   const handleCompleted = () => {
-    navigator("/");
+    setValue("department", "");
+    setValue("specialty", "");
+    setValue("doctor", "");
+    setValue("date", "");
+    setValue("time", "");
+    setValue("idNumber", "");
+    setValue("birthday", "");
+    setValue("name", "");
+    setValue("phone", "");
+    setValue("nextRegistrationNumber", "");
+    setStep(1);
+    navigate("/");
   };
 
   const birthdayStamp = (data) => {
@@ -121,12 +175,12 @@ export default function Appointment() {
 
   const onSubmit = async (data) => {
     if (!isValidTaiwanID(data.idNumber)) {
-      alert("身分證號碼輸入錯誤");
+      setShowPopup(true);
+      setPopupMessage("身分證號碼輸入錯誤");
       return;
     }
     const nextNumber = getNextRegistrationNumber(registrationData, data.time);
     setValue("nextRegistrationNumber", nextNumber);
-
     setValue("idNumber", data.idNumber);
     try {
       const docRef = await addDoc(collection(fireDb, "registrations"), {
@@ -155,10 +209,15 @@ export default function Appointment() {
   return (
     <Container>
       <Header>
-        <BackButton onClick={() => handleReturnClick()}>{"<< "}返回</BackButton>
         <Title>網路預約掛號流程</Title>
       </Header>
       <ProcessStep>
+        {step !== 5 && (
+          <BackButton onClick={() => handleReturnClick()}>
+            <ReturnText>{step === 1 ? "掛號首頁" : "上一步"}</ReturnText>
+            <BackIcon src={Return} />
+          </BackButton>
+        )}
         {steps.map((item, index) => (
           <Step
             key={item.step}
@@ -208,7 +267,21 @@ export default function Appointment() {
             schedule={scheduleData}
             getNextRegistrationNumber={getNextRegistrationNumber}
             registrationData={registrationData}
-            onResetClick={() => setStep(1)}
+            onResetClick={() => {
+              navigate("/");
+              setTimeout(() => {
+                document
+                  .getElementById("select-department")
+                  ?.scrollIntoView({ behavior: "smooth" });
+              }, 0);
+              setStep(1);
+              setValue("department", "");
+              setValue("specialty", "");
+              setValue("idNumber", "");
+              setValue("birthday", "");
+              setValue("name", "");
+              setValue("phone", "");
+            }}
             onSubmit={(idNumber, birthday, name, phone) =>
               onSubmit({ idNumber, birthday, name, phone })
             }
@@ -229,63 +302,129 @@ export default function Appointment() {
           />
         )}
       </ServiceList>
+      {showPopup && (
+        <PopUp>
+          <PopupContent>
+            <PopupMessage>{popupMessage}</PopupMessage>
+            <CloseButton onClick={() => setShowPopup(false)}>確定</CloseButton>
+          </PopupContent>
+        </PopUp>
+      )}
     </Container>
   );
 }
 
+const PopupContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+`;
+
+const BaseButton = styled.button`
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+`;
+
+const PopupMessage = styled.p`
+  font-size: 18px;
+  margin-bottom: 20px;
+  text-align: center;
+`;
+
+const CloseButton = styled(BaseButton)`
+  background-color: #244a8b;
+  color: white;
+  &:hover {
+    background-color: #1c3a6e;
+  }
+`;
+
 const Container = styled.div`
-  font-family: Arial, sans-serif;
   max-width: 1000px;
   margin: 0 auto;
-  padding-top: 100px;
+  padding: 100px 0 0px;
+  height: auto;
+  min-height: 100vh;
+  @media (max-width: 1024.1px) {
+    padding: 100px 40px 30px;
+  }
+  @media (max-width: 768.1px) {
+    padding: 100px 20px 20px;
+  }
 `;
 
 const Header = styled.div`
-  background-color: #b7c3da;
-  height: 46px;
+  background-color: #b7c3da8a;
+  width: 100%;
+  height: 45px;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  padding-right: 40%;
   gap: 150px;
-  border-radius: 2px;
+  border-radius: 10px;
+  position: relative;
 `;
 
-const BackButton = styled.button`
-  width: 148px;
-  height: 100%;
-  border: none;
+const BackButton = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row;
+  height: auto;
   color: #244a8b;
-  background-color: #ffc288;
-  font-size: 24px;
-  font-weight: 700;
-  opacity: 0.8;
-  border-radius: 2px;
+  background-color: #d3cdcd;
+  opacity: 1;
+  width: auto;
+  min-width: 120px;
+  height: 40px;
+  padding: 10px 5px;
+  border-radius: 10px;
   cursor: pointer;
+  &:hover {
+    opacity: 0.7;
+  }
 `;
 
-const Title = styled.h1`
-  margin-left: 20px;
-  font-size: 18px;
+const ReturnText = styled.span`
+  display: inline-block;
+  font-size: 16px;
+  text-align: center;
+  font-weight: 600;
+`;
+
+const BackIcon = styled.img`
+  width: 25px;
+  height: 25px;
+`;
+
+const Title = styled.span`
+  font-size: 28px;
+  font-weight: 600;
   color: #244a8b;
 `;
 
 const ProcessStep = styled.div`
-  font-size: 18px;
+  font-size: 19px;
   letter-spacing: 1px;
   background-color: transparent;
   padding: 11px 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  width: 100%;
+  gap: 10px;
 `;
 
 const Step = styled.div`
   display: flex;
   align-items: center;
-  width: 200px;
+  width: 180px;
   height: 45px;
-  padding-left: 40px;
+  padding-left: 32px;
   color: #ffffff;
   border-radius: 2px;
   background-color: ${(props) =>
@@ -296,21 +435,33 @@ const Step = styled.div`
       : props.$isLast
       ? "polygon(100% 0%, 0% 0%, 12% 50%, 0% 100%, 100% 100%)"
       : "polygon(0% 0%, 88% 0%, 100% 50%, 88% 100%, 0% 100%, 12% 50%)"};
+
+  @media (max-width: 1024.1px) {
+    font-size: 18px;
+    padding-left: 25px;
+  }
+  @media (max-width: 768.1px) {
+    font-size: 15px;
+    padding-left: 18px;
+  }
 `;
 
 const ServiceList = styled.form`
   border: 5px solid #d2cdcd;
   height: auto;
-  max-height: 840px;
+  max-height: calc(100vh - 278px);
   min-height: 50px;
   overflow-y: auto;
   overflow-x: hidden;
-  border-radius: 2px;
+  border-radius: 25px;
   scroll-behavior: smooth;
   scrollbar-width: none;
   -ms-overflow-style: none;
 
   &::-webkit-scrollbar {
     display: none;
+  }
+  @media (max-width: 768.1px) {
+    overflow-x: auto;
   }
 `;
