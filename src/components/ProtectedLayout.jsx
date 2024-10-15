@@ -51,7 +51,10 @@ export default function ProtectedLayout() {
             <SelectLink to="/class-schedule">門診班表</SelectLink>
             <SelectLink to={`/doctor-profile/${user.uid}`}>醫師簡介</SelectLink>
           </Menu>
-          <Profile onMouseEnter={() => setIsDropdownOpen(true)}>
+          <Profile 
+            onMouseEnter={() => setIsDropdownOpen(true)} 
+            onClick={() => setIsDropdownOpen((prev) => !prev)}
+          >
             <AuthImg
               src={(() => {
                 const doctor = data?.find((d) => d.uid === user.uid);

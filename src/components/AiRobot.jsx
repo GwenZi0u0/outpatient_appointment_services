@@ -64,7 +64,7 @@ export default function AiRobot({ handleCloseAI }) {
         );
 
         const parts = responseMessage.split(/(<[^>]+>)/);
-        let textContent = '';
+        let textContent = "";
         let selectCards = [];
 
         parts.forEach((part, index) => {
@@ -113,7 +113,14 @@ export default function AiRobot({ handleCloseAI }) {
           <>
             <div>{textContent}</div>
             {selectCards.length > 0 && (
-              <div style={{ marginTop: "20px", display: "flex", flexWrap: "wrap", gap: "10px" }}>
+              <div
+                style={{
+                  marginTop: "20px",
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: "10px",
+                }}
+              >
                 {selectCards}
               </div>
             )}
@@ -188,7 +195,8 @@ const ChatContainer = styled.div`
 const ChatWindow = styled.div`
   position: relative;
   width: 80%;
-  height: 80%;
+  height: 800px;
+  min-height: 80%;
   border: 1px solid #ccc;
   border-radius: 35px;
   padding: 20px;
@@ -196,17 +204,24 @@ const ChatWindow = styled.div`
   background-color: #00b0c1;
   display: flex;
   flex-direction: column;
+  @media (max-width: 768.1px) {
+    width: 90%;
+  }
 `;
 
 const CloseIcon = styled.img`
   position: absolute;
-  top: 10px;
+  top: 15px;
   right: 15px;
   cursor: pointer;
   width: 50px;
   height: 50px;
   margin-left: 10px;
   margin-right: 5px;
+  @media (max-width: 768.1px) {
+    width: 40px;
+    height: 40px;
+  }
 `;
 
 const InputContainer = styled.div`
@@ -234,7 +249,7 @@ const MessagesContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  min-height: 78%;
+  height: 75%;
   overflow-y: auto;
   border: 1px solid #ddd;
   margin-bottom: 10px;
@@ -272,6 +287,9 @@ const MessageWrapper = styled.div`
   font-weight: 500;
   color: #000;
   letter-spacing: 1px;
+  @media (max-width: 768.1px) {
+    max-width: 80%;
+  }
 `;
 
 const MessageEnd = styled.div`
@@ -291,9 +309,9 @@ const Title = styled.span`
   text-align: center;
   color: #ffffff;
   margin: 0;
-  padding: 8px 0;
+  padding: 20px 0;
   font-size: 28px;
-  font-weight: 500;
+  font-weight: 700;
   letter-spacing: 1px;
 `;
 
@@ -301,6 +319,12 @@ const Note = styled.div`
   color: #bb3131;
   font-size: 20px;
   font-weight: 500;
-  padding-top: 10px;
+  padding: 15px 0;
   letter-spacing: 1px;
+  @media (max-width: 768.1px) {
+    font-size: 18px;
+  }
+  @media (max-width: 480.1px) {
+    font-size: 16px;
+  }
 `;

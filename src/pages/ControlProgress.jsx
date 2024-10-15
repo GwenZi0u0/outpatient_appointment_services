@@ -274,6 +274,9 @@ const ButtonArea = styled.div`
   display: flex;
   flex-direction: row;
   gap: 20px;
+  @media (max-width: 768.1px) {
+    gap: 10px;
+  }
 `;
 
 const MainContainer = styled.div`
@@ -301,10 +304,12 @@ const Container = styled.div`
     padding: 80px 150px 40px;
   }
   @media (max-width: 768.1px) {
-    padding: 80px 50px 40px;
+    width: 100%;
+    padding: 50px 50px 40px;
   }
   @media (max-width: 480.1px) {
-    padding: 80px 20px 40px;
+    padding: 40px 20px 40px;
+    gap: 50px;
   }
 `;
 
@@ -313,6 +318,11 @@ const DateContext = styled.div`
   flex-direction: row;
   align-items: center;
   gap: 50px;
+  @media (max-width: 768.1px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 30px;
+  }
 `;
 
 const DateText = styled.div`
@@ -323,6 +333,12 @@ const DateText = styled.div`
   font-size: 24px;
   font-weight: 700;
   letter-spacing: 9.6px;
+  @media (max-width: 768.1px) {
+    justify-content: flex-start;
+    width: 100%;
+    font-size: 20px;
+    letter-spacing: 8.2px;
+  }
 `;
 
 const OpenClinicButton = styled.button`
@@ -356,6 +372,11 @@ const NumberRegisteredPeopleText = styled.div`
   font-weight: 700;
   letter-spacing: 9.6px;
   gap: 50px;
+  @media (max-width: 768.1px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 30px;
+  }
 `;
 
 const PeopleNumber = styled.span`

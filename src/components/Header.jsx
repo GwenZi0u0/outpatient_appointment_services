@@ -26,22 +26,25 @@ export default function Header() {
   useEffect(() => {
     const handleScroll = () => {
       window.requestAnimationFrame(() => {
-        setIsGradient(window.scrollY > 80);
+        const scrollPosition =
+          document.documentElement.scrollTop || document.body.scrollTop;
+        setIsGradient(scrollPosition > 80);
       });
     };
 
     if (isRootPath) {
-      window.addEventListener("scroll", handleScroll);
+      document.addEventListener("scroll", handleScroll);
       setIsGradient(false);
     } else {
       setIsGradient(true);
     }
 
-    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
 
     return () => {
       if (isRootPath) {
-        window.removeEventListener("scroll", handleScroll);
+        document.removeEventListener("scroll", handleScroll);
       }
     };
   }, [isRootPath]);
@@ -60,10 +63,7 @@ export default function Header() {
           <LogoIcon src={Logo} alt="Logo" $isGradient={isGradient} />
         </LogoLink>
         <Menu $isGradient={isGradient}>
-          <SelectLink
-            to="/"
-            $isGradient={isGradient}
-          >
+          <SelectLink to="/" $isGradient={isGradient}>
             掛號首頁
           </SelectLink>
           <SelectLink to="/cancel-registration" $isGradient={isGradient}>

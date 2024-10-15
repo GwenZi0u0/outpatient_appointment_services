@@ -107,12 +107,21 @@ const MainContainer = styled.div`
   height: auto;
   min-height: 100vh;
   padding: 80px 0 40px;
+  @media (max-width: 768.1px) {
+    padding: 80px 20px 40px;
+  }
 `;
 
 const ProfileContainer = styled.div`
   width: 850px;
   margin: 0 auto;
-  border-radius: 8px;
+  border-radius: 10px;
+  @media (max-width: 1024.1px) {
+    width: 90%;
+  }
+  @media (max-width: 768.1px) {
+    width: 100%;
+  }
 `;
 
 const TitleContainer = styled.div`
@@ -126,6 +135,9 @@ const Title = styled.h2`
   align-items: center;
   font-size: 32px;
   margin-bottom: 20px;
+  @media (max-width: 480.1px) {
+    font-size: 28px;
+  }
 `;
 
 const TitleImg = styled.img`
@@ -141,6 +153,9 @@ const ProfileContent = styled.div`
   border-radius: 8px;
   padding: 20px;
   gap: 20px;
+  @media (max-width: 768.1px) {
+    gap: 0;
+  }
 `;
 
 const ImageContainer = styled.div`
@@ -153,6 +168,9 @@ const ImageContainer = styled.div`
   overflow: hidden;
   padding: 20px;
   gap: 20px;
+  @media (max-width: 768.1px) {
+    gap: 0;
+  }
 `;
 
 const ProfileImage = styled.img`
@@ -165,6 +183,11 @@ const ProfileImage = styled.img`
 const InfoContainer = styled.div`
   padding: 10px;
   flex: 1;
+  @media (max-width: 768.1px) {
+    width: 100%;
+    text-align: left;
+    padding: 0 15px;
+  }
 `;
 
 const Name = styled.h3`
@@ -172,6 +195,9 @@ const Name = styled.h3`
   font-size: 25px;
   color: #0267b5;
   margin-bottom: 10px;
+  @media (max-width: 768.1px) {
+    font-size: 22px;
+  }
 `;
 
 const PositionContainer = styled.div`
@@ -181,18 +207,30 @@ const PositionContainer = styled.div`
   font-weight: 400;
   gap: 10px;
   padding: 10px;
+  @media (max-width: 480.1px) {
+    font-size: 20px;
+    gap: 0;
+  }
 `;
 
 const ProfileInfoContainer = styled.div`
   display: flex;
   align-items: flex-start;
   gap: 25px;
+  @media (max-width: 768.1px) {
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
 `;
 
 const Position = styled.p`
   font-weight: 700;
   font-size: 24px;
   letter-spacing: 2px;
+  @media (max-width: 480.1px) {
+    font-size: 22px;
+  }
 `;
 
 const SpecialtiesContainer = styled.div`
@@ -211,6 +249,13 @@ const SpecialtyTag = styled.span`
   border-radius: 20px;
   font-size: 22px;
   letter-spacing: 2px;
+  @media (max-width: 768.1px) {
+    font-size: 20px;
+  }
+  @media (max-width: 480.1px) {
+    padding: 8px 15px;
+    font-size: 18px;
+  }
 `;
 
 const DetailsList = styled.ul`
@@ -218,12 +263,21 @@ const DetailsList = styled.ul`
   padding: 0;
   letter-spacing: 2px;
   line-height: 2.2;
+  @media (max-width: 480.1px) {
+    line-height: 2;
+  }
 `;
 
 const DetailItem = styled.li`
   text-align: left;
   font-size: 22px;
   font-weight: 450;
+  @media (max-width: 768.1px) {
+    font-size: 20px;
+  }
+  @media (max-width: 480.1px) {
+    font-size: 17px;
+  }
 `;
 
 const AdditionalInfo = styled.div`
@@ -234,4 +288,10 @@ const AdditionalInfo = styled.div`
   letter-spacing: 2px;
   line-height: 2.2;
   min-height: 100px;
+  @media (max-width: 480.1px) {
+    font-size: 18px;
+    line-height: 2;
+    padding: 10px;
+    min-height: 80px;
+  }
 `;

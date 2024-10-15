@@ -11,15 +11,23 @@ const GlobalStyles = createGlobalStyle`
         padding: 0;
         margin: 0;
         background-color: #FFFDF9;
+        
     }
-    #root {
-    height: 100vh;
-    overflow-y: auto;
-    scrollbar-width: none; 
-    -ms-overflow-style: none; 
-    &::-webkit-scrollbar {
-      display: none; 
-    }
+    html, body {
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: #ccc #f1f1f1;
+        &::-webkit-scrollbar {
+            width: 8px; 
+            height: 8px;
+        }
+        &::-webkit-scrollbar-thumb {
+            background-color: #ccc;
+            border-radius: 10px;
+        }
+        &::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
     }
 `;
 export default GlobalStyles;

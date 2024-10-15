@@ -36,14 +36,25 @@ const Button = styled.button`
   &:hover {
     transform: scale(1.1);
   }
+  @media (max-width: 480.1px) {
+    width: 90px;
+    height: 90px;
+  }
 `;
 
 const RobotImg = styled.img`
   width: 70px;
   height: 70px;
+  @media (max-width: 480.1px) {
+    width: 50px;
+    height: 50px;
+  }
 `;
 
 const Text = styled.span`
   font-size: 15px;
   font-weight: 500;
+  @media (max-width: 480.1px) {
+    font-size: 12px;
+  }
 `;

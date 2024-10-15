@@ -346,6 +346,13 @@ const HintContainer = styled.div`
   flex-direction: column;
   width: 85%;
   padding: 20px;
+  @media (max-width: 768.1px) {
+    padding: 20px;
+    width: 100%;
+  }
+  @media (max-width: 480.1px) {
+    padding: 10px;
+  }
 `;
 
 const Hint = styled.div`
@@ -449,7 +456,7 @@ const CalendarContainer = styled.div`
     padding: 100px 50px 20px;
   }
   @media (max-width: 768.1px) {
-    padding: 100px 0px 20px;
+    padding: 85px 0px 20px;
   }
 `;
 
@@ -458,6 +465,13 @@ const ConfirmedContainer = styled.div`
   flex-direction: row;
   padding: 20px 30px;
   width: 85%;
+  @media (max-width: 768.1px) {
+    padding: 20px 20px;
+    width: 100%;
+  }
+  @media (max-width: 480.1px) {
+    padding: 20px 15px;
+  }
 `;
 
 const Confirmed = styled.div`
@@ -472,6 +486,13 @@ const ConfirmedTitle = styled.div`
   font-weight: bold;
   letter-spacing: 2.5px;
   width: auto;
+  @media (max-width: 768.1px) {
+    font-size: 18px;
+    width: 100%;
+  }
+  @media (max-width: 480.1px) {
+    font-size: 16px;
+  }
 `;
 
 const Button = styled.button`
@@ -488,6 +509,9 @@ const Button = styled.button`
   &:hover {
     background-color: #00b1c1;
   }
+  @media (max-width: 768.1px) {
+    width: 300px;
+  }
 `;
 
 const TableWrapper = styled.div`
@@ -498,6 +522,14 @@ const TableWrapper = styled.div`
   align-items: center;
   padding: 20px;
   font-size: 20px;
+  @media (max-width: 768.1px) {
+    width: 100%;
+    padding: 15px;
+  }
+  @media (max-width: 480.1px) {
+    font-size: 18px;
+    padding: 10px;
+  }
 `;
 
 const StyledTable = styled.table`

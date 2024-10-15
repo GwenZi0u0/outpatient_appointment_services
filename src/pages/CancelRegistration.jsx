@@ -399,6 +399,8 @@ const SearchContainer = styled.div`
   @media (max-width: 1024.1px) {
     align-items: center;
   }
+  @media (max-width: 768.1px) {
+  }
 `;
 
 const SearchFrame = styled.div`
@@ -416,7 +418,7 @@ const SearchFrame = styled.div`
   }
   @media (max-width: 480.1px) {
     width: 90%;
-    padding-left: 0px;
+    padding-left: 0;
   }
 `;
 
@@ -446,6 +448,7 @@ const SearchButton = styled.button`
   border: none;
   border-radius: 10px;
   width: 100px;
+  min-width: 80px;
   height: 50px;
   padding: 0 20px;
   font-size: 18px;
@@ -472,30 +475,21 @@ const Input = styled.input`
   @media (max-width: 1024.1px) {
     min-width: 300px;
   }
+  @media (max-width: 768.1px) {
+    min-width: 200px;
+  }
+  @media (max-width: 480.1px) {
+    min-width: 150px;
+  }
 `;
-
-// const Input = styled.input`
-//   width: auto;
-//   min-width: 500px;
-//   height: 50px;
-//   padding: 10px;
-//   font-size: 18px;
-//   border: 1px solid #cccccc;
-//   border-radius: 5px;
-//   &:focus {
-//     outline: none;
-//     border: 2px solid #244a8b;
-//   }
-//   @media (max-width: 1024.1px) {
-//     min-width: 350px;
-//     margin-left: 0;
-//   }
-// `;
 
 const Hint = styled.span`
   font-size: 14px;
   font-weight: 400;
   color: #666666;
+  @media (max-width: 480.1px) {
+    font-size: 12px;
+  }
 `;
 
 const Table = styled.table`
@@ -543,10 +537,11 @@ const TableCell = styled.td`
     font-size: 20px;
   }
   @media (max-width: 1024.1px) {
-    font-size: 18px;
+    font-size: 17px;
     letter-spacing: 4.4px;
   }
   @media (max-width: 768.1px) {
+    font-size: 16px;
     letter-spacing: 3.3px;
   }
 `;

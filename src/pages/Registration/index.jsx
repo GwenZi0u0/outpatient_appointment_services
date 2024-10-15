@@ -460,14 +460,14 @@ const SelectRegion = styled.div`
     padding: 20px 70px 100px;
   }
   @media (max-width: 1024.1px) {
-    padding: 20px 30px 100px;
+    padding: 20px 30px 80px;
   }
   @media (max-width: 768.1px) {
-    padding: 20px 30px 100px;
+    padding: 20px 30px 50px;
     gap: 20px;
   }
   @media (max-width: 480.1px) {
-    padding: 20px 10px 100px;
+    padding: 20px 10px 40px;
   }
 `;
 
