@@ -1,5 +1,5 @@
-import styled from "styled-components";
 import { useQuery } from "@tanstack/react-query";
+import styled from "styled-components";
 import { fetchRegistrationData } from "../../api";
 
 export default function RegistrationCompleted({

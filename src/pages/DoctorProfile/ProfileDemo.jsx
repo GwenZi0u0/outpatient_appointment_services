@@ -1,9 +1,9 @@
-import styled from "styled-components";
 import { useMemo } from "react";
 import { useParams } from "react-router-dom";
-import ProfileDoctor from "../../assets/profileDoctor.svg";
+import styled from "styled-components";
 import AuthMenImg from "../../assets/authMen.png";
 import AuthWomenImg from "../../assets/authWomen.png";
+import ProfileDoctor from "../../assets/profileDoctor.svg";
 
 export default function ProfileDemo({
   calculateAge,

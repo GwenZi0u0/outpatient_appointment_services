@@ -1,5 +1,5 @@
-import { create } from "zustand";
 import styled from "styled-components";
+import { create } from "zustand";
 import { timeSlots } from "../../utils/dateUtils";
 
 const useRegistrationInformationStore = create((set) => ({

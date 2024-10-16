@@ -1,24 +1,24 @@
-import { create } from "zustand";
-import styled from "styled-components";
-import { useMemo, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { addDoc, collection, Timestamp } from "firebase/firestore";
+import { useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import { fetchSchedulesData, fetchRegistrationData } from "../../api";
-import SelectSpecialties from "./SelectSpecialties";
-import SelectDoctors from "./SelectDoctors";
-import SelectTime from "./SelectTime";
-import RegistrationInformation from "./RegistrationInformation";
-import RegistrationCompleted from "./RegistrationCompleted";
-import { collection, addDoc, Timestamp } from "firebase/firestore";
-import { fireDb } from "../../firebase";
-import {
-  isValidTaiwanID,
-  formatFirestoreTimestamp,
-  convertToTimestamp,
-} from "../../utils/dateUtils";
+import styled from "styled-components";
+import { create } from "zustand";
+import { fetchRegistrationData, fetchSchedulesData } from "../../api";
 import Return from "../../assets/return_Square.svg";
 import { PopUp } from "../../components/PopUp";
+import { fireDb } from "../../firebase";
+import {
+  convertToTimestamp,
+  formatFirestoreTimestamp,
+  isValidTaiwanID,
+} from "../../utils/dateUtils";
+import RegistrationCompleted from "./RegistrationCompleted";
+import RegistrationInformation from "./RegistrationInformation";
+import SelectDoctors from "./SelectDoctors";
+import SelectSpecialties from "./SelectSpecialties";
+import SelectTime from "./SelectTime";
 
 const useAppointmentStore = create((set) => ({
   step: 1,

@@ -1,13 +1,13 @@
-import styled from "styled-components";
-import { Outlet, Navigate, Link } from "react-router-dom";
-import { useAuth } from "../contexts/AuthContext";
-import Logo from "../assets/Logo.svg";
-import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { Link, Navigate, Outlet } from "react-router-dom";
+import styled from "styled-components";
 import { fetchDoctorsDataWithLimit } from "../api";
-import Loading from "../assets/loading.gif";
-import AuthWomenImg from "../assets/authWomen.png";
 import AuthMenImg from "../assets/authMen.png";
+import AuthWomenImg from "../assets/authWomen.png";
+import Loading from "../assets/loading.gif";
+import Logo from "../assets/Logo.svg";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function ProtectedLayout() {
   const { user, loading, signOut } = useAuth((state) => ({
@@ -21,7 +21,7 @@ export default function ProtectedLayout() {
     queryKey: ["fetchDoctors"],
     queryFn: () => fetchDoctorsDataWithLimit(),
     staleTime: 5 * 60 * 1000,
-  })
+  });
   if (loading) {
     return (
       <LoadingContainer>
@@ -51,8 +51,8 @@ export default function ProtectedLayout() {
             <SelectLink to="/class-schedule">門診班表</SelectLink>
             <SelectLink to={`/doctor-profile/${user.uid}`}>醫師簡介</SelectLink>
           </Menu>
-          <Profile 
-            onMouseEnter={() => setIsDropdownOpen(true)} 
+          <Profile
+            onMouseEnter={() => setIsDropdownOpen(true)}
             onClick={() => setIsDropdownOpen((prev) => !prev)}
           >
             <AuthImg

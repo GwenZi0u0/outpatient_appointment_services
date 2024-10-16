@@ -1,15 +1,15 @@
-import styled, { keyframes } from "styled-components";
-import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { fetchDepartmentsData } from "../../api";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import styled, { keyframes } from "styled-components";
+import { fetchDepartmentsData } from "../../api";
+import AnnouncementImg from "../../assets/announcementImage.svg";
 import BackGround from "../../assets/background.svg";
 import BackGroundMobile from "../../assets/background_mobile.svg";
-import AnnouncementImg from "../../assets/announcementImage.svg";
-import Loading from "../../components/Loading";
-import CusService from "../../components/CusService";
 import AiRobot from "../../components/AiRobot";
+import CusService from "../../components/CusService";
+import Loading from "../../components/Loading";
 
 const carouselData = new Map([
   // [

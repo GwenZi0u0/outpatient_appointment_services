@@ -1,14 +1,14 @@
-import { create } from "zustand";
-import { useMemo, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useEffect, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import styled from "styled-components";
-import { useQuery } from "@tanstack/react-query";
+import { create } from "zustand";
 import {
   fetchDepartmentsData,
   fetchDoctorsData,
-  fetchSchedulesData,
-  fetchRegistrationData,
   fetchProgressData,
+  fetchRegistrationData,
+  fetchSchedulesData,
 } from "../api";
 import {
   filterRegistrationDataByCurrentDate,

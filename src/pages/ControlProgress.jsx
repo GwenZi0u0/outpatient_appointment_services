@@ -1,22 +1,22 @@
-import { create } from "zustand";
-import styled from "styled-components";
-import { useAuth } from "../contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
-import { fetchProgressData, fetchRegistrationData } from "../api";
-import { Timestamp } from "firebase/firestore";
-import { useEffect, useMemo } from "react";
-import { fireDb } from "../firebase";
 import {
-  collection,
   addDoc,
-  getDocs,
-  query,
-  where,
+  collection,
   deleteDoc,
   doc,
   getDoc,
+  getDocs,
+  query,
+  Timestamp,
   updateDoc,
+  where,
 } from "firebase/firestore";
+import { useEffect, useMemo } from "react";
+import styled from "styled-components";
+import { create } from "zustand";
+import { fetchProgressData, fetchRegistrationData } from "../api";
+import { useAuth } from "../contexts/AuthContext";
+import { fireDb } from "../firebase";
 
 export default function CancelRegistrationPage() {
   const useControlProgressStore = create((set) => ({

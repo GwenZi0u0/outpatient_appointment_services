@@ -1,19 +1,19 @@
-import { useState, useEffect, useMemo } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { create } from "zustand";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { doc, updateDoc } from "firebase/firestore";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
-import { fireDb, fireStorage } from "../../firebase";
+import { create } from "zustand";
 import AuthMenImg from "../../assets/authMen.png";
 import AuthWomenImg from "../../assets/authWomen.png";
-import ProfileDoctor from "../../assets/profileDoctor.svg";
 import EditImage from "../../assets/editImage.svg";
 import EditProfileIcon from "../../assets/editProfileIcon.svg";
+import ProfileDoctor from "../../assets/profileDoctor.svg";
 import SaveProfile from "../../assets/save.svg";
 import CancelIcon from "../../assets/x-square.svg";
 import RemoveIcon from "../../assets/x.svg";
 import { PopUp } from "../../components/PopUp";
+import { fireDb, fireStorage } from "../../firebase";
 
 const useEditProfile = create((set) => ({
   showPopup: false,
@@ -678,7 +678,7 @@ const AdditionalInfo = styled.div`
   letter-spacing: 2px;
   line-height: 2.2;
   min-height: 100px;
-  @media(max-width: 480.1px) {
+  @media (max-width: 480.1px) {
     font-size: 18px;
     line-height: 2;
     padding: 10px;

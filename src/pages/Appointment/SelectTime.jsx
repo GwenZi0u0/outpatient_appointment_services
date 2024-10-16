@@ -1,6 +1,6 @@
 import { useState } from "react";
 import styled from "styled-components";
-import { timeSlots, weeks, isDisabled, dayKeys } from "../../utils/dateUtils";
+import { dayKeys, isDisabled, timeSlots, weeks } from "../../utils/dateUtils";
 
 export default function SelectTime({
   register,

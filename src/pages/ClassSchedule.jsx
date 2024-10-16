@@ -1,31 +1,31 @@
-import { create } from "zustand";
+import { useQuery } from "@tanstack/react-query";
+import {
+  addDoc,
+  collection,
+  deleteDoc,
+  doc,
+  Timestamp,
+  updateDoc,
+} from "firebase/firestore";
 import { useMemo } from "react";
 import styled from "styled-components";
-import { useQuery } from "@tanstack/react-query";
+import { create } from "zustand";
 import {
   fetchDepartmentsData,
   fetchDoctorsData,
-  fetchSchedulesData,
   fetchRequestLeaveData,
+  fetchSchedulesData,
 } from "../api";
+import { PopUp } from "../components/PopUp";
 import { useAuth } from "../contexts/AuthContext";
-import {
-  collection,
-  addDoc,
-  Timestamp,
-  deleteDoc,
-  doc,
-  updateDoc,
-} from "firebase/firestore";
 import { fireDb } from "../firebase";
 import {
-  timeSlots,
-  isDoctorDisabled,
-  doctorWeeks,
   convertToTimestamp,
   dayKeys,
+  doctorWeeks,
+  isDoctorDisabled,
+  timeSlots,
 } from "../utils/dateUtils";
-import { PopUp } from "../components/PopUp";
 
 const useClassSchedule = create((set) => ({
   selectedDateTimes: [],

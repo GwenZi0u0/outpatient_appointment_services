@@ -1,16 +1,16 @@
-import styled from "styled-components";
-import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import styled from "styled-components";
 import { fetchDepartmentsData } from "../api";
 import SentIcon from "../assets/sent.png";
 import CloseImg from "../assets/x-circle.svg";
-import CallOpenAI from "./CallOpenAI";
 import {
   SelectCard,
   SelectCardImage,
   SelectCardTitle,
 } from "../pages/Registration";
+import CallOpenAI from "./CallOpenAI";
 
 export default function AiRobot({ handleCloseAI }) {
   const [messages, setMessages] = useState([]);

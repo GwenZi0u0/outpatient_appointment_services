@@ -1,4 +1,5 @@
 # Project Structure
+
 ```
 ├── public              # Static files (images, fonts, etc.)
 │
@@ -29,9 +30,9 @@
 │   ├── api.js          # API service functions to interact with backend
 │   ├── App.jsx         # Main application component
 │   └── main.jsx        # Entry point for the React application
-│ 
+│
 index.html              # Homepage, entry point for the web app
-│ 
+│
 ├── .gitignore          # Files to ignore in Git
 ├── package.json        # Project dependencies and scripts
 ├── vite.config.js      # Vite configuration file
