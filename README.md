@@ -2,48 +2,85 @@
 
 outpatient_appointment_services
 
+## Introduction
+
+> Objective
+- Create an online appointment booking website. 
+- The expected difference from others on the market is to streamline the appointment scheduling process.
+
+> User
+- Doctor, Nurse
+- Patient
+
+> Pain points of online registration pages on the market:
+- Font is too small, and operation buttons are unclear.
+- The online registration system can be made clearer, with easy-to-understand buttons and a user-friendly interface.
+
 ## Table of Contents
 
 - [Getting Started](#getting-started)
 - [Installation](#installation)
 - [Running the Project](#running-the-project)
-- [Technologies Used](#technologies-used)
+- [Project Structure](#project-structure)
+- [Tech Stack](#tech-stack)
 
 ## Getting Started
 
-This project is a simple application built with React, Vite, Zustand, and styled-components. It serves as a starting point for building modern web applications with these technologies.
+his project is a simple application built with React, Vite, Zustand, styled-components, useQuery, and useForm. It serves as a starting point for building modern web applications with these technologies.
 
 ## Installation
 
 Follow these steps to get the project up and running on your local machine:
 
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/yourusername/your-repo-name.git
-   cd your-repo-name
-   ```
-2. **Install the dependencies:**
-
-   Make sure you have Node.js and yarn installed.
-
-   ```bash
-   yarn install
-   ```
-
+1. **Install packages:**
+    
+    Make sure you have Node.js and yarn installed.
+     ```bash
+    yarn install
+    ```
+    
 ## Running the Project
 
 To run the project locally:
-
 ```bash
 yarn dev
 ```
 
-## Technologies Used
+Run prod site mode
 
+```bash
+yarn build
+```
+
+## Project Structure
+
+The detailed structural information of this project has been moved to the [dedicated document](./PROJECT_STRUCTURE.md).
+
+## Tech Stack
+
+**Frontend**
 - React: A JavaScript library for building user interfaces.
 - Vite: A fast development build tool for modern web projects.
+
+**State Management**
+- Zustand: A small, fast state management solution using hooks.
+
+**Styling**
 - styled-components: A library for styling React components using tagged template literals.
-- Zustand:State management.
+
+**Data Fetching**
+- useQuery(@tanstack/react-query): An opinionated, efficient library for managing server state and handling data fetching or updating.
+
+**Form Handling**
+- useForm(react-hook-form): A hook for managing and handling form state, simplifying input validation and submission.
+
+### Features
+
+- Modular and scalable structure.
+- Simple yet powerful state management using Zustand.
+- Responsive and reusable components styled with styled-components.
+- Data fetching and caching through useQuery, ensuring efficient server communication.
+- Easy form handling and validation using useForm.
 
 # React + Vite
 
