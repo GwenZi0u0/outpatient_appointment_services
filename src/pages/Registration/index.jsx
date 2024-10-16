@@ -9,7 +9,7 @@ import BackGround from "../../assets/svg/background.svg";
 import BackGroundMobile from "../../assets/svg/backgroundMobile.svg";
 import AiRobot from "../../components/AiRobot";
 import CusService from "../../components/CusService";
-import Loading from "../../components/Loading";
+import Loading from "../../components/common/Loading";
 
 const carouselData = new Map([
   // [

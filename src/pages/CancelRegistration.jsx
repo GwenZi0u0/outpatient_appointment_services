@@ -10,7 +10,7 @@ import {
   fetchRegistrationData,
   fetchSchedulesData,
 } from "../api";
-import { PopUp } from "../components/PopUp";
+import { PopUp } from "../components/common/PopUp";
 import { fireDb } from "../firebase";
 import {
   filterRegistrationDataByFutureDate,

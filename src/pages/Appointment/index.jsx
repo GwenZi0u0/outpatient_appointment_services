@@ -7,7 +7,7 @@ import styled from "styled-components";
 import { create } from "zustand";
 import { fetchRegistrationData, fetchSchedulesData } from "../../api";
 import Return from "../../assets/svg/returnIcon.svg";
-import { PopUp } from "../../components/PopUp";
+import { PopUp } from "../../components/common/PopUp";
 import { fireDb } from "../../firebase";
 import {
   convertToTimestamp,

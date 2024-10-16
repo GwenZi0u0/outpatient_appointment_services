@@ -16,7 +16,7 @@ import {
   fetchRequestLeaveData,
   fetchSchedulesData,
 } from "../api";
-import { PopUp } from "../components/PopUp";
+import { PopUp } from "../components/common/PopUp";
 import { useAuth } from "../contexts/AuthContext";
 import { fireDb } from "../firebase";
 import {

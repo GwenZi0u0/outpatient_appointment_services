@@ -12,7 +12,7 @@ import EditImage from "../../assets/svg/editImgIcon.svg";
 import SaveProfile from "../../assets/svg/saveIcon.svg";
 import CancelIcon from "../../assets/svg/x-square.svg";
 import RemoveIcon from "../../assets/svg/xIcon.svg";
-import { PopUp } from "../../components/PopUp";
+import { PopUp } from "../../components/common/PopUp";
 import { fireDb, fireStorage } from "../../firebase";
 
 const useEditProfile = create((set) => ({
