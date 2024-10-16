@@ -1,5 +1,5 @@
 # Project Structure
-
+```
 ├── public              # Static files (images, fonts, etc.)
 │
 ├── src
@@ -39,3 +39,4 @@ index.html              # Homepage, entry point for the web app
 ├── firebase.json       # Firebase project configuration
 ├── yarn.lock           # Yarn lockfile for consistent package installations
 └── README.md           # Project documentation
+```
