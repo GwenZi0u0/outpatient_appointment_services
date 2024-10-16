@@ -7,9 +7,9 @@ import { fetchDepartmentsData } from "../../api";
 import AnnouncementImg from "../../assets/svg/announcementImage.svg";
 import BackGround from "../../assets/svg/background.svg";
 import BackGroundMobile from "../../assets/svg/backgroundMobile.svg";
-import AiRobot from "../../components/AiRobot";
-import CusService from "../../components/CusService";
+import AiRobot from "../../components/features/AiRobot";
 import Loading from "../../components/common/Loading";
+import CusService from "../../components/features/CusService";
 
 const carouselData = new Map([
   // [
