@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import SelectedIcon from "../../assets/selected.svg";
+import SelectedIcon from "../../assets/svg/selectedIcon.svg";
 
 export default function SelectSpecialties({
   register,

@@ -4,10 +4,10 @@ import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { create } from "zustand";
 import { fetchNoticeData } from "../api";
-import Loading from "../assets/loading.gif";
-import Lock from "../assets/Lock.svg";
-import KeyIcon from "../assets/login_key.svg";
-import UserIcon from "../assets/login_user.svg";
+import Loading from "../assets/videos/loading.gif";
+import Lock from "../assets/svg/lock.svg";
+import KeyIcon from "../assets/svg/loginKeyIcon.svg";
+import UserIcon from "../assets/svg/loginUserIcon.svg";
 import { useAuth } from "../contexts/AuthContext";
 
 const useLoginStore = create((set) => ({

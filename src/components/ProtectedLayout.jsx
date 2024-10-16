@@ -3,10 +3,10 @@ import { useState } from "react";
 import { Link, Navigate, Outlet } from "react-router-dom";
 import styled from "styled-components";
 import { fetchDoctorsDataWithLimit } from "../api";
-import AuthMenImg from "../assets/authMen.png";
-import AuthWomenImg from "../assets/authWomen.png";
-import Loading from "../assets/loading.gif";
-import Logo from "../assets/Logo.svg";
+import AuthMenImg from "../assets/images/authMen.png";
+import AuthWomenImg from "../assets/images/authWomen.png";
+import Loading from "../assets/videos/loading.gif";
+import Logo from "../assets/svg/logo.svg";
 import { useAuth } from "../contexts/AuthContext";
 
 export default function ProtectedLayout() {

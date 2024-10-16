@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import Robot from "../assets/Robot.png";
+import Robot from "../assets/images/robot.png";
 
 export default function CusService({ handleClick }) {
   return (

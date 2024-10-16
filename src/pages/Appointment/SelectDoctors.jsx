@@ -2,9 +2,9 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { fetchDoctorsData } from "../../api";
-import AuthMenImg from "../../assets/authMen.png";
-import AuthWomenImg from "../../assets/authWomen.png";
-import SelectedIcon from "../../assets/selected.svg";
+import AuthMenImg from "../../assets/images/authMen.png";
+import AuthWomenImg from "../../assets/images/authWomen.png";
+import SelectedIcon from "../../assets/svg/selectedIcon.svg";
 
 export default function SelectDoctors({
   register,

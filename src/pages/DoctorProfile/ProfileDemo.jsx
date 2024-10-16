@@ -1,9 +1,9 @@
 import { useMemo } from "react";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
-import AuthMenImg from "../../assets/authMen.png";
-import AuthWomenImg from "../../assets/authWomen.png";
-import ProfileDoctor from "../../assets/profileDoctor.svg";
+import AuthMenImg from "../../assets/images/authMen.png";
+import AuthWomenImg from "../../assets/images/authWomen.png";
+import DoctorProfileIcon from "../../assets/svg/doctorProfileIcon.svg";
 
 export default function ProfileDemo({
   calculateAge,
@@ -23,7 +23,7 @@ export default function ProfileDemo({
         <ProfileContainer key={selectedDoctor.uid}>
           <TitleContainer>
             <Title>
-              <TitleImg src={ProfileDoctor} alt="profile" />
+              <TitleImg src={DoctorProfileIcon} alt="profile" />
               醫師簡介
             </Title>
           </TitleContainer>

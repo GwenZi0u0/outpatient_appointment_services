@@ -6,7 +6,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { create } from "zustand";
 import { fetchRegistrationData, fetchSchedulesData } from "../../api";
-import Return from "../../assets/return_Square.svg";
+import Return from "../../assets/svg/returnIcon.svg";
 import { PopUp } from "../../components/PopUp";
 import { fireDb } from "../../firebase";
 import {

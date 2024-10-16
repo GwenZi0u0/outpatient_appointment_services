@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
 import { fetchDepartmentsData, fetchDoctorsData } from "../../api";
-import Loading from "../../assets/loading.gif";
+import Loading from "../../assets/videos/loading.gif";
 import Header from "../../components/Header";
 import ProtectedLayout from "../../components/ProtectedLayout";
 import { useAuth } from "../../contexts/AuthContext";

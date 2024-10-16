@@ -3,8 +3,8 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { fetchDepartmentsData } from "../api";
-import SentIcon from "../assets/sent.png";
-import CloseImg from "../assets/x-circle.svg";
+import SentIcon from "../assets/images/sentIcon.png";
+import CloseImg from "../assets/svg/x-circle.svg";
 import {
   SelectCard,
   SelectCardImage,
