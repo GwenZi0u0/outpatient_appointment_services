@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import Header from "./components/Header";
-import ProtectedLayout from "./components/ProtectedLayout";
+import Header from "./components/layout/Header";
+import ProtectedLayout from "./components/layout/ProtectedLayout";
 import { AuthProvider } from "./contexts/AuthContext";
 import AppointmentPage from "./pages/Appointment";
 import CancelRegistrationPage from "./pages/CancelRegistration";
