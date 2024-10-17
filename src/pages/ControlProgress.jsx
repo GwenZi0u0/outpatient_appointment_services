@@ -18,23 +18,23 @@ import {
   updateDoc,
 } from "firebase/firestore";
 
-export default function CancelRegistrationPage() {
-  const useControlProgressStore = create((set) => ({
-    isOpen: false,
-    currentTime: new Date(),
-    currentNumber: null,
-    currentPeriod: null,
-    period: "",
-    selectedPeriod: null,
-    setIsOpen: (isOpen) => set({ isOpen }),
-    setCurrentTime: (currentTime) => set({ currentTime }),
-    setCurrentNumber: (currentNumber) => set({ currentNumber }),
-    setCurrentPeriod: (currentPeriod) => set({ currentPeriod }),
-    setPeriod: (period) => set({ period }),
-    toggleIsOpen: () => set((state) => ({ isOpen: !state.isOpen })),
-    setSelectedPeriod: (selectedPeriod) => set({ selectedPeriod }),
-  }));
+const useControlProgressStore = create((set) => ({
+  isOpen: false,
+  currentTime: new Date(),
+  currentNumber: null,
+  currentPeriod: null,
+  period: "",
+  selectedPeriod: null,
+  setIsOpen: (isOpen) => set({ isOpen }),
+  setCurrentTime: (currentTime) => set({ currentTime }),
+  setCurrentNumber: (currentNumber) => set({ currentNumber }),
+  setCurrentPeriod: (currentPeriod) => set({ currentPeriod }),
+  setPeriod: (period) => set({ period }),
+  toggleIsOpen: () => set((state) => ({ isOpen: !state.isOpen })),
+  setSelectedPeriod: (selectedPeriod) => set({ selectedPeriod }),
+}));
 
+export default function CancelRegistrationPage() {
   const {
     isOpen,
     currentTime,
