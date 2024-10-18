@@ -16,17 +16,18 @@ const daysOfWeek = {
   sunday: "(日)",
 };
 
-const getDayKey = (dayIndex) => {
-  const dayMap = [
-    "sunday",
-    "monday",
-    "tuesday",
-    "wednesday",
-    "thursday",
-    "friday",
-    "saturday",
-  ];
-  return dayMap[dayIndex];
+const weekdays = [
+  "sunday",
+  "monday",
+  "tuesday",
+  "wednesday",
+  "thursday",
+  "friday",
+  "saturday",
+];
+
+const getWeekdayName = (dayIndex) => {
+  return weekdays[dayIndex];
 };
 
 export const dayKeys = [
@@ -57,7 +58,7 @@ const formatWeeklyDates = (startDate) => {
     let month = currentDate.getMonth() + 1;
     let year = currentDate.getFullYear();
 
-    let dayKey = getDayKey(currentDate.getDay());
+    let dayKey = getWeekdayName(currentDate.getDay());
 
     formattedDates.push(`${year}/${month}/${day} ${daysOfWeek[dayKey]}`);
   }
@@ -78,7 +79,7 @@ export const formatWeeklyDoctorDates = (startDate) => {
     let month = currentDate.getMonth() + 1;
     let year = currentDate.getFullYear();
 
-    let dayKey = getDayKey(currentDate.getDay());
+    let dayKey = getWeekdayName(currentDate.getDay());
 
     formattedDates.push(`${year}/${month}/${day} ${daysOfWeek[dayKey]}`);
   }
@@ -217,7 +218,7 @@ export const getToday = () => {
   const month = today.getMonth() + 1;
   const day = today.getDate();
   const dayIndex = today.getDay();
-  const dayKey = getDayKey(dayIndex);
+  const dayKey = getWeekdayName(dayIndex);
 
   return { date: `${year}/${month}/${day}`, daysOfWeek: dayKey };
 };
