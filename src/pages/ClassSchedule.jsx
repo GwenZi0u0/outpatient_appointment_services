@@ -24,7 +24,7 @@ import {
   dayKeys,
   doctorWeeks,
   isDoctorDisabled,
-  timeSlots,
+  timePeriods,
 } from "../utils/dateUtils";
 
 const useClassSchedule = create((set) => ({
@@ -252,7 +252,7 @@ export default function ClassSchedulePage() {
                 </Tr>
               </Thead>
               <Tbody>
-                {Object.entries(timeSlots).map(([time, slot]) => (
+                {Object.entries(timePeriods).map(([time, slot]) => (
                   <Tr key={time}>
                     <TimeSlot>{slot}</TimeSlot>
                     {week.map((date, dayIndex) => (

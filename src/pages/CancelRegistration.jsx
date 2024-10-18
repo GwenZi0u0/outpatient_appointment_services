@@ -15,7 +15,7 @@ import { fireDb } from "../firebase";
 import {
   filterRegistrationDataByFutureDate,
   formatFirestoreTimestamp,
-  timeSlots,
+  timePeriods,
 } from "../utils/dateUtils";
 
 const useCancelRegistrationStore = create((set) => ({
@@ -250,7 +250,7 @@ export default function CancelRegistrationPage() {
                           {formatFirestoreTimestamp(data.OPD_date).slice(5)}
                         </TableCell>
                         <TableCell>
-                          {timeSlots[data.appointment_timeslot] || ""}
+                          {timePeriods[data.appointment_timeslot] || ""}
                         </TableCell>
                         <TableCell>{schedule?.room || ""}</TableCell>
                         <TableCell>{doctor?.physician_name || ""}</TableCell>

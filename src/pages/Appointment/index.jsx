@@ -32,6 +32,7 @@ const useAppointmentStore = create((set) => ({
 export default function Appointment() {
   const navigate = useNavigate();
   const { state } = useLocation();
+  
   useEffect(() => {
     if (!state || !state.department) {
       navigate("/");
@@ -51,6 +52,7 @@ export default function Appointment() {
     popupMessage,
     setPopupMessage,
   } = useAppointmentStore();
+
   const { data: scheduleData } = useQuery({
     queryKey: ["schedules"],
     queryFn: fetchSchedulesData,

@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import styled from "styled-components";
 import { fetchRegistrationData } from "../../api";
+import { timePeriods } from "../../utils/dateUtils";
 
 export default function RegistrationCompleted({
   specialty,
@@ -45,12 +46,6 @@ export default function RegistrationCompleted({
     (schedule) => schedule.doctor_id === doctor.uid
   );
 
-  const timeSlots = {
-    morning: "上午",
-    afternoon: "下午",
-    evening: "夜間",
-  };
-
   return (
     <Container>
       <Title>您預約的掛號資料為</Title>
@@ -71,7 +66,7 @@ export default function RegistrationCompleted({
             <Tbody>
               <TableRow>
                 <TableCell>{date || ""}</TableCell>
-                <TableCell>{timeSlots[time] || ""}</TableCell>
+                <TableCell>{timePeriods[time] || ""}</TableCell>
                 <TableCell>YOI Hospital</TableCell>
                 <TableCell>{specialty?.specialty || ""}</TableCell>
                 <TableCell>{currentSchedule?.room || ""}</TableCell>

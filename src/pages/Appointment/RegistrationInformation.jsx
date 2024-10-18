@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { create } from "zustand";
-import { timeSlots } from "../../utils/dateUtils";
+import { timePeriods } from "../../utils/dateUtils";
 
 const useRegistrationInformationStore = create((set) => ({
   idNumber: "",
@@ -78,7 +78,7 @@ export default function RegistrationInformation({
         <Tbody>
           <TableRow>
             <TableCell>{date || ""}</TableCell>
-            <TableCell>{timeSlots[time] || ""}</TableCell>
+            <TableCell>{timePeriods[time] || ""}</TableCell>
             <TableCell>YOI Hospital</TableCell>
             <TableCell>{specialty.specialty || ""}</TableCell>
             <TableCell>{currentSchedule?.room || ""}</TableCell>

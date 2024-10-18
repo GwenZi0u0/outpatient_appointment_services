@@ -1,6 +1,6 @@
 import { useState } from "react";
 import styled from "styled-components";
-import { dayKeys, isDisabled, timeSlots, weeks } from "../../utils/dateUtils";
+import { dayKeys, isDisabled, timePeriods, weeks } from "../../utils/dateUtils";
 
 export default function SelectTime({
   register,
@@ -51,7 +51,7 @@ export default function SelectTime({
               </Tr>
             </Thead>
             <Tbody>
-              {Object.entries(timeSlots).map(
+              {Object.entries(timePeriods).map(
                 ([time, slot], rowIndex, array) => (
                   <Tr key={time}>
                     <TimeSlot>{slot}</TimeSlot>

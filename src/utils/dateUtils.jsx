@@ -1,6 +1,6 @@
 import { Timestamp } from "firebase/firestore";
 
-export const timeSlots = {
+export const timePeriods = {
   morning: "上午",
   afternoon: "下午",
   evening: "夜間",
