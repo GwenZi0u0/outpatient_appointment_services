@@ -12,13 +12,14 @@
 │   │   ├── layout
 │   │   │   ├── Header.jsx         # Application header with navigation
 │   │   │   └── ProtectedLayout.jsx # Layout wrapper to protect routes based on auth status
-│   │   ├── features
-│   │   │   ├── AiRobot.jsx        # Component to interact with an AI robot
-│   │   │   ├── CallOpenAI.jsx     # Component to handle OpenAI API calls
-│   │   │   └── CusService.jsx     # Customer service chat interface
-│   │   └── ui
+│   │   └── features
+│   │       ├── AiRobot.jsx        # Component to interact with an AI robot
+│   │       ├── CallOpenAI.jsx     # Component to handle OpenAI API calls
+│   │       └── CusService.jsx     # Customer service chat interface
+│   │   
 │   ├── contexts        # Contexts for state management
 │   │  └── AuthContext.jsx      # Context for handling user authentication
+│   │   
 │   ├── pages           # Application pages
 │   │  ├── Appointment        # Appointment booking page
 │   │  ├── DoctorProfile      # Page for displaying doctor profile information
@@ -29,8 +30,13 @@
 │   │  ├── Login              # User login page
 │   │  ├── Progress           # Progress tracking page
 │   │  └── NotFound           # 404 error page for undefined routes
+│   │   
 │   ├── styles
 │   │  └── GlobalStyles.jsx   # Global styles for the entire application
+│   │
+│   ├── utils
+│   │  └── dateUtils.jsx   # Utility functions related to date manipulation
+│   │
 │   ├── api.js          # API service functions to interact with backend
 │   ├── routes.jsx      # Defines the routing structure and maps paths to components in the application
 │   ├── App.jsx         # Main application component
