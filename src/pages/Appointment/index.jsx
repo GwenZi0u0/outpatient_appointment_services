@@ -1,24 +1,25 @@
-import { create } from "zustand";
-import styled from "styled-components";
-import { useMemo, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { addDoc, collection } from "firebase/firestore";
+import { useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import { fetchSchedulesData, fetchRegistrationData } from "../../api";
-import SelectSpecialties from "./SelectSpecialties";
-import SelectDoctors from "./SelectDoctors";
-import SelectTime from "./SelectTime";
-import RegistrationInformation from "./RegistrationInformation";
-import RegistrationCompleted from "./RegistrationCompleted";
-import { collection, addDoc, Timestamp } from "firebase/firestore";
+import styled from "styled-components";
+import { create } from "zustand";
+import { fetchRegistrationData, fetchSchedulesData } from "../../api";
+import Return from "../../assets/svg/returnIcon.svg";
+import { PopUp } from "../../components/common/PopUp";
 import { fireDb } from "../../firebase";
 import {
+  calculateNextRegistrationNumber,
+  convertDateStringToTimestamp,
+  convertToFirebaseTimestamp,
   isValidTaiwanID,
-  formatFirestoreTimestamp,
-  convertToTimestamp,
 } from "../../utils/dateUtils";
-import Return from "../../assets/return_Square.svg";
-import { PopUp } from "../../components/PopUp";
+import RegistrationCompleted from "./RegistrationCompleted";
+import RegistrationInformation from "./RegistrationInformation";
+import SelectDoctors from "./SelectDoctors";
+import SelectSpecialties from "./SelectSpecialties";
+import SelectTime from "./SelectTime";
 
 const useAppointmentStore = create((set) => ({
   step: 1,
@@ -32,6 +33,7 @@ const useAppointmentStore = create((set) => ({
 export default function Appointment() {
   const navigate = useNavigate();
   const { state } = useLocation();
+
   useEffect(() => {
     if (!state || !state.department) {
       navigate("/");
@@ -51,6 +53,7 @@ export default function Appointment() {
     popupMessage,
     setPopupMessage,
   } = useAppointmentStore();
+
   const { data: scheduleData } = useQuery({
     queryKey: ["schedules"],
     queryFn: fetchSchedulesData,
@@ -62,7 +65,7 @@ export default function Appointment() {
     refetchInterval: 30000,
   });
 
-  const { register, handleSubmit, setValue, watch, getValues } = useForm({
+  const { register, handleSubmit, setValue, watch } = useForm({
     defaultValues: {
       department: department,
       specialty: "",
@@ -76,8 +79,6 @@ export default function Appointment() {
       nextRegistrationNumber: "",
     },
   });
-
-  console.log(getValues());
 
   const steps = useMemo(
     () => [
@@ -152,25 +153,9 @@ export default function Appointment() {
     navigate("/");
   };
 
-  const birthdayStamp = (data) => {
-    const date = new Date(data);
-    const firebaseTimestamp = Timestamp.fromDate(date);
-    return firebaseTimestamp;
-  };
-
   const getNextRegistrationNumber = (data, time) => {
-    const extractedDate = watch("date").split(" ")[0];
-    const foundDate = data.filter(
-      (item) => formatFirestoreTimestamp(item.OPD_date) === extractedDate
-    );
-    const foundTime = foundDate.filter(
-      (item) => item.appointment_timeslot === time
-    );
-    const maxRegistrationNumber = Math.max(
-      ...foundTime.map((item) => item.registration_number),
-      0
-    );
-    return maxRegistrationNumber + 1;
+    const selectedDate = watch("date");
+    return calculateNextRegistrationNumber(data, time, selectedDate);
   };
 
   const onSubmit = async (data) => {
@@ -183,10 +168,10 @@ export default function Appointment() {
     setValue("nextRegistrationNumber", nextNumber);
     setValue("idNumber", data.idNumber);
     try {
-      const docRef = await addDoc(collection(fireDb, "registrations"), {
-        OPD_date: convertToTimestamp(data.date),
+      await addDoc(collection(fireDb, "registrations"), {
+        OPD_date: convertDateStringToTimestamp(data.date),
         appointment_timeslot: data.time,
-        birth_date: birthdayStamp(data.birthday),
+        birth_date: convertToFirebaseTimestamp(data.birthday),
         division: {
           department_id: data.department.id,
           specialty_id: data.specialty.id,
@@ -198,8 +183,6 @@ export default function Appointment() {
         registration_number: nextNumber,
         status: "confirmed",
       });
-
-      console.log("Document written with ID: ", docRef.id);
       setStep(5);
     } catch (e) {
       console.error("Error adding document: ", e);

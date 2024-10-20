@@ -1,22 +1,22 @@
-import { create } from "zustand";
-import styled from "styled-components";
-import { useAuth } from "../contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
-import { fetchProgressData, fetchRegistrationData } from "../api";
-import { Timestamp } from "firebase/firestore";
-import { useEffect, useMemo } from "react";
-import { fireDb } from "../firebase";
 import {
-  collection,
   addDoc,
-  getDocs,
-  query,
-  where,
+  collection,
   deleteDoc,
   doc,
   getDoc,
+  getDocs,
+  query,
   updateDoc,
+  where,
 } from "firebase/firestore";
+import { useEffect, useMemo } from "react";
+import styled from "styled-components";
+import { create } from "zustand";
+import { fetchProgressData, fetchRegistrationData } from "../api";
+import { useAuth } from "../contexts/AuthContext";
+import { fireDb } from "../firebase";
+import { formatDateToLocaleString } from "../utils/dateUtils";
 
 const useControlProgressStore = create((set) => ({
   isOpen: false,
@@ -75,27 +75,16 @@ export default function CancelRegistrationPage() {
     return () => clearInterval(interval);
   }, [setCurrentTime]);
 
-  const getCurrentDateInfo = (data) => {
-    const date = data instanceof Timestamp ? data.toDate() : new Date(data);
-    return date
-      .toLocaleDateString("zh-TW", {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-      })
-      .replace(/\//g, "/");
-  };
-
   const handleButtonClick = (selectedPeriod) => {
     setPeriod(selectedPeriod);
     setSelectedPeriod(selectedPeriod);
   };
 
   const filterRegistrationDataByCurrentDate = (registrationData) => {
-    const currentDateFormatted = getCurrentDateInfo(new Date());
+    const currentDateFormatted = formatDateToLocaleString(new Date());
     const filteredData = registrationData?.filter((data) => {
       const isDateMatching =
-        getCurrentDateInfo(data.OPD_date) === currentDateFormatted;
+        formatDateToLocaleString(data.OPD_date) === currentDateFormatted;
       const isDoctorMatching = user.uid === data.doctor_id;
       const isStatus = data.status === "confirmed";
       const isPeriodMatching = period === data.appointment_timeslot;
@@ -116,7 +105,6 @@ export default function CancelRegistrationPage() {
           )
         );
         await Promise.all(querySnapshot.docs.map((doc) => deleteDoc(doc.ref)));
-        console.log("Document deleted");
       } catch (e) {
         console.error("Error deleting document", e);
       }
@@ -146,6 +134,7 @@ export default function CancelRegistrationPage() {
       (data) =>
         user.uid === data.doctor_id && data.registration_number > currentNumber
     );
+    
   const formatTime = (date) => {
     const hours = String(date.getHours()).padStart(2, "0");
     const minutes = String(date.getMinutes()).padStart(2, "0");
@@ -194,7 +183,6 @@ export default function CancelRegistrationPage() {
             await updateDoc(docRef, {
               number: firstValidNumber,
             });
-            console.log("Document updated successfully");
           } else {
             console.error("No such document");
           }
@@ -212,7 +200,7 @@ export default function CancelRegistrationPage() {
       <MainContainer>
         <Container>
           <DateContext>
-            <DateText>日期 : {getCurrentDateInfo(new Date())}</DateText>
+            <DateText>日期 : {formatDateToLocaleString(new Date())}</DateText>
             <DateText>現在時間 : {formatTime(currentTime)}</DateText>
           </DateContext>
           <NumberRegisteredPeopleText>

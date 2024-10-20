@@ -1,7 +1,7 @@
-import { create } from "zustand";
-import { createContext, useContext, useEffect } from "react";
-import { fireAuth } from "../firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
+import { createContext, useContext, useEffect } from "react";
+import { create } from "zustand";
+import { fireAuth } from "../firebase";
 
 const useAuthStore = create((set) => ({
   user: null,
@@ -10,7 +10,11 @@ const useAuthStore = create((set) => ({
 
   signInWithEmail: async (email, password) => {
     try {
-      const result = await signInWithEmailAndPassword(fireAuth, email, password);
+      const result = await signInWithEmailAndPassword(
+        fireAuth,
+        email,
+        password
+      );
       set({ user: result.user, error: null, loading: false });
     } catch (error) {
       set({ error: error.message, loading: false });
@@ -44,7 +48,9 @@ export const AuthProvider = ({ children }) => {
     return () => unsubscribe();
   }, []);
 
-  return <AuthContext.Provider value={useAuthStore}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={useAuthStore}>{children}</AuthContext.Provider>
+  );
 };
 
 export const useAuth = () => {

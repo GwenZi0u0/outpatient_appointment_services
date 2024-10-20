@@ -1,17 +1,22 @@
 # Project Structure
+
 ```
-├── public              # Static files (images, fonts, etc.)
+├── public              # Static files
 │
 ├── src
-│   ├── assets          # Project assets (images, icons, etc.)
+│   ├── assets          # Project assets (images, svg, videos)
 │   ├── components      # Reusable UI components
-│   │  ├── AiRobot.jsx          # Component to interact with an AI robot
-│   │  ├── CallOpenAI.jsx       # Component to handle OpenAI API calls
-│   │  ├── CusService.jsx       # Customer service chat interface
-│   │  ├── Header.jsx           # Application header with navigation
-│   │  ├── Loading.jsx          # Loading spinner component
-│   │  ├── PopUp.jsx            # Pop-up modal for notifications
-│   │  └── ProtectedLayout.jsx  # Layout wrapper to protect routes based on auth status
+│   │   ├── common
+│   │   │   ├── Loading.jsx        # Loading spinner component
+│   │   │   └── PopUp.jsx          # Pop-up modal for notifications
+│   │   ├── layout
+│   │   │   ├── Header.jsx         # Application header with navigation
+│   │   │   └── ProtectedLayout.jsx # Layout wrapper to protect routes based on auth status
+│   │   ├── features
+│   │   │   ├── AiRobot.jsx        # Component to interact with an AI robot
+│   │   │   ├── CallOpenAI.jsx     # Component to handle OpenAI API calls
+│   │   │   └── CusService.jsx     # Customer service chat interface
+│   │   └── ui
 │   ├── contexts        # Contexts for state management
 │   │  └── AuthContext.jsx      # Context for handling user authentication
 │   ├── pages           # Application pages
@@ -27,11 +32,12 @@
 │   ├── styles
 │   │  └── GlobalStyles.jsx   # Global styles for the entire application
 │   ├── api.js          # API service functions to interact with backend
+│   ├── routes.jsx      # Defines the routing structure and maps paths to components in the application
 │   ├── App.jsx         # Main application component
 │   └── main.jsx        # Entry point for the React application
-│ 
+│
 index.html              # Homepage, entry point for the web app
-│ 
+│
 ├── .gitignore          # Files to ignore in Git
 ├── package.json        # Project dependencies and scripts
 ├── vite.config.js      # Vite configuration file

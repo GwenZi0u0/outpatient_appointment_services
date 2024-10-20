@@ -1,13 +1,13 @@
-import styled from "styled-components";
-import { useAuth } from "../../contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
-import { fetchDoctorsData, fetchDepartmentsData } from "../../api";
-import ProtectedLayout from "../../components/ProtectedLayout";
-import Header from "../../components/Header";
-import ProfileDemo from "./ProfileDemo";
-import EditProfile from "./EditProfile";
-import Loading from "../../assets/loading.gif";
 import { useParams } from "react-router-dom";
+import styled from "styled-components";
+import { fetchDepartmentsData, fetchDoctorsData } from "../../api";
+import Loading from "../../assets/videos/loading.gif";
+import Header from "../../components/layout/Header";
+import ProtectedLayout from "../../components/layout/ProtectedLayout";
+import { useAuth } from "../../contexts/AuthContext";
+import EditProfile from "./EditProfile";
+import ProfileDemo from "./ProfileDemo";
 
 export default function DoctorProfilePage() {
   const { user } = useAuth();

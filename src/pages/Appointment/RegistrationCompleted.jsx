@@ -1,6 +1,7 @@
-import styled from "styled-components";
 import { useQuery } from "@tanstack/react-query";
+import styled from "styled-components";
 import { fetchRegistrationData } from "../../api";
+import { timePeriods } from "../../utils/dateUtils";
 
 export default function RegistrationCompleted({
   specialty,
@@ -16,8 +17,6 @@ export default function RegistrationCompleted({
   const { data } = useQuery({
     queryKey: ["registrations"],
     queryFn: fetchRegistrationData,
-    staleTime: 0,
-    cacheTime: 0,
   });
 
   const formatDate = (timestamp) => {
@@ -37,19 +36,13 @@ export default function RegistrationCompleted({
   const foundItem = Array.isArray(data)
     ? data.find(
         (item) =>
-          item.personal_id_number === idNumber && item.status === "confirmed"
+          item.personal_id_number === idNumber && item.status === "confirmed" && item.doctor_id === doctor.uid
       )
     : null;
 
   const currentSchedule = schedule.find(
     (schedule) => schedule.doctor_id === doctor.uid
   );
-
-  const timeSlots = {
-    morning: "上午",
-    afternoon: "下午",
-    evening: "夜間",
-  };
 
   return (
     <Container>
@@ -71,7 +64,7 @@ export default function RegistrationCompleted({
             <Tbody>
               <TableRow>
                 <TableCell>{date || ""}</TableCell>
-                <TableCell>{timeSlots[time] || ""}</TableCell>
+                <TableCell>{timePeriods[time] || ""}</TableCell>
                 <TableCell>YOI Hospital</TableCell>
                 <TableCell>{specialty?.specialty || ""}</TableCell>
                 <TableCell>{currentSchedule?.room || ""}</TableCell>

@@ -1,16 +1,16 @@
-import styled from "styled-components";
-import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { fetchDepartmentsData } from "../api";
-import SentIcon from "../assets/sent.png";
-import CloseImg from "../assets/x-circle.svg";
-import CallOpenAI from "./CallOpenAI";
+import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import styled from "styled-components";
+import { fetchDepartmentsData } from "../../api";
+import SentIcon from "../../assets/images/sentIcon.png";
+import CloseImg from "../../assets/svg/x-circle.svg";
 import {
   SelectCard,
   SelectCardImage,
   SelectCardTitle,
-} from "../pages/Registration";
+} from "../../pages/Registration/index";
+import CallOpenAI from "./CallOpenAI";
 
 export default function AiRobot({ handleCloseAI }) {
   const [messages, setMessages] = useState([]);
@@ -24,19 +24,12 @@ export default function AiRobot({ handleCloseAI }) {
   });
 
   const handleCardClick = (specialty) => {
-    console.log("handleCardClick called with specialty:", specialty);
     if (departments) {
       const matchedDepartment = departments.find((dept) =>
         dept.department.toLowerCase().includes(specialty.toLowerCase())
       );
 
-      console.log("Matched department:", matchedDepartment);
-
       if (matchedDepartment) {
-        console.log(
-          "Navigating to /appointment with department:",
-          matchedDepartment
-        );
         navigate("/appointment", { state: { department: matchedDepartment } });
       } else {
         console.error(`未找到匹配的科别: ${specialty}`);
@@ -88,7 +81,6 @@ export default function AiRobot({ handleCloseAI }) {
                     marginTop: "10px",
                   }}
                   onClick={() => {
-                    console.log("SelectCard clicked");
                     handleCardClick(specialty);
                   }}
                 >

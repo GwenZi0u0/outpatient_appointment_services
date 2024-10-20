@@ -1,22 +1,22 @@
-import { create } from "zustand";
-import styled from "styled-components";
+import { useQuery } from "@tanstack/react-query";
+import { doc, updateDoc } from "firebase/firestore";
 import { useEffect, useMemo } from "react";
 import { useLocation } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import styled from "styled-components";
+import { create } from "zustand";
 import {
-  fetchRegistrationData,
   fetchDepartmentsData,
   fetchDoctorsData,
+  fetchRegistrationData,
   fetchSchedulesData,
 } from "../api";
-import { doc, updateDoc } from "firebase/firestore";
+import { PopUp } from "../components/common/PopUp";
 import { fireDb } from "../firebase";
 import {
-  timeSlots,
-  formatFirestoreTimestamp,
   filterRegistrationDataByFutureDate,
+  formatTimestampToDateString,
+  timePeriods,
 } from "../utils/dateUtils";
-import { PopUp } from "../components/PopUp";
 
 const useCancelRegistrationStore = create((set) => ({
   idNumber: "",
@@ -247,10 +247,10 @@ export default function CancelRegistrationPage() {
                       <TableRow key={index}>
                         <TableCell>{specialtyData?.specialty || ""}</TableCell>
                         <TableCell>
-                          {formatFirestoreTimestamp(data.OPD_date).slice(5)}
+                          {formatTimestampToDateString(data.OPD_date).slice(5)}
                         </TableCell>
                         <TableCell>
-                          {timeSlots[data.appointment_timeslot] || ""}
+                          {timePeriods[data.appointment_timeslot] || ""}
                         </TableCell>
                         <TableCell>{schedule?.room || ""}</TableCell>
                         <TableCell>{doctor?.physician_name || ""}</TableCell>

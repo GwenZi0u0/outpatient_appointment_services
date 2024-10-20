@@ -1,5 +1,5 @@
 import styled, { keyframes } from "styled-components";
-import LineImg from "../assets/LoadingLine.png";
+import LineImg from "../../assets/images/loadingLine.png";
 
 const heartAnimation = keyframes`
   0% {

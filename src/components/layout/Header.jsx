@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import Logo from "../assets/Logo.svg";
-import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
-import MenuImg from "../assets/menu.svg";
-import CloseImg from "../assets/x-circle.svg";
+import Logo from "../../assets/svg/logo.svg";
+import MenuImg from "../../assets/svg/menuIcon.svg";
+import CloseImg from "../../assets/svg/x-circle.svg";
 
 export default function Header() {
   const navigate = useNavigate();

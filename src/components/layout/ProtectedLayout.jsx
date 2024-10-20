@@ -1,13 +1,13 @@
-import styled from "styled-components";
-import { Outlet, Navigate, Link } from "react-router-dom";
-import { useAuth } from "../contexts/AuthContext";
-import Logo from "../assets/Logo.svg";
-import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { fetchDoctorsDataWithLimit } from "../api";
-import Loading from "../assets/loading.gif";
-import AuthWomenImg from "../assets/authWomen.png";
-import AuthMenImg from "../assets/authMen.png";
+import { useState } from "react";
+import { Link, Navigate, Outlet } from "react-router-dom";
+import styled from "styled-components";
+import { fetchDoctorsDataWithLimit } from "../../api";
+import { useAuth } from "../../contexts/AuthContext";
+import AuthMenImg from "../../assets/images/authMen.png";
+import AuthWomenImg from "../../assets/images/authWomen.png";
+import Logo from "../../assets/svg/logo.svg";
+import Loading from "../../assets/videos/loading.gif";
 
 export default function ProtectedLayout() {
   const { user, loading, signOut } = useAuth((state) => ({
@@ -21,7 +21,7 @@ export default function ProtectedLayout() {
     queryKey: ["fetchDoctors"],
     queryFn: () => fetchDoctorsDataWithLimit(),
     staleTime: 5 * 60 * 1000,
-  })
+  });
   if (loading) {
     return (
       <LoadingContainer>
@@ -51,8 +51,8 @@ export default function ProtectedLayout() {
             <SelectLink to="/class-schedule">門診班表</SelectLink>
             <SelectLink to={`/doctor-profile/${user.uid}`}>醫師簡介</SelectLink>
           </Menu>
-          <Profile 
-            onMouseEnter={() => setIsDropdownOpen(true)} 
+          <Profile
+            onMouseEnter={() => setIsDropdownOpen(true)}
             onClick={() => setIsDropdownOpen((prev) => !prev)}
           >
             <AuthImg

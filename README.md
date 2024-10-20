@@ -5,14 +5,17 @@ outpatient_appointment_services
 ## Introduction
 
 > Objective
-- Create an online appointment booking website. 
+
+- Create an online appointment booking website.
 - The expected difference from others on the market is to streamline the appointment scheduling process.
 
 > User
+
 - Doctor, Nurse
 - Patient
 
 > Pain points of online registration pages on the market:
+
 - Font is too small, and operation buttons are unclear.
 - The online registration system can be made clearer, with easy-to-understand buttons and a user-friendly interface.
 
@@ -33,15 +36,17 @@ his project is a simple application built with React, Vite, Zustand, styled-comp
 Follow these steps to get the project up and running on your local machine:
 
 1. **Install packages:**
-    
-    Make sure you have Node.js and yarn installed.
-     ```bash
-    yarn install
-    ```
-    
+
+   Make sure you have Node.js and yarn installed.
+
+   ```bash
+   yarn install
+   ```
+
 ## Running the Project
 
 To run the project locally:
+
 ```bash
 yarn dev
 ```
@@ -59,19 +64,24 @@ The detailed structural information of this project has been moved to the [dedic
 ## Tech Stack
 
 **Frontend**
+
 - React: A JavaScript library for building user interfaces.
 - Vite: A fast development build tool for modern web projects.
 
 **State Management**
+
 - Zustand: A small, fast state management solution using hooks.
 
 **Styling**
+
 - styled-components: A library for styling React components using tagged template literals.
 
 **Data Fetching**
+
 - useQuery(@tanstack/react-query): An opinionated, efficient library for managing server state and handling data fetching or updating.
 
 **Form Handling**
+
 - useForm(react-hook-form): A hook for managing and handling form state, simplifying input validation and submission.
 
 ### Features

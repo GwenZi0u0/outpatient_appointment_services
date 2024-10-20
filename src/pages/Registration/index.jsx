@@ -1,26 +1,22 @@
-import styled, { keyframes } from "styled-components";
-import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { fetchDepartmentsData } from "../../api";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useNavigate, useLocation } from "react-router-dom";
-import BackGround from "../../assets/background.svg";
-import BackGroundMobile from "../../assets/background_mobile.svg";
-import AnnouncementImg from "../../assets/announcementImage.svg";
-import Loading from "../../components/Loading";
-import CusService from "../../components/CusService";
-import AiRobot from "../../components/AiRobot";
+import { useLocation, useNavigate } from "react-router-dom";
+import styled, { keyframes } from "styled-components";
+import { fetchDepartmentsData } from "../../api";
+import AnnouncementImg from "../../assets/svg/announcementImage.svg";
+import BackGround from "../../assets/svg/background.svg";
+import BackGroundMobile from "../../assets/svg/backgroundMobile.svg";
+import Loading from "../../components/common/Loading";
+import AiRobot from "../../components/features/AiRobot";
+import CusService from "../../components/features/CusService";
 
 const carouselData = new Map([
-  // [
-  //   "兒童保健暨疫苗接種時間\n週一至週五下午13:30~15:30\n週六上午9:00-10:30\n108年1月起恢復卡介苗接種\n接種時間：每周三下午13:30-14:30",
-  // ],
   [
     "門診看診時間\n上午 9:00~12:00 下午 13:30~16:30 夜間 17:30~20:30\n(星期六下午及國定例假日休診.)\n上午診請於11:30前至診間候診、下午診請於16:00前至診間候診、\n夜診請於20:00前至診間候診。",
   ],
   [
     "櫃台掛號開放時間\n上午：8:00~11:00 下午：13:00~16:00 夜間：17:00~20:00",
-    // "其他掛號方式：\n自動掛號機(依院區門診時間)、網路、電話語音(02-21811995)、\n客服中心(02-25553000)、台北市民當家熱線1999轉888(免付費電話)\n掛號開放時間：00:00~24:00",
   ],
 ]);
 

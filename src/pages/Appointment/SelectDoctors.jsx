@@ -1,10 +1,10 @@
-import styled from "styled-components";
 import { useQuery } from "@tanstack/react-query";
-import { fetchDoctorsData } from "../../api";
 import { Link } from "react-router-dom";
-import SelectedIcon from "../../assets/selected.svg";
-import AuthWomenImg from "../../assets/authWomen.png";
-import AuthMenImg from "../../assets/authMen.png";
+import styled from "styled-components";
+import { fetchDoctorsData } from "../../api";
+import AuthMenImg from "../../assets/images/authMen.png";
+import AuthWomenImg from "../../assets/images/authWomen.png";
+import SelectedIcon from "../../assets/svg/selectedIcon.svg";
 
 export default function SelectDoctors({
   register,
@@ -25,6 +25,7 @@ export default function SelectDoctors({
         doctor.division.division_id === department.id &&
         doctor.division.specialty_id === specialty.id
     ) || [];
+
   return (
     <>
       {filteredDoctors.length > 0 ? (
@@ -99,7 +100,6 @@ const DoctorName = styled.span`
   font-size: 24px;
 `;
 
-// Start of Selection
 const DoctorTitle = styled(Link)`
   text-decoration: none;
   color: #0267b5;

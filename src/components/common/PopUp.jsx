@@ -33,7 +33,7 @@ const PopUpWrapper = styled.div`
   min-width: 400px;
   height: 250px;
   background-color: white;
-  border: 5px solid #00B0C1;
+  border: 5px solid #00b0c1;
   border-radius: 30px;
   padding: 50px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
