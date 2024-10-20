@@ -67,24 +67,28 @@ The detailed structural information of this project has been moved to the [dedic
 
 **Frontend**
 
-- React: A JavaScript library for building user interfaces.
-- Vite: A fast development build tool for modern web projects.
+- ![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB) : A JavaScript library for building user interfaces.
+- ![Vite](https://img.shields.io/badge/vite-%23646CFF.svg?style=for-the-badge&logo=vite&logoColor=white) : A fast development build tool for modern web projects.
 
 **State Management**
 
-- Zustand: A small, fast state management solution using hooks.
-
-**Styling**
-
-- styled-components: A library for styling React components using tagged template literals.
+- ![Zustand](https://img.shields.io/badge/zustand-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB) : A small, fast state management solution using hooks.
 
 **Data Fetching**
 
-- useQuery(@tanstack/react-query): An opinionated, efficient library for managing server state and handling data fetching or updating.
+- 	![React Query](https://img.shields.io/badge/-React%20Query-FF4154?style=for-the-badge&logo=react%20query&logoColor=white)(@tanstack/react-query) : An opinionated, efficient library for managing server state and handling data fetching or updating.
 
 **Form Handling**
 
-- useForm(react-hook-form): A hook for managing and handling form state, simplifying input validation and submission.
+- ![React Hook Form](https://img.shields.io/badge/React%20Hook%20Form-%23EC5990.svg?style=for-the-badge&logo=reacthookform&logoColor=white) : A hook for managing and handling form state, simplifying input validation and submission.
+
+**API Integration**
+
+- ![ChatGPT](https://img.shields.io/badge/chatGPT-74aa9c?style=for-the-badge&logo=openai&logoColor=white) : An API from OpenAI that can talk like a human. It helps apps have smart conversations or answer questions automatically.
+
+**Styling**
+
+- ![Styled Components](https://img.shields.io/badge/styled--components-DB7093?style=for-the-badge&logo=styled-components&logoColor=white) : A library for styling React components using tagged template literals.
 
 ### Features
 
