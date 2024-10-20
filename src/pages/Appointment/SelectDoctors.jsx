@@ -100,7 +100,6 @@ const DoctorName = styled.span`
   font-size: 24px;
 `;
 
-// Start of Selection
 const DoctorTitle = styled(Link)`
   text-decoration: none;
   color: #0267b5;

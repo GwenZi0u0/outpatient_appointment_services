@@ -224,13 +224,6 @@ const Label = styled.label`
   margin-bottom: 15px;
 `;
 
-// const Select = styled.select`
-//   width: 100%;
-//   padding: 15px;
-//   margin-bottom: 10px;
-//   font-size: 20px;
-// `;
-
 const Input = styled.input`
   width: 100%;
   padding: 15px;

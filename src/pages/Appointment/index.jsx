@@ -10,9 +10,9 @@ import Return from "../../assets/svg/returnIcon.svg";
 import { PopUp } from "../../components/common/PopUp";
 import { fireDb } from "../../firebase";
 import {
-  convertToFirebaseTimestamp,
-  convertDateStringToTimestamp,
   calculateNextRegistrationNumber,
+  convertDateStringToTimestamp,
+  convertToFirebaseTimestamp,
   isValidTaiwanID,
 } from "../../utils/dateUtils";
 import RegistrationCompleted from "./RegistrationCompleted";
@@ -168,7 +168,7 @@ export default function Appointment() {
     setValue("nextRegistrationNumber", nextNumber);
     setValue("idNumber", data.idNumber);
     try {
-      const docRef = await addDoc(collection(fireDb, "registrations"), {
+      await addDoc(collection(fireDb, "registrations"), {
         OPD_date: convertDateStringToTimestamp(data.date),
         appointment_timeslot: data.time,
         birth_date: convertToFirebaseTimestamp(data.birthday),
@@ -183,8 +183,6 @@ export default function Appointment() {
         registration_number: nextNumber,
         status: "confirmed",
       });
-
-      console.log("Document written with ID: ", docRef.id);
       setStep(5);
     } catch (e) {
       console.error("Error adding document: ", e);
