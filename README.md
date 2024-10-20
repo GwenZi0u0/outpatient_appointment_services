@@ -68,6 +68,7 @@ The detailed structural information of this project has been moved to the [dedic
 **Frontend**
 
 ![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB) A JavaScript library for building user interfaces.
+
 ![Vite](https://img.shields.io/badge/vite-%23646CFF.svg?style=for-the-badge&logo=vite&logoColor=white) A fast development build tool for modern web projects.
 
 **State Management**
