@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { addDoc, collection, Timestamp } from "firebase/firestore";
+import { addDoc, collection } from "firebase/firestore";
 import { useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -10,8 +10,9 @@ import Return from "../../assets/svg/returnIcon.svg";
 import { PopUp } from "../../components/common/PopUp";
 import { fireDb } from "../../firebase";
 import {
-  convertToTimestamp,
-  formatFirestoreTimestamp,
+  convertToFirebaseTimestamp,
+  convertDateStringToTimestamp,
+  calculateNextRegistrationNumber,
   isValidTaiwanID,
 } from "../../utils/dateUtils";
 import RegistrationCompleted from "./RegistrationCompleted";
@@ -32,7 +33,7 @@ const useAppointmentStore = create((set) => ({
 export default function Appointment() {
   const navigate = useNavigate();
   const { state } = useLocation();
-  
+
   useEffect(() => {
     if (!state || !state.department) {
       navigate("/");
@@ -64,7 +65,7 @@ export default function Appointment() {
     refetchInterval: 30000,
   });
 
-  const { register, handleSubmit, setValue, watch, getValues } = useForm({
+  const { register, handleSubmit, setValue, watch } = useForm({
     defaultValues: {
       department: department,
       specialty: "",
@@ -78,8 +79,6 @@ export default function Appointment() {
       nextRegistrationNumber: "",
     },
   });
-
-  console.log(getValues());
 
   const steps = useMemo(
     () => [
@@ -154,25 +153,9 @@ export default function Appointment() {
     navigate("/");
   };
 
-  const birthdayStamp = (data) => {
-    const date = new Date(data);
-    const firebaseTimestamp = Timestamp.fromDate(date);
-    return firebaseTimestamp;
-  };
-
   const getNextRegistrationNumber = (data, time) => {
-    const extractedDate = watch("date").split(" ")[0];
-    const foundDate = data.filter(
-      (item) => formatFirestoreTimestamp(item.OPD_date) === extractedDate
-    );
-    const foundTime = foundDate.filter(
-      (item) => item.appointment_timeslot === time
-    );
-    const maxRegistrationNumber = Math.max(
-      ...foundTime.map((item) => item.registration_number),
-      0
-    );
-    return maxRegistrationNumber + 1;
+    const selectedDate = watch("date");
+    return calculateNextRegistrationNumber(data, time, selectedDate);
   };
 
   const onSubmit = async (data) => {
@@ -186,9 +169,9 @@ export default function Appointment() {
     setValue("idNumber", data.idNumber);
     try {
       const docRef = await addDoc(collection(fireDb, "registrations"), {
-        OPD_date: convertToTimestamp(data.date),
+        OPD_date: convertDateStringToTimestamp(data.date),
         appointment_timeslot: data.time,
-        birth_date: birthdayStamp(data.birthday),
+        birth_date: convertToFirebaseTimestamp(data.birthday),
         division: {
           department_id: data.department.id,
           specialty_id: data.specialty.id,

@@ -20,11 +20,11 @@ import { PopUp } from "../components/common/PopUp";
 import { useAuth } from "../contexts/AuthContext";
 import { fireDb } from "../firebase";
 import {
-  convertToTimestamp,
-  dayKeys,
-  doctorWeeks,
+  convertDateStringToTimestamp,
+  formattedDoctorWeeklyDates,
   isDoctorDisabled,
   timePeriods,
+  weekdays,
 } from "../utils/dateUtils";
 
 const useClassSchedule = create((set) => ({
@@ -133,20 +133,21 @@ export default function ClassSchedulePage() {
     ?.flatMap((item) => item.date_times);
 
   const isLeaveDay = useMemo(() => {
-    return doctorWeeks
+    return formattedDoctorWeeklyDates
       .map((week) =>
         week.filter((day) =>
           requestLeave?.some(
-            (leave) => convertToTimestamp(day).seconds === leave.date.seconds
+            (leave) =>
+              convertDateStringToTimestamp(day).seconds === leave.date.seconds
           )
         )
       )
       .flat();
-  }, [doctorWeeks, requestLeave]);
+  }, [formattedDoctorWeeklyDates, requestLeave]);
 
   const handleCheckboxChange = (date, time) => {
     if (isDoctorDisabled(date)) return;
-    const firebaseTimestamp = convertToTimestamp(date);
+    const firebaseTimestamp = convertDateStringToTimestamp(date);
     toggleDateTime(firebaseTimestamp, time);
   };
 
@@ -205,7 +206,7 @@ export default function ClassSchedulePage() {
   };
 
   const handleLeaveDayClick = (date, time) => {
-    const firebaseTimestamp = convertToTimestamp(date);
+    const firebaseTimestamp = convertDateStringToTimestamp(date);
     setLeaveDayToCancel({ date: firebaseTimestamp, time });
     setConfirmMessage("確定要撤回這個休診申請嗎？");
     setShowPopup(true);
@@ -236,7 +237,7 @@ export default function ClassSchedulePage() {
           </Hint>
         </HintContainer>
         <TableWrapper>
-          {doctorWeeks.map((week, weekIndex) => (
+          {formattedDoctorWeeklyDates.map((week, weekIndex) => (
             <StyledTable key={weekIndex}>
               <Thead>
                 <Tr>
@@ -264,12 +265,12 @@ export default function ClassSchedulePage() {
                           (scheduleItem) =>
                             scheduleItem.department_id === department.id &&
                             scheduleItem.doctor_id === user.uid &&
-                            dayKeys[dayIndex] in scheduleItem.shift_rules &&
+                            weekdays[dayIndex] in scheduleItem.shift_rules &&
                             Array.isArray(
-                              scheduleItem.shift_rules[dayKeys[dayIndex]]
+                              scheduleItem.shift_rules[weekdays[dayIndex]]
                             ) &&
                             scheduleItem.shift_rules[
-                              dayKeys[dayIndex]
+                              weekdays[dayIndex]
                             ].includes(time)
                         ) ? (
                           isLeaveDay.includes(date) ? (
@@ -293,8 +294,8 @@ export default function ClassSchedulePage() {
                               checked={selectedDateTimes.some(
                                 (item) =>
                                   item.date.seconds ===
-                                    convertToTimestamp(date).seconds &&
-                                  item.times.includes(time)
+                                    convertDateStringToTimestamp(date)
+                                      .seconds && item.times.includes(time)
                               )}
                               onChange={() => handleCheckboxChange(date, time)}
                               disabled={isDoctorDisabled(date)}

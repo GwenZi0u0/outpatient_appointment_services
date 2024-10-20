@@ -14,7 +14,7 @@ import { PopUp } from "../components/common/PopUp";
 import { fireDb } from "../firebase";
 import {
   filterRegistrationDataByFutureDate,
-  formatFirestoreTimestamp,
+  formatTimestampToDateString,
   timePeriods,
 } from "../utils/dateUtils";
 
@@ -247,7 +247,7 @@ export default function CancelRegistrationPage() {
                       <TableRow key={index}>
                         <TableCell>{specialtyData?.specialty || ""}</TableCell>
                         <TableCell>
-                          {formatFirestoreTimestamp(data.OPD_date).slice(5)}
+                          {formatTimestampToDateString(data.OPD_date).slice(5)}
                         </TableCell>
                         <TableCell>
                           {timePeriods[data.appointment_timeslot] || ""}

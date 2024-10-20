@@ -25,6 +25,7 @@ export default function SelectDoctors({
         doctor.division.division_id === department.id &&
         doctor.division.specialty_id === specialty.id
     ) || [];
+
   return (
     <>
       {filteredDoctors.length > 0 ? (

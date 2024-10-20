@@ -1,6 +1,11 @@
 import { useState } from "react";
 import styled from "styled-components";
-import { dayKeys, isDisabled, timePeriods, weeks } from "../../utils/dateUtils";
+import {
+  formattedWeeklyDates,
+  isDateDisabled,
+  timePeriods,
+  weekdays,
+} from "../../utils/dateUtils";
 
 export default function SelectTime({
   register,
@@ -34,7 +39,7 @@ export default function SelectTime({
         </Confirmed>
       </ConfirmedContainer>
       <TableWrapper>
-        {weeks.map((week, weekIndex) => (
+        {formattedWeeklyDates.map((week, weekIndex) => (
           <StyledTable key={weekIndex}>
             <Thead>
               <Tr>
@@ -68,12 +73,12 @@ export default function SelectTime({
                           (scheduleItem) =>
                             scheduleItem.department_id === department.id &&
                             scheduleItem.doctor_id === doctor.uid &&
-                            dayKeys[dayIndex] in scheduleItem.shift_rules &&
+                            weekdays[dayIndex] in scheduleItem.shift_rules &&
                             Array.isArray(
-                              scheduleItem.shift_rules[dayKeys[dayIndex]]
+                              scheduleItem.shift_rules[weekdays[dayIndex]]
                             ) &&
                             scheduleItem.shift_rules[
-                              dayKeys[dayIndex]
+                              weekdays[dayIndex]
                             ].includes(time)
                         ) ? (
                           <CheckInput
@@ -82,7 +87,7 @@ export default function SelectTime({
                             defaultValue={time}
                             onClick={() => handleTimeSelection(date, time)}
                             {...register("time")}
-                            disabled={isDisabled(date)}
+                            disabled={isDateDisabled(date)}
                             checked={
                               selectedDateTime &&
                               selectedDateTime.date === date &&
