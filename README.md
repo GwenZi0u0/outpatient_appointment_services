@@ -31,7 +31,7 @@ outpatient_appointment_services
 
 ## Getting Started
 
-his project is a simple application built with React, Vite, Zustand, styled-components, useQuery, and useForm. It serves as a starting point for building modern web applications with these technologies.
+this project is a simple application built with React, Vite, Zustand, styled-components, useQuery, and useForm. It serves as a starting point for building modern web applications with these technologies.
 
 ## Installation
 
