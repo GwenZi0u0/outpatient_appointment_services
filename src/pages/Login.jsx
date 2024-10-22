@@ -4,15 +4,15 @@ import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { create } from "zustand";
 import { fetchNoticeData } from "../api";
-import Loading from "../assets/videos/loading.gif";
 import Lock from "../assets/svg/lock.svg";
 import KeyIcon from "../assets/svg/loginKeyIcon.svg";
 import UserIcon from "../assets/svg/loginUserIcon.svg";
+import Loading from "../assets/videos/loading.gif";
 import { useAuth } from "../contexts/AuthContext";
 
 const useLoginStore = create((set) => ({
-  email: "",
-  password: "",
+  email: "ann123@yoihospital.com",
+  password: "yoiann123",
   setEmail: (email) => set({ email }),
   setPassword: (password) => set({ password }),
 }));

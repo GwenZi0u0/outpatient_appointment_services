@@ -114,6 +114,7 @@ export default function RegistrationInformation({
       <Input
         type="text"
         value={name}
+        placeholder="王小明"
         {...register("name", { required: "請輸入姓名" })}
         onChange={(e) => setName(e.target.value)}
         required
