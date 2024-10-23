@@ -2,7 +2,8 @@
 
 outpatient_appointment_services
 
-[Project Link](https://outpatient-appointment.web.app/)
+User Doctor : [Project Link](https://outpatient-appointment.web.app/login)
+User Patient : [Project Link](https://outpatient-appointment.web.app/)
 
 ## Introduction
 
