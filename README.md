@@ -2,9 +2,9 @@
 
 outpatient_appointment_services
 
-User Doctor : [Project Link](https://outpatient-appointment.web.app/login)
-
 User Patient : [Project Link](https://outpatient-appointment.web.app/)
+
+User Doctor : [Project Link](https://outpatient-appointment.web.app/login)
 
 ## Introduction
 
@@ -15,8 +15,8 @@ User Patient : [Project Link](https://outpatient-appointment.web.app/)
 
 > User
 
-- Doctor, Nurse
 - Patient
+- Doctor
 
 > Pain points of online registration pages on the market:
 
