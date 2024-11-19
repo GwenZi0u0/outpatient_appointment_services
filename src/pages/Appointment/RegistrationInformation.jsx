@@ -1,17 +1,6 @@
 import styled from "styled-components";
-import { create } from "zustand";
+import { useRegistrationInformationStore } from "../../stores";
 import { timePeriods } from "../../utils/dateUtils";
-
-const useRegistrationInformationStore = create((set) => ({
-  idNumber: "",
-  birthday: "",
-  name: "",
-  phone: "",
-  setIdNumber: (value) => set({ idNumber: value }),
-  setBirthday: (value) => set({ birthday: value }),
-  setName: (value) => set({ name: value }),
-  setPhone: (value) => set({ phone: value }),
-}));
 
 export default function RegistrationInformation({
   register,

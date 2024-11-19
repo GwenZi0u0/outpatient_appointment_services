@@ -12,27 +12,11 @@ import {
 } from "firebase/firestore";
 import { useEffect, useMemo } from "react";
 import styled from "styled-components";
-import { create } from "zustand";
 import { fetchProgressData, fetchRegistrationData } from "../api";
 import { useAuth } from "../contexts/AuthContext";
 import { fireDb } from "../firebase";
 import { formatDateToLocaleString } from "../utils/dateUtils";
-
-const useControlProgressStore = create((set) => ({
-  isOpen: false,
-  currentTime: new Date(),
-  currentNumber: null,
-  currentPeriod: null,
-  period: "",
-  selectedPeriod: null,
-  setIsOpen: (isOpen) => set({ isOpen }),
-  setCurrentTime: (currentTime) => set({ currentTime }),
-  setCurrentNumber: (currentNumber) => set({ currentNumber }),
-  setCurrentPeriod: (currentPeriod) => set({ currentPeriod }),
-  setPeriod: (period) => set({ period }),
-  toggleIsOpen: () => set((state) => ({ isOpen: !state.isOpen })),
-  setSelectedPeriod: (selectedPeriod) => set({ selectedPeriod }),
-}));
+import { useControlProgressStore } from "../stores";
 
 export default function CancelRegistrationPage() {
   const {

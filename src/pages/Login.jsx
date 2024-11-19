@@ -2,20 +2,13 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { create } from "zustand";
 import { fetchNoticeData } from "../api";
 import Lock from "../assets/svg/lock.svg";
 import KeyIcon from "../assets/svg/loginKeyIcon.svg";
 import UserIcon from "../assets/svg/loginUserIcon.svg";
 import Loading from "../assets/videos/loading.gif";
 import { useAuth } from "../contexts/AuthContext";
-
-const useLoginStore = create((set) => ({
-  email: "ann123@yoihospital.com",
-  password: "yoiann123",
-  setEmail: (email) => set({ email }),
-  setPassword: (password) => set({ password }),
-}));
+import { useLoginStore } from "../stores";
 
 export default function LoginPage() {
   const { email, password, setEmail, setPassword } = useLoginStore();

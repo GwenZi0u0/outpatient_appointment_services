@@ -3,7 +3,6 @@ import { doc, updateDoc } from "firebase/firestore";
 import { useEffect, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import styled from "styled-components";
-import { create } from "zustand";
 import {
   fetchDepartmentsData,
   fetchDoctorsData,
@@ -12,38 +11,12 @@ import {
 } from "../api";
 import { PopUp } from "../components/common/PopUp";
 import { fireDb } from "../firebase";
+import { useCancelRegistrationStore } from "../stores";
 import {
   filterRegistrationDataByFutureDate,
   formatTimestampToDateString,
   timePeriods,
 } from "../utils/dateUtils";
-
-const useCancelRegistrationStore = create((set) => ({
-  idNumber: "",
-  error: "",
-  isOpened: false,
-  result: [],
-  popupMessage: "",
-  confirmAction: null,
-  showPopup: false,
-  setIdNumber: (idNumber) => set({ idNumber }),
-  setError: (error) => set({ error }),
-  setIsOpened: (isOpened) => set({ isOpened }),
-  setResult: (result) => set({ result }),
-  setPopupMessage: (popupMessage) => set({ popupMessage }),
-  setConfirmAction: (confirmAction) => set({ confirmAction }),
-  setShowPopup: (showPopup) => set({ showPopup }),
-  resetState: () =>
-    set({
-      idNumber: "",
-      error: "",
-      isOpened: false,
-      result: [],
-      popupMessage: "",
-      showPopup: false,
-      confirmAction: null,
-    }),
-}));
 
 export default function CancelRegistrationPage() {
   const {

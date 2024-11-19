@@ -9,7 +9,6 @@ import {
 } from "firebase/firestore";
 import { useMemo } from "react";
 import styled from "styled-components";
-import { create } from "zustand";
 import {
   fetchDepartmentsData,
   fetchDoctorsData,
@@ -19,6 +18,7 @@ import {
 import { PopUp } from "../components/common/PopUp";
 import { useAuth } from "../contexts/AuthContext";
 import { fireDb } from "../firebase";
+import { useClassSchedule } from "../stores";
 import {
   convertDateStringToTimestamp,
   formattedDoctorWeeklyDates,
@@ -26,58 +26,6 @@ import {
   timePeriods,
   weekdays,
 } from "../utils/dateUtils";
-
-const useClassSchedule = create((set) => ({
-  selectedDateTimes: [],
-  leaveDayToCancel: [],
-  showPopup: false,
-  popupMessage: "",
-  confirmMessage: "",
-  setShowPopup: (show) => set({ showPopup: show }),
-  setPopupMessage: (message) => set({ popupMessage: message }),
-  setConfirmMessage: (message) => set({ confirmMessage: message }),
-  setLeaveDayToCancel: (days) => set({ leaveDayToCancel: days }),
-  setSelectedDateTimes: (updater) =>
-    set((state) => {
-      const newSelectedDateTimes = updater(state.selectedDateTimes);
-      return { selectedDateTimes: newSelectedDateTimes };
-    }),
-  toggleDateTime: (firebaseTimestamp, time) =>
-    set((state) => {
-      const prevState = state.selectedDateTimes;
-      const dateIndex = prevState.findIndex(
-        (item) => item.date.seconds === firebaseTimestamp.seconds
-      );
-      let newState;
-
-      if (dateIndex === -1) {
-        newState = [...prevState, { date: firebaseTimestamp, times: [time] }];
-      } else {
-        const updatedTimes = [...prevState[dateIndex].times];
-        const timeIndex = updatedTimes.indexOf(time);
-
-        if (timeIndex === -1) {
-          updatedTimes.push(time);
-        } else {
-          updatedTimes.splice(timeIndex, 1);
-        }
-
-        if (updatedTimes.length === 0) {
-          newState = prevState.filter(
-            (item) => item.date.seconds !== firebaseTimestamp.seconds
-          );
-        } else {
-          newState = [...prevState];
-          newState[dateIndex] = {
-            ...newState[dateIndex],
-            times: updatedTimes,
-          };
-        }
-      }
-
-      return { selectedDateTimes: newState };
-    }),
-}));
 
 export default function ClassSchedulePage() {
   const {

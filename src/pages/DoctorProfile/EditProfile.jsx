@@ -3,7 +3,6 @@ import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
-import { create } from "zustand";
 import AuthMenImg from "../../assets/images/authMen.png";
 import AuthWomenImg from "../../assets/images/authWomen.png";
 import ProfileDoctor from "../../assets/svg/doctorProfileIcon.svg";
@@ -14,17 +13,7 @@ import CancelIcon from "../../assets/svg/x-square.svg";
 import RemoveIcon from "../../assets/svg/xIcon.svg";
 import { PopUp } from "../../components/common/PopUp";
 import { fireDb, fireStorage } from "../../firebase";
-
-const useEditProfile = create((set) => ({
-  showPopup: false,
-  popupMessage: "",
-  confirmMessage: "",
-  currentAction: null,
-  setShowPopup: (show) => set({ showPopup: show }),
-  setPopupMessage: (message) => set({ popupMessage: message }),
-  setConfirmMessage: (message) => set({ confirmMessage: message }),
-  setCurrentAction: (action) => set({ currentAction: action }),
-}));
+import { useEditProfile } from "../../stores";
 
 export default function EditProfile({
   calculateAge,

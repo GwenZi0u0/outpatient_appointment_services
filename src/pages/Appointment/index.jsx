@@ -4,7 +4,6 @@ import { useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { create } from "zustand";
 import { fetchRegistrationData, fetchSchedulesData } from "../../api";
 import Return from "../../assets/svg/returnIcon.svg";
 import { PopUp } from "../../components/common/PopUp";
@@ -20,15 +19,7 @@ import RegistrationInformation from "./RegistrationInformation";
 import SelectDoctors from "./SelectDoctors";
 import SelectSpecialties from "./SelectSpecialties";
 import SelectTime from "./SelectTime";
-
-const useAppointmentStore = create((set) => ({
-  step: 1,
-  showPopup: false,
-  popupMessage: "",
-  setStep: (newStep) => set({ step: newStep }),
-  setShowPopup: (newShowPopup) => set({ showPopup: newShowPopup }),
-  setPopupMessage: (popupMessage) => set({ popupMessage }),
-}));
+import { useAppointmentStore } from "../../stores";
 
 export default function Appointment() {
   const navigate = useNavigate();

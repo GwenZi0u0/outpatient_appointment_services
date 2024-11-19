@@ -2,7 +2,6 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import styled from "styled-components";
-import { create } from "zustand";
 import {
   fetchDepartmentsData,
   fetchDoctorsData,
@@ -10,28 +9,11 @@ import {
   fetchRegistrationData,
   fetchSchedulesData,
 } from "../api";
+import { useProgressStore } from "../stores";
 import {
   filterRegistrationDataByCurrentDate,
   getToday,
 } from "../utils/dateUtils";
-
-const useProgressStore = create((set) => ({
-  idNumber: "",
-  error: "",
-  isOpened: false,
-  visibleRows: 5,
-  setIdNumber: (idNumber) => set({ idNumber }),
-  setError: (error) => set({ error }),
-  setIsOpened: (isOpened) => set({ isOpened }),
-  setVisibleRows: (visibleRows) => set({ visibleRows }),
-  resetState: () =>
-    set({
-      idNumber: "",
-      error: "",
-      isOpened: false,
-      visibleRows: 5,
-    }),
-}));
 
 export default function ProgressPage() {
   const {
