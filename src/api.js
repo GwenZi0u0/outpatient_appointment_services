@@ -14,9 +14,8 @@ const fetchCollectionData = async (
       id: doc.id,
       ...doc.data(),
     }));
-  } catch (error) {
-    console.error(`Error fetching ${collectionName} data:`, error);
-    throw error;
+  } catch (e) {
+    e.message;
   }
 };
 
@@ -47,8 +46,7 @@ export const fetchDoctorsDataWithLimit = async (limitCount = 50) => {
       uid: doc.uid,
       ...doc.data(),
     }));
-  } catch (error) {
-    console.error("Error fetching doctors data:", error);
-    throw error;
+  } catch (e) {
+    e.message;
   }
 };

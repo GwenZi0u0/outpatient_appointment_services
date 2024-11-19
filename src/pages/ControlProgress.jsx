@@ -106,7 +106,7 @@ export default function CancelRegistrationPage() {
         );
         await Promise.all(querySnapshot.docs.map((doc) => deleteDoc(doc.ref)));
       } catch (e) {
-        console.error("Error deleting document", e);
+        e.message;
       }
 
       setCurrentNumber(null);
@@ -123,7 +123,7 @@ export default function CancelRegistrationPage() {
           setCurrentPeriod(period);
         }
       } catch (e) {
-        console.error("Error adding document: ", e);
+        e.message;
       }
     }
     toggleIsOpen();
@@ -183,14 +183,10 @@ export default function CancelRegistrationPage() {
             await updateDoc(docRef, {
               number: firstValidNumber,
             });
-          } else {
-            console.error("No such document");
           }
-        } catch (error) {
-          console.error("Error updating document: ", error);
+        } catch (e) {
+          e.message;
         }
-      } else {
-        console.error("No valid progress document found");
       }
     }
   };

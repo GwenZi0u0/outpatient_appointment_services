@@ -185,7 +185,7 @@ export default function Appointment() {
       });
       setStep(5);
     } catch (e) {
-      console.error("Error adding document: ", e);
+      e.message;
     }
   };
 

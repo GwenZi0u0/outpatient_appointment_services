@@ -52,8 +52,8 @@ export default function LoginPage() {
       localStorage.setItem("email", email);
 
       navigate("/control-progress");
-    } catch (err) {
-      console.error("Login failed:", err);
+    } catch (e) {
+      e.message;
     }
   };
 

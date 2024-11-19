@@ -196,8 +196,8 @@ export default function ClassSchedulePage() {
         }
       }
       await refetchRequestLeaveData();
-    } catch (error) {
-      console.error("Error: ", error);
+    } catch (e) {
+      e.message;
       setPopupMessage("操作失敗,請稍後再試");
     } finally {
       setConfirmMessage("");

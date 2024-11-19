@@ -92,8 +92,8 @@ export default function EditProfile({
       };
       await updateDoc(docRef, updatedFields);
       await refetchDoctorData();
-    } catch (error) {
-      console.error("上傳失敗：", error);
+    } catch (e) {
+      e.message;
     } finally {
       if (file) {
         setIsUploadingImage(false);
@@ -173,8 +173,8 @@ export default function EditProfile({
       await updateDoc(docRef, updatedFields);
       await refetchDoctorData();
       setIsEditing(false);
-    } catch (error) {
-      console.error("儲存失敗：", error);
+    } catch (e) {
+      e.message;
     }
   };
 

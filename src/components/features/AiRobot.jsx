@@ -31,11 +31,7 @@ export default function AiRobot({ handleCloseAI }) {
 
       if (matchedDepartment) {
         navigate("/appointment", { state: { department: matchedDepartment } });
-      } else {
-        console.error(`未找到匹配的科别: ${specialty}`);
       }
-    } else {
-      console.error("Departments data is not available");
     }
   };
 
@@ -123,8 +119,8 @@ export default function AiRobot({ handleCloseAI }) {
           ...prevMessages,
           { text: finalMessage, isSent: false },
         ]);
-      } catch (error) {
-        console.error("Error sending message:", error);
+      } catch (e) {
+        e.preventDefault();
         setMessages((prevMessages) => [
           ...prevMessages,
           { text: "抱歉，發生錯誤，請稍後再試。", isSent: false },

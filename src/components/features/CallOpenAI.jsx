@@ -23,8 +23,8 @@ export default async function CallOpenAI(userAsk) {
 
     const data = await response.json();
     return data.choices[0].message.content;
-  } catch (error) {
-    console.error("Error calling OpenAI:", error);
+  } catch (e) {
+    e.message;
     return "抱歉，發生錯誤，請稍後再試。";
   }
 }

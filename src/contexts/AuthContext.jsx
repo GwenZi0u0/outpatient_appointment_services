@@ -18,7 +18,6 @@ const useAuthStore = create((set) => ({
       set({ user: result.user, error: null, loading: false });
     } catch (error) {
       set({ error: error.message, loading: false });
-      console.error("Error signing in:", error);
     }
   },
 
@@ -28,7 +27,6 @@ const useAuthStore = create((set) => ({
       set({ user: null, error: null });
     } catch (error) {
       set({ error: error.message });
-      console.error("Error signing out:", error);
     }
   },
 
